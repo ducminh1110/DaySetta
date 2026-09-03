@@ -1,0 +1,17 @@
+build/
+build-*/
+*.o
+*.a
+*.so
+*.dylib
+*.dSYM/
+frame-*.ppm
+frame-*.pam
+frame-*.bgra
+latest.ppm
+*_ring
+core
+.ipsw
+*.ipsw
+artifacts/macos-27/*.bin
+artifacts/macos-27/raw/

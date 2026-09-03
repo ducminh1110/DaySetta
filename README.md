@@ -6,9 +6,13 @@ that does **not** depend on Apple's `dyld`, does **not** run inside Darling, and
 targets two deployment profiles: **native Linux** and a DaySetta-owned
 **compatibility substrate**.
 
-> **Status: design only (M0).** Everything in this repository is `PLANNED` unless it
-> cites existing Daylight evidence. Daylight citations describe the predecessor, not
-> code that exists here.
+> **Status: prototype path green (M0–M2 still open).** As of 2026-11-06T08:21Z the
+> native broker/server/scene/renderer/SDK path builds clean and passes 22/22 cases,
+> including the two-window end-to-end test. M1/M2 hardening and the macOS 27 MIG
+> inventory remain open. macOS 27.0.1 arm64e is the runtime target; macOS 26.6 remains
+> the protocol baseline. See
+> [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) and the
+> [`AI continuation handoff`](docs/HANDOFF_FULL.md).
 
 ## What Daylight established
 
@@ -133,6 +137,24 @@ and not a Metal implementation. See `COMPATIBILITY_SCOPE.md` for the exact bound
 
 ## Current state
 
-M0 is the current milestone: contracts, evidence index, and repository hygiene. No
-server, loader, or runtime code exists yet. `ROADMAP.md` defines the gates that must
-pass before any runtime claim is made.
+Snapshot: **2026-11-06T08:21Z**. This is a prototype, not a release. The exact
+commands, output and test timestamp are in
+[`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md).
+
+| Area | State | Evidence class | Artifact |
+|---|---|---|---|
+| M0 — evidence, ADRs, CI | IN PROGRESS | `IMPLEMENTED` | `adr/0001-target-macos-27.md` … `adr/0004-headless-first.md`, `ci/check_docs.py` |
+| M1 — transport, protocol, event ring | IN PROGRESS — native path passing | `IMPLEMENTED` / `VERIFIED` | 22/22 cases; `src/ipc/ipc.cpp`, `src/protocol/protocol.cpp`, `src/event/event.cpp` |
+| M2 — scene, renderer, SDK, server | IN PROGRESS — two-window path passing | `IMPLEMENTED` / `VERIFIED` | e2e + 18 scene/compositor/SDK cases; `src/scene/`, `src/render/`, `src/server/` |
+| Broker process | IMPLEMENTED | `IMPLEMENTED` | `broker_live_registry`; `src/broker/broker.cpp` |
+| Control tool | IMPLEMENTED | `IMPLEMENTED` | `src/ctl/main.cpp`; no automated CLI test |
+| Test suite | 22 of 22 cases pass | `VERIFIED` | `tests/`; 0.39 s ctest target |
+| macOS 27 MIG inventory | NOT SCANNED | `UNKNOWN` | `tools/macos27/`, `artifacts/macos-27/` empty |
+| macOS 27 arm64e runtime | no runtime claim | `UNKNOWN` | `adr/0001-target-macos-27.md` |
+| macOS 27 catalogue | catalogue only | `VERIFIED` | `data/apple-api/coverage.json` |
+| macOS 26.6 protocol baseline | 738 MIG routines, 9 subsystems | `VERIFIED` | `protocol/macos-26.6-x86_64.json` |
+| Headless PPM/PAM/BGRA output | tested | `VERIFIED` | `compositor_output_ppm_pam_and_bgra`; `src/render/output.cpp` |
+
+DaySetta is **not** "macOS 27 compatible". It has no Mach-O loader, ObjC runtime or
+SkyLight dialect. The target is macOS 27 arm64e; the protocol evidence is macOS 26.6.
+`ROADMAP.md` defines the gates that must pass before any runtime claim is made.
