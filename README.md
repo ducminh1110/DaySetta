@@ -8,8 +8,8 @@ targets two deployment profiles: **native Linux** and a DaySetta-owned
 
 > **Status: prototype path green (M0–M2 still open).** As of 2026-11-06T08:21Z the
 > native broker/server/scene/renderer/SDK path builds clean and passes 22/22 cases,
-> including the two-window end-to-end test. M1/M2 hardening and the macOS 27 MIG
-> inventory remain open. macOS 27.0.1 arm64e is the runtime target; macOS 26.6 remains
+> including the two-window end-to-end test. M1/M2 hardening remain open; the macOS 27 MIG static scan is done (WP1b)
+> (`artifacts/macos-27/`). macOS 27.0.1 arm64e is the runtime target; macOS 26.6 remains
 > the protocol baseline. See
 > [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) and the
 > [`AI continuation handoff`](docs/HANDOFF_FULL.md).
@@ -149,7 +149,7 @@ commands, output and test timestamp are in
 | Broker process | IMPLEMENTED | `IMPLEMENTED` | `broker_live_registry`; `src/broker/broker.cpp` |
 | Control tool | IMPLEMENTED | `IMPLEMENTED` | `src/ctl/main.cpp`; no automated CLI test |
 | Test suite | 22 of 22 cases pass | `VERIFIED` | `tests/`; 0.39 s ctest target |
-| macOS 27 MIG inventory | NOT SCANNED | `UNKNOWN` | `tools/macos27/`, `artifacts/macos-27/` empty |
+| macOS 27 MIG inventory | 9 subsystems, 744 routines (static scan; names inferred from 26.6) | `OBSERVED` | `artifacts/macos-27/mig-routines.json`, `MIG_27_REPORT.md` |
 | macOS 27 arm64e runtime | no runtime claim | `UNKNOWN` | `adr/0001-target-macos-27.md` |
 | macOS 27 catalogue | catalogue only | `VERIFIED` | `data/apple-api/coverage.json` |
 | macOS 26.6 protocol baseline | 738 MIG routines, 9 subsystems | `VERIFIED` | `protocol/macos-26.6-x86_64.json` |
