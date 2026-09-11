@@ -193,3 +193,23 @@ component and exclusion.
 
 **Exit criteria.** 1.0 release candidate tagged; external review complete; the next
 protocol major has a written compatibility policy.
+
+## 9. North Star (not started)
+
+Status: `PLANNED`, no work done, no commitments, no claims. Vision in the user's words:
+a desktop window app where the user drags a macOS IPSW into it, it extracts automatically,
+and the macOS desktop appears inside that window, used like a real macOS VM. Later also
+running macOS apps on x86_64 hosts and on arm hosts.
+
+Open questions only (`UNKNOWN` until answered):
+
+* Host/guest architecture matrix: which host (Linux x86_64, Linux arm64, macOS) with which
+  guest (macOS arm64, macOS x86_64), and which pairs are in scope at all.
+* How the guest display reaches the window, and how that relates to the DaySetta scene and
+  capture path.
+* Apple's macOS license limits on where virtualization is allowed.
+* IPSW handling: source, extraction, storage, integrity checks.
+* Ahead-of-time translation vs interpreter plus JIT vs dynamic translation for the app case;
+  see `docs/REF_ARM_TRANSLATORS.md` for what two public translators state.
+* How a bridge to host system libraries would work when the host is Linux, where no macOS
+  libraries exist to bridge to.
