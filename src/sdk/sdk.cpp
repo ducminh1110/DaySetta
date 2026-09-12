@@ -133,6 +133,7 @@ Client& Client::operator=(Client&& other) noexcept {
         // A moved client starts without the old subscription; poll_event()
         // subscribes again on demand.
         events_ = event::Ring{};
+        wake_ = ipc::Fd{};
     }
     return *this;
 }
@@ -331,7 +332,8 @@ Result<proto::Message> Client::call(proto::Op op, std::vector<std::uint8_t> payl
     }
 
     std::size_t expected_fds = 0;
-    if (op == proto::Op::subscribe_events || op == proto::Op::capture) expected_fds = 1;
+    if (op == proto::Op::capture) expected_fds = 1;
+    if (op == proto::Op::subscribe_events) expected_fds = 2;
     if (message.fds.size() != expected_fds) {
         return Result<proto::Message>::fail(
             Code::protocol, "reply carried " + std::to_string(message.fds.size()) +
@@ -504,9 +506,9 @@ Result<void> Client::subscribe_events() {
         return Result<void>::fail(Code::protocol,
                                   "subscribe_events reply has an invalid event ring");
     }
-    if (reply.value().fds.size() != 1) {
+    if (reply.value().fds.size() != 2) {
         return Result<void>::fail(Code::protocol,
-                                  "subscribe_events reply did not carry one descriptor");
+                                  "subscribe_events reply did not carry two descriptors");
     }
     int ring_fd = reply.value().fds.front().get();
     auto ring = event::Ring::map(ring_fd, true);
@@ -516,7 +518,14 @@ Result<void> Client::subscribe_events() {
                                   "event ring capacity does not match the reply");
     }
 
+    int wake_fd = reply.value().fds[1].get();
+    int fl = ::fcntl(wake_fd, F_GETFL);
+    if (fl < 0 || (fl & O_NONBLOCK) == 0) {
+        return Result<void>::fail(Code::protocol,
+                                  "event wakeup descriptor is not a non-blocking fd");
+    }
     events_ = std::move(ring.value());
+    wake_ = std::move(reply.value().fds[1]);
     return Result<void>::ok();
 }
 
@@ -546,28 +555,38 @@ Result<event::Event> Client::poll_event(int timeout_ms) {
                                               "timed out waiting for an event");
         }
 
-        int sleep_ms = 5;
+        int wait_ms = -1;
         if (timeout_ms >= 0) {
             auto remaining =
                 std::chrono::ceil<std::chrono::milliseconds>(deadline - now).count();
-            if (remaining < 1) remaining = 1;
-            if (remaining < sleep_ms) sleep_ms = static_cast<int>(remaining);
+            wait_ms = static_cast<int>(
+                std::clamp<long long>(remaining, 1, std::numeric_limits<int>::max()));
         }
 
-        // M1 has no wakeup descriptor for the ring: the server writes shared memory
-        // only.  Check the socket without blocking to reject unsolicited messages,
-        // then sleep briefly and re-check the ring.
-        auto ready = ipc::wait_readable(channel_.fd(), 0);
-        if (ready) {
+        // The ring was empty just above.  The server publishes, then writes the
+        // eventfd, so a publish after that check leaves the eventfd readable and
+        // poll() returns at once.  The socket is watched to reject unsolicited data.
+        pollfd pfds[2] = {{wake_.get(), POLLIN, 0}, {channel_.fd(), POLLIN, 0}};
+        int rc = ::poll(pfds, 2, wait_ms);
+        if (rc < 0) {
+            if (errno == EINTR) continue;
+            return Result<event::Event>::fail(Code::io, std::strerror(errno));
+        }
+        if ((pfds[1].revents & (POLLIN | POLLERR | POLLNVAL)) != 0) {
             return Result<event::Event>::fail(
                 Code::protocol,
                 "server sent unsolicited data while no reply was pending");
         }
-        if (ready.error().code != Code::timeout) {
-            return Result<event::Event>::fail(ready.error().code,
-                                              ready.error().message);
+        if ((pfds[1].revents & POLLHUP) != 0) {
+            return Result<event::Event>::fail(Code::state, "server closed the connection");
         }
-        ::poll(nullptr, 0, sleep_ms);
+        if ((pfds[0].revents & (POLLERR | POLLNVAL)) != 0) {
+            return Result<event::Event>::fail(Code::state, "event wakeup descriptor error");
+        }
+        if ((pfds[0].revents & POLLIN) != 0) {
+            std::uint64_t count = 0;
+            if (::read(wake_.get(), &count, sizeof(count)) < 0) {}  // drain; EAGAIN is fine
+        }
     }
 }
 

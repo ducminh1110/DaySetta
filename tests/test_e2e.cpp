@@ -170,6 +170,24 @@ DS_TEST(e2e_two_windows_capture_and_input) {
                 static_cast<std::uint32_t>(ds::event::Type::button_down));
     DS_CHECK_EQ(event.value().target_window, w2.value());
 
+    // Wakeup: a second client injects 150 ms into a blocking poll_event(5000).
+    // The event must arrive promptly (generous bound), not after the timeout.
+    {
+        auto injector = ds::sdk::Client::connect(runtime, "e2e-injector", ds::proto::Role::test);
+        DS_CHECK(injector.has_value());
+        std::thread late([&] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(150));
+            (void)injector->inject_input(input);
+        });
+        auto t0 = std::chrono::steady_clock::now();
+        auto woken = client->poll_event(5000);
+        auto waited = std::chrono::steady_clock::now() - t0;
+        late.join();
+        DS_CHECK(woken.has_value());
+        DS_CHECK(waited >= std::chrono::milliseconds(100));
+        DS_CHECK(waited < std::chrono::milliseconds(2000));
+    }
+
     auto dump = client->scene_dump();
     DS_CHECK(dump.has_value());
     DS_CHECK(dump.value().find("\"blue\"") != std::string::npos);

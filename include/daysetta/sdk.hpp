@@ -75,6 +75,7 @@ private:
     HelloInfo hello_;
     std::uint64_t sequence_ = 1;
     event::Ring events_;
+    ipc::Fd wake_;  // eventfd: the server writes it after each ring publish
 };
 
 // Broker protocol used by the SDK and by daysetta-ctl.  Exposed for tests.

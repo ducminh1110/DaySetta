@@ -79,8 +79,11 @@ Reply: `u64 commit_sequence` (assigned by the server), `u32 accepted_damage`.
 
 ### subscribe_events (0x0030)
 
-Request: empty. Reply: `u32 capacity`, `u32 event_size`, one descriptor: a sealed
-event ring (`include/daysetta/event.hpp`).
+Request: empty. Reply: `u32 capacity`, `u32 event_size`, exactly two descriptors, in
+this order: (1) a sealed event ring (`include/daysetta/event.hpp`); (2) a non-blocking
+`eventfd` the server writes `1` to after each successful ring publish. The consumer
+checks the ring, then `poll`s the eventfd, drains it with `read`, and re-checks the ring.
+A reply with any other descriptor count is a protocol error.
 
 ### ack_events (0x0031)
 
