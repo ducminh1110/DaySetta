@@ -18,6 +18,7 @@ struct CpuState {
     uint64_t sp = 0;
     uint64_t pc = 0;
     uint64_t pstate = 0;
+    uint64_t tpidrro = 0;  // emulated TPIDRRO_EL0 (Darwin TSD base), loaded by the handler
     uint64_t get(unsigned r) const { return r == 31 ? 0 : x[r]; }       // XZR
     uint64_t get_sp(unsigned r) const { return r == 31 ? sp : x[r]; }  // SP
     void set(unsigned r, uint64_t v) { if (r != 31) x[r] = v; }
@@ -67,6 +68,11 @@ struct TrapRuntime {
     bool (*lazy_lower)(uint64_t pc, void* ctx, std::string* err) = nullptr;
     void* ctx = nullptr;
     bool log_svc = true;
+    // Darwin syscall hook: called after a lowered `svc` was emulated (x0/carry preset to ENOSYS);
+    // may rewrite x0/pstate carry/pc.  Null keeps the ENOSYS default.
+    void (*svc)(CpuState& cpu, uint32_t imm, void* ctx) = nullptr;
+    // Value of the calling thread's emulated TPIDRRO_EL0; null reads 0.
+    uint64_t (*tsd)(void* ctx) = nullptr;
 };
 
 // Install SIGTRAP/SIGILL/SIGSEGV handlers (SA_SIGINFO|SA_ONSTACK) for the process.

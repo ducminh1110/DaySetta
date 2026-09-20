@@ -31,7 +31,7 @@ function(daysetta_executable name source)
 endfunction()
 
 # ds-exec: genuine-Apple-code execution layer (software PAC, LSE/PAC lowering, cache mapping).
-file(GLOB DS_EXEC_SRC CONFIGURE_DEPENDS src/exec/*.cpp)
+file(GLOB DS_EXEC_SRC CONFIGURE_DEPENDS src/exec/*.cpp src/darwin/*.cpp)
 add_library(ds-exec STATIC ${DS_EXEC_SRC})
 target_include_directories(ds-exec PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_options(ds-exec PRIVATE -Wall -Wextra -Wpedantic -Werror)
@@ -40,6 +40,10 @@ target_link_libraries(ds-exec PUBLIC pthread)
 add_executable(ds-exec-probe tools/ds-exec-probe/main.cpp)
 target_link_libraries(ds-exec-probe PRIVATE ds-exec)
 target_compile_options(ds-exec-probe PRIVATE -Wall -Wextra -Wpedantic -Werror)
+
+add_executable(ds-run tools/ds-run/main.cpp)
+target_link_libraries(ds-run PRIVATE ds-exec)
+target_compile_options(ds-run PRIVATE -Wall -Wextra -Wpedantic -Werror)
 
 daysetta_executable(daysetta-server src/server/main.cpp)
 daysetta_executable(daysetta-ctl src/ctl/main.cpp)
@@ -62,8 +66,9 @@ if(DAYSETTA_BUILD_TESTS)
     DS_SERVER_BIN="$<TARGET_FILE:daysetta-server>"
     DS_CTL_BIN="$<TARGET_FILE:daysetta-ctl>"
     DS_PROBE_BIN="$<TARGET_FILE:ds-exec-probe>"
+    DS_RUN_BIN="$<TARGET_FILE:ds-run>"
   )
-  add_dependencies(daysetta_tests daysetta-broker daysetta-server daysetta-ctl ds-exec-probe)
+  add_dependencies(daysetta_tests daysetta-broker daysetta-server daysetta-ctl ds-exec-probe ds-run)
   add_test(NAME daysetta COMMAND daysetta_tests)
   set_tests_properties(daysetta PROPERTIES TIMEOUT 180)
 endif()

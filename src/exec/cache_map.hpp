@@ -47,6 +47,8 @@ public:
     bool map(const std::string& main_path, const Pac& pac, std::string* err);
 
     size_t image_count() const { return images_.size(); }
+    // Address of the dyld_cache_header (== sharedRegionStart): what shared_region_check_np reports.
+    uint64_t base() const { return base_; }
     // Address of the mach_header of `path`, or 0.
     uint64_t find_image(const std::string& path);
     // "path+0xoff" for an address inside an image __TEXT, "" otherwise.
