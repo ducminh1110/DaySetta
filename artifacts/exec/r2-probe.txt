@@ -1,0 +1,16 @@
+host: AT_HWCAP=0x8ff atomics(LSE)=no paca=no
+cache: 80 files, 101 mappings, 6703 MiB, 4088 images; slide v5: 18920839 plain, 11531881 signed (software PAC, VA 48 bits) in 1.09s
+strlen                 _strlen @/usr/lib/system/libsystem_platform.dylib+0x0 result=20 reference=20 MATCH
+strlen(1000)           _strlen                                  result=1000 reference=1000 MATCH
+memcmp(eq)             _memcmp @/usr/lib/system/libsystem_platform.dylib+0x0 result=0 reference=0 MATCH
+memcmp(lt)             _memcmp                                  result=-1 reference=-1 MATCH
+memcmp(gt)             _memcmp                                  result=1 reference=1 MATCH
+note: plain _strtol not called (reads Darwin TSD via mrs tpidrro_el0, 0 on Linux; observed by disassembly); using _strtol_l
+strtol_l(C)            _strtol_l @/usr/lib/system/libsystem_c.dylib+0x0 result=-12345 end=8 reference=-12345 end=8 MATCH
+strtol_l(base0)        _strtol_l                                result=2147483647 end=10 reference=2147483647 end=10 MATCH
+adler32                _adler32 @/usr/lib/libz.1.dylib+0x0      result=3682465898 reference=3682465898 MATCH
+crc32                  _crc32 @/usr/lib/libz.1.dylib+0x0        result=2750763420 reference=2750763420 MATCH
+pages lowered (lazy, on first fetch): 5; words scanned 4536; patched: pac-sign=51 pac-auth=7 pac-strip=0 pacga=0 br-auth=9 ret-auth=33 ldr-auth=0 cas=5 casp=1 rmw=4 svc=0
+unsupported (LDAPR) words seen in lowered pages: 1
+traps taken: pac-sign=3 pac-auth=1 pac-strip=0 pacga=0 br-auth=0 ret-auth=2 ldr-auth=0 cas=0 casp=0 rmw=0 svc=0 | total=6 auth_fail=0 lazy_page_faults=5
+RESULT: 9 match, 0 mismatch/failed
