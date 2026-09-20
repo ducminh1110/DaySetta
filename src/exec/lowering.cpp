@@ -147,6 +147,25 @@ bool decode(uint32_t w, Insn& out) {
         o.op = Op::RetAuth;
         o.key = w == 0xD65F0BFF ? PacKey::IA : PacKey::IB;
         ok = true;
+    } else if (w == 0xDAC1A3FE || w == 0xDAC1A7FE) {  // PACIASPPC / PACIBSPPC (FEAT_PAuth_LR)
+        o.op = Op::PacSign;
+        o.key = w == 0xDAC1A3FE ? PacKey::IA : PacKey::IB;
+        o.rd = 30;
+        o.mod = ModSrc::SpPc;
+        ok = true;
+    } else if ((w & 0xFFC0001F) == 0xF380001F) {  // AUTIASPPC/AUTIBSPPC <label>: bit 21 = key B, label = pc - imm16*4
+        o.op = Op::PacAuth;
+        o.key = bits(w, 21, 21) ? PacKey::IB : PacKey::IA;
+        o.rd = 30;
+        o.mod = ModSrc::SpPc;
+        o.imm = int32_t(bits(w, 20, 5)) * 4;
+        ok = true;
+    } else if ((w & 0xFFC0001F) == 0x5500001F) {  // RETAASPPC/RETABSPPC <label>
+        o.op = Op::RetAuth;
+        o.key = bits(w, 21, 21) ? PacKey::IB : PacKey::IA;
+        o.mod = ModSrc::SpPc;
+        o.imm = int32_t(bits(w, 20, 5)) * 4;
+        ok = true;
     } else if ((w & 0xFFFFF01F) == 0xD503201F) {
         ok = decode_hint(w, o);
     } else if ((w & 0xFFFF8000) == 0xDAC10000) {

@@ -116,6 +116,10 @@ uint64_t modifier(const Insn& in, const CpuState& c) {
     switch (in.mod) {
         case ModSrc::Zero: return 0;
         case ModSrc::Sp: return c.sp;
+        // FEAT_PAuth_LR: hardware hashes SP with a PC; the soft PAC only needs sign/auth to agree.
+        // Sign (imm == 0) uses the signing instruction's own address; auth uses the label operand,
+        // which the compiler points at the signing instruction.  INFERRED from LLVM output, not HW.
+        case ModSrc::SpPc: return c.sp * 0x9E3779B97F4A7C15ull ^ (c.pc - uint64_t(in.imm));
         default: return c.get(in.rm);
     }
 }
@@ -153,7 +157,7 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
             return out;
         }
         case Op::RetAuth: {
-            const AuthResult r = pac.auth(in.key, c.x[30], c.sp);
+            const AuthResult r = pac.auth(in.key, c.x[30], in.mod == ModSrc::SpPc ? modifier(in, c) : c.sp);
             c.pc = r.value;
             if (!r.ok) {
                 stats.auth_fail.fetch_add(1, std::memory_order_relaxed);
@@ -318,23 +322,19 @@ void store_state(const CpuState& s, ucontext_t* uc) {
     uc->uc_mcontext.pstate = s.pstate;
 }
 
-void on_trap(int sig, siginfo_t*, void* vuc) {
-    auto* uc = static_cast<ucontext_t*>(vuc);
+enum class TrapRes { NotBrk, NotLowered, Done };
+
+// Emulate the lowered instruction under a SIGTRAP.  NotBrk/NotLowered leave the context untouched
+// (the BRK is the guest's own); Done means handled (or a terminal fault was raised).
+TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out) {
     const uint64_t pc = uc->uc_mcontext.pc;
     const uint32_t word = *reinterpret_cast<const uint32_t*>(pc);
-    if ((word & 0xFFE0001F) != 0xD4200000) {
-        say("ds-exec: SIGTRAP at pc=0x%llx word=0x%08x (%s) is not a BRK\n", (unsigned long long)pc, word, where(pc).c_str());
-        die_default(sig);
-        return;
-    }
+    if ((word & 0xFFE0001F) != 0xD4200000) return TrapRes::NotBrk;
     const uint32_t idx = (word >> 5) & 0xFFFF;
+    if (idx_out) *idx_out = idx;
     const TrapEntry* e = trap_table().find(idx, pc);
     Insn in;
-    if (!e || !decode(e->word, in)) {
-        say("ds-exec: unhandled BRK #%u at pc=0x%llx (%s): not a lowered instruction\n", idx, (unsigned long long)pc, where(pc).c_str());
-        die_default(sig);
-        return;
-    }
+    if (!e || !decode(e->word, in)) return TrapRes::NotLowered;
     CpuState cs;
     load_state(cs, uc);
     if (g_rt->tsd) cs.tpidrro = g_rt->tsd(g_rt->ctx);
@@ -352,26 +352,46 @@ void on_trap(int sig, siginfo_t*, void* vuc) {
                     (long long)o.svc_x16, o.svc_imm, (unsigned long long)pc, where(pc).c_str(),
                     (unsigned long long)kDarwinENOSYS);
             store_state(cs, uc);
-            return;
+            if (g_rt->after_trap) g_rt->after_trap(g_rt->ctx);
+            return TrapRes::Done;
         case Emu::AuthFault:
             say("ds-exec: PAC authentication failure at pc=0x%llx (%s) word=0x%08x: poisoned 0x%llx\n",
                 (unsigned long long)pc, where(pc).c_str(), e->word, (unsigned long long)o.fault_addr);
             if (in.op == Op::LdrAuth) {  // access through the poisoned address faults like hardware
                 die_default(SIGSEGV);
                 raise(SIGSEGV);
-                return;
+                return TrapRes::Done;
             }
             store_state(cs, uc);  // branch to the poisoned pc: the fetch faults, reported by on_segv
-            return;
+            return TrapRes::Done;
         case Emu::Misaligned:
             say("ds-exec: misaligned atomic at pc=0x%llx (%s) word=0x%08x addr=0x%llx\n",
                 (unsigned long long)pc, where(pc).c_str(), e->word, (unsigned long long)o.fault_addr);
             die_default(SIGBUS);
             raise(SIGBUS);
-            return;
+            return TrapRes::Done;
         default:
             say("ds-exec: cannot emulate word 0x%08x at pc=0x%llx\n", e->word, (unsigned long long)pc);
+            die_default(SIGTRAP);
+            return TrapRes::Done;
+    }
+}
+
+void on_trap(int sig, siginfo_t*, void* vuc) {
+    auto* uc = static_cast<ucontext_t*>(vuc);
+    const uint64_t pc = uc->uc_mcontext.pc;
+    uint32_t idx = 0;
+    switch (try_trap(uc, &idx)) {
+        case TrapRes::NotBrk:
+            say("ds-exec: SIGTRAP at pc=0x%llx word=0x%08x (%s) is not a BRK\n", (unsigned long long)pc,
+                *reinterpret_cast<const uint32_t*>(pc), where(pc).c_str());
             die_default(sig);
+            return;
+        case TrapRes::NotLowered:
+            say("ds-exec: unhandled BRK #%u at pc=0x%llx (%s): not a lowered instruction\n", idx, (unsigned long long)pc, where(pc).c_str());
+            die_default(sig);
+            return;
+        default:
             return;
     }
 }
@@ -416,6 +436,8 @@ struct AltStack {
 };
 
 }  // namespace
+
+bool handle_sigtrap(void* vuc) { return try_trap(static_cast<ucontext_t*>(vuc), nullptr) == TrapRes::Done; }
 
 void thread_init() {
     thread_local AltStack alt;
