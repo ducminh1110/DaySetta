@@ -124,6 +124,17 @@ uint64_t modifier(const Insn& in, const CpuState& c) {
     }
 }
 
+// Arm ARM (2026-03) shared/functions/cpa/PointerCheckAtEL.
+uint64_t pointer_check(const CpuState& c, uint64_t result, uint64_t base, bool cptm_detected) {
+    const bool prev = ((base >> 55) & 1) != ((base >> 54) & 1);
+    const bool cpta_detected = (result >> 56) != (base >> 56) || prev;
+    if ((cpta_detected && c.cpta) || (cptm_detected && c.cptm)) {
+        result = (result & ((uint64_t(1) << 55) - 1)) | (base & ~((uint64_t(1) << 55) - 1));  // rv[63:55] = base[63:55]
+        result = (result & ~(uint64_t(1) << 54)) | ((~(result >> 55) & 1) << 54);              // rv[54] = NOT rv[55]
+    }
+    return result;
+}
+
 }  // namespace
 
 EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats) {
@@ -241,6 +252,23 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
                 old = seen;
             }
             c.set(in.rd, old);  // Rt == XZR discards (ST* aliases)
+            break;
+        }
+        case Op::Cpa: {
+            uint64_t r, base, ovf = 0;
+            if (in.mul) {  // MADDPT/MSUBPT: X[] (no SP) operands, 128-bit signed product
+                base = c.get(in.rs);
+                int64_t p;
+                ovf = __builtin_mul_overflow(int64_t(c.get(in.rn)), int64_t(c.get(in.rm)), &p);  // SInt product != SInt(product[63:0])
+                const uint64_t lo = uint64_t(p);
+                r = in.sub ? base - lo : base + lo;
+            } else {
+                base = c.get_sp(in.rn);
+                const uint64_t off = c.get(in.rm) << in.imm;
+                r = in.sub ? base - off : base + off;
+            }
+            r = pointer_check(c, r, base, ovf);
+            if (in.mul) c.set(in.rd, r); else c.set_sp(in.rd, r);
             break;
         }
         case Op::Mrs:

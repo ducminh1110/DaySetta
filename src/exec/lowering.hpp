@@ -28,6 +28,7 @@ enum class Op : uint8_t {
     Svc,       // svc #imm (Darwin uses #0x80)
     Mrs,       // mrs Xt, tpidrro_el0 (Darwin TSD base; reads 0 on Linux)
     Ldapur,    // FEAT_LRCPC2 LDAPUR{B,H,SB,SH,SW,}: emulated with an acquire (LDAR-class) load
+    Cpa,       // FEAT_CPA ADDPT/SUBPT/MADDPT/MSUBPT (Arm ARM 2026-03 pseudocode, PointerAddCheck)
     kCount
 };
 
@@ -47,6 +48,8 @@ struct Insn {
     bool release = false;
     bool link = false;   // BLRAA*
     bool writeback = false;
+    bool sub = false;    // CPA: SUBPT/MSUBPT
+    bool mul = false;    // CPA: MADDPT/MSUBPT (Ra in rs, shift unused)
     int32_t imm = 0;     // LDRAA offset, SVC immediate, LDAPUR offset, PAuth_LR label distance in bytes (pc - label)
     uint8_t sext = 0;    // LDAPUR: 0 zero-extend, 1 sign-extend to X, 2 sign-extend to W
     Rmw rmw = Rmw::Add;
