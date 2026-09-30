@@ -235,6 +235,7 @@ DS_TEST(darwin_lowering_mrs_ldapur_ldapr) {
     ex::Insn in;
     DS_CHECK(ex::decode(0xd53bd061, in) && in.op == ex::Op::Mrs && in.rd == 1);
     DS_CHECK(ex::decode(0xd53bd07e, in) && in.op == ex::Op::Mrs && in.rd == 30);
+    DS_CHECK(ex::decode(0xd53bd04b, in) && in.op == ex::Op::MrsTpidr && in.rd == 11);
     DS_CHECK(ex::decode(0x995fc041, in) && in.op == ex::Op::Ldapur && in.size == 2 && in.imm == -4);
     DS_CHECK(ex::decode(0x198000c5, in) && in.op == ex::Op::Ldapur && in.sext == 1);
     DS_CHECK(ex::decode(0x99900107, in) && in.op == ex::Op::Ldapur && in.imm == -256);

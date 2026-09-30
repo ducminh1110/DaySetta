@@ -160,9 +160,10 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
         case Op::BrAuth: {
             const AuthResult r = pac.auth(in.key, c.get(in.rn), modifier(in, c));
             if (in.link) c.x[30] = c.pc + 4;
-            {   // DEBUG spin sampler (MLDR_DSEXEC_SPIN)
+            {   // debug spin sampler (env MLDR_DSEXEC_SPIN, off by default)
                 static std::atomic<uint64_t> n{0};
-                if (n.fetch_add(1, std::memory_order_relaxed) % 200000 == 199999)
+                static const bool spin = getenv("MLDR_DSEXEC_SPIN") != nullptr;
+                if (spin && n.fetch_add(1, std::memory_order_relaxed) % 200000 == 199999)
                     fprintf(stderr, "ds-exec: br-auth spin sample at pc=0x%llx -> 0x%llx lr=0x%llx\n", (unsigned long long)c.pc,
                             (unsigned long long)r.value, (unsigned long long)c.x[30]);
             }
@@ -209,6 +210,13 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
             const uint64_t m = size_mask(in.size);
             const uint64_t old =
                 pick_cas(in.size, in.acquire, in.release)(p, c.get(in.rs) & m, c.get(in.rd) & m);
+            {   // DEBUG watch (MLDR_DSEXEC_WATCH=<hex addr>)
+                static const uint64_t w = getenv("MLDR_DSEXEC_WATCH") ? strtoull(getenv("MLDR_DSEXEC_WATCH"), nullptr, 16) : 0;
+                if (w && (reinterpret_cast<uint64_t>(p) & ~7ull) == (w & ~7ull))
+                    fprintf(stderr, "ds-exec: CAS %p exp=0x%llx new=0x%llx old=0x%llx pc=0x%llx tpidrro=0x%llx\n", p,
+                            (unsigned long long)(c.get(in.rs) & m), (unsigned long long)(c.get(in.rd) & m), (unsigned long long)old,
+                            (unsigned long long)c.pc, (unsigned long long)c.tpidrro);
+            }
             c.set(in.rs, old);
             break;
         }
@@ -280,6 +288,9 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
         }
         case Op::Mrs:
             c.set(in.rd, c.tpidrro);
+            break;
+        case Op::MrsTpidr:
+            c.set(in.rd, 0);
             break;
         case Op::Ldapur: {
             // Acquire load (LDAR-class on this host): RCsc is stronger than the RCpc the original has.
@@ -390,9 +401,19 @@ TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out, uint64_t tsd = 0) {
             if (g_rt->after_trap) g_rt->after_trap(g_rt->ctx);
             return TrapRes::Done;
         case Emu::AuthFault:
-            say("ds-exec: PAC authentication failure at pc=0x%llx (%s) word=0x%08x: poisoned 0x%llx lr=0x%llx x0=0x%llx\n",
-                (unsigned long long)pc, where(pc).c_str(), e->word, (unsigned long long)o.fault_addr,
-                (unsigned long long)cs.x[30], (unsigned long long)cs.x[0]);
+            say("ds-exec: PAC authentication failure at pc=0x%llx (%s) word=0x%08x: poisoned 0x%llx\n",
+                (unsigned long long)pc, where(pc).c_str(), e->word, (unsigned long long)o.fault_addr);
+            if (getenv("MLDR_DSEXEC_REGS"))  // debug, off by default
+                say("ds-exec:   lr=0x%llx x0=0x%llx\n", (unsigned long long)cs.x[30], (unsigned long long)cs.x[0]);
+            if (getenv("MLDR_DSEXEC_BT")) {  // debug: frame-pointer walk
+                const uint64_t* fp = reinterpret_cast<const uint64_t*>(cs.x[29]);
+                for (int i = 0; i < 12 && fp && reinterpret_cast<uint64_t>(fp) > 0x10000; ++i) {
+                    fprintf(stderr, "ds-exec:   bt[%d] ra=0x%llx\n", i, (unsigned long long)(fp[1] & 0xFFFFFFFFFull));
+                    const uint64_t* n = reinterpret_cast<const uint64_t*>(fp[0]);
+                    if (n <= fp) break;
+                    fp = n;
+                }
+            }
             if (in.op == Op::LdrAuth) {  // access through the poisoned address faults like hardware
                 die_default(SIGSEGV);
                 raise(SIGSEGV);

@@ -5,7 +5,7 @@ namespace ds::exec {
 const char* op_name(Op op) {
     static const char* names[] = {"none",    "pac-sign", "pac-auth", "pac-strip", "pacga", "br-auth",
                                   "ret-auth", "ldr-auth", "cas",      "casp",      "rmw",   "svc",
-                                  "mrs-tpidrro", "ldapur", "cpa"};
+                                  "mrs-tpidrro", "ldapur", "cpa", "mrs-tpidr"};
     return names[static_cast<int>(op)];
 }
 
@@ -178,6 +178,10 @@ bool decode(uint32_t w, Insn& out) {
         ok = true;
     } else if ((w & 0xFEDFF800) == 0xD61F0800) {
         ok = decode_branch(w, o);
+    } else if ((w & 0xFFFFFFE0) == 0xD53BD040) {  // MRS Xt, TPIDR_EL0 (op2=2)
+        o.op = Op::MrsTpidr;
+        o.rd = bits(w, 4, 0);
+        ok = true;
     } else if ((w & 0xFFFFFFE0) == 0xD53BD060) {  // MRS Xt, TPIDRRO_EL0 (op0=3 op1=3 CRn=13 CRm=0 op2=3)
         o.op = Op::Mrs;
         o.rd = bits(w, 4, 0);
@@ -259,7 +263,7 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
             continue;
         }
         const bool want = in.op == Op::Svc ? policy.svc
-                          : in.op == Op::Mrs || in.op == Op::Ldapur ? policy.sysreg
+                          : in.op == Op::Mrs || in.op == Op::MrsTpidr || in.op == Op::Ldapur ? policy.sysreg
                           : in.op == Op::Cpa ? policy.pac
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
                                                                                        : policy.pac;
