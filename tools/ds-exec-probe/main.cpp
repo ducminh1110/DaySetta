@@ -1,3 +1,11 @@
+#if !defined(__aarch64__)
+// Runs guest arm64 code natively (trap-and-lower): aarch64 hosts only.  Exit 77 = skipped.
+#include <cstdio>
+int main() {
+    std::fprintf(stderr, "ds-exec-probe: requires an aarch64 host (x86_64 build: skipped)\n");
+    return 77;
+}
+#else
 // ds-exec-probe: map the genuine macOS 27 arm64e dyld shared cache, lower the pages that
 // run, call a few pure Apple functions and compare with host references.
 #include <asm/hwcap.h>
@@ -160,3 +168,5 @@ int main(int argc, char** argv) {
     std::printf("RESULT: %d match, %d mismatch/failed\n", g_pass, g_fail);
     return g_fail ? 1 : 0;
 }
+
+#endif  // __aarch64__

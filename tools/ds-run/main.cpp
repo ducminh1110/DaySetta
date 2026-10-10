@@ -1,3 +1,11 @@
+#if !defined(__aarch64__)
+// Runs guest arm64 code natively (trap-and-lower): aarch64 hosts only.  Exit 77 = skipped.
+#include <cstdio>
+int main() {
+    std::fprintf(stderr, "ds-run: requires an aarch64 host (x86_64 build: skipped)\n");
+    return 77;
+}
+#else
 // ds-run: run a genuine Apple macOS arm64e executable under the genuine /usr/lib/dyld and the
 // genuine shared cache on a Linux aarch64 host.  Milestone R3.
 //   ds-run [--cache PATH] [--root DIR] EXECUTABLE [ARGS...]
@@ -146,3 +154,5 @@ int main(int argc, char** argv) {
         : "memory");
     __builtin_unreachable();
 }
+
+#endif  // __aarch64__

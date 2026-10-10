@@ -3,6 +3,8 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/uio.h>
+#include <cerrno>
 #include <unistd.h>
 
 #include <cstdio>
@@ -202,6 +204,13 @@ DS_TEST(darwin_syscall_dispatch_errno_carry) {
     DS_CHECK_EQ(ctx.unimplemented.size(), size_t(1));
     // shared_region_check_np reports the mapped cache; bad pointer -> EFAULT (14)
     uint64_t base = 0;
+    {   // qemu-user (x86_64 CI cross run) does not implement process_vm_writev: copyout cannot work there.
+        struct iovec l{&base, 0}, r{&base, 0};
+        if (process_vm_writev(getpid(), &l, 1, &r, 1, 0) < 0 && errno == ENOSYS) {
+            std::fprintf(stderr, "SKIP darwin_syscall_dispatch_errno_carry tail: process_vm_writev unsupported (qemu-user)\n");
+            return;
+        }
+    }
     c = svc_state("shared_region_check_np");
     c.x[0] = reinterpret_cast<uint64_t>(&base);
     dispatch_svc(ctx, c);
@@ -281,6 +290,10 @@ DS_TEST(darwin_macho_slice_selection) {
 }
 
 DS_TEST(darwin_r3_echo_integration) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP darwin_r3_echo_integration: needs an aarch64 host\n");
+    return;
+#endif
     const char* store = "/home/ubuntu/macos-re/store-27/root/bin/echo";
     const char* cache = "/home/ubuntu/macos-re/cache-arm64e/dyld_shared_cache_arm64e";
     struct stat st;

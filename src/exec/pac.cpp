@@ -23,7 +23,7 @@ struct Sip {
 
 uint64_t load64(const uint8_t* p) {
     uint64_t v;
-    std::memcpy(&v, p, 8);  // host is little-endian aarch64
+    std::memcpy(&v, p, 8);  // little-endian host (aarch64, x86_64)
     return v;
 }
 }  // namespace

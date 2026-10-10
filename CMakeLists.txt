@@ -71,4 +71,7 @@ if(DAYSETTA_BUILD_TESTS)
   add_dependencies(daysetta_tests daysetta-broker daysetta-server daysetta-ctl ds-exec-probe ds-run)
   add_test(NAME daysetta COMMAND daysetta_tests)
   set_tests_properties(daysetta PROPERTIES TIMEOUT 180)
+  if(CMAKE_CROSSCOMPILING)  # child processes (broker/server) exec via binfmt_misc qemu: give them the sysroot too
+    set_tests_properties(daysetta PROPERTIES ENVIRONMENT "QEMU_LD_PREFIX=${CMAKE_FIND_ROOT_PATH}")
+  endif()
 endif()

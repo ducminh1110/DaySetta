@@ -8,35 +8,32 @@ permissions:
   contents: read
 
 jobs:
-  linux:
-    name: Linux / C++20 / headless
-    runs-on: ubuntu-latest
+  native:
+    name: ${{ matrix.arch }} native (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: aarch64, os: ubuntu-24.04-arm }
+          - { arch: x86_64, os: ubuntu-24.04 }
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Toolchain
         run: |
+          uname -m
           cmake --version
           g++ --version
+      - name: Build, test, docs (ci/run.sh)
+        run: bash ci/run.sh
 
-      - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
-
-      - name: Build
-        run: cmake --build build --parallel 8
-
-      - name: Test
-        id: test
-        continue-on-error: true
-        run: ctest --test-dir build --output-on-failure
-
-      - name: Documentation
-        if: always()
-        run: python3 ci/check_docs.py
-
-      - name: Enforce test result
-        if: always() && steps.test.outcome == 'failure'
-        run: |
-          echo "ctest failed; see the Test step." >&2
-          exit 1
+  # aarch64 host cross-building x86_64 and running the tests under qemu-user.
+  x86_64-cross:
+    name: x86_64 cross + qemu (ubuntu-24.04-arm)
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cross toolchain + qemu-user
+        run: sudo apt-get update && sudo apt-get install -y g++-x86-64-linux-gnu qemu-user
+      - name: Build and test under qemu-x86_64
+        run: DS_ARCH=x86_64 bash ci/run.sh

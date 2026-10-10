@@ -1,6 +1,8 @@
 #include "commpage.hpp"
 
+#if defined(__aarch64__)
 #include <asm/hwcap.h>
+#endif
 #include <sys/auxv.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -20,8 +22,13 @@ constexpr uint64_t kFP16 = 0x8, kCache64 = 0x20, kAdvSIMD = 0x100, kHPFPCvt = 0x
 
 HostCaps detect_host_caps() {
     HostCaps c;
+#if defined(__aarch64__)
     const unsigned long h = getauxval(AT_HWCAP);
+#else
+    [[maybe_unused]] const unsigned long h = 0;  // non-arm64 host: no native arm64 features; guest runs on baseline arm64 only
+#endif
     uint64_t caps = 0;
+#if defined(__aarch64__)
     if (h & HWCAP_ASIMD) caps |= kAdvSIMD | kFMA;
     if (h & HWCAP_FP) caps |= kVfp;
     if (h & HWCAP_FPHP) caps |= kHPFPCvt;
@@ -37,6 +44,7 @@ HostCaps detect_host_caps() {
     if (h & HWCAP_JSCVT) caps |= kJSCVT;
     if (h & HWCAP_SB) caps |= kSB;
     if (h & HWCAP_DCPOP) caps |= kDPB;
+#endif
     // Deliberately NOT advertised even though the guest can execute them under ds-exec lowering:
     // kHasFeatPAuth (software PAC), kHasFeatLRCPC/LRCPC2 (LDAPR strengthened to LDAR) -- the page
     // describes the hardware, and emulated paths are slower than the non-feature fallbacks.
