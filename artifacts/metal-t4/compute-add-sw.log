@@ -1,0 +1,5 @@
+Validation layer requested but not available. Ignoring...
+indium: using Vulkan device "llvmpipe (LLVM 20.1.2, 256 bits)" (VkPhysicalDeviceType 4) => SOFTWARE
+Compute results as expected
+Execution finished
+rc=0

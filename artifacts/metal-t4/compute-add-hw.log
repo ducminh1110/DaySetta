@@ -1,0 +1,5 @@
+Validation layer requested but not available. Ignoring...
+indium: using Vulkan device "Tesla T4" (VkPhysicalDeviceType 2) => HW
+Compute results as expected
+Execution finished
+rc=0

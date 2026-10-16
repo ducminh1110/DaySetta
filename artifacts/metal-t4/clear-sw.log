@@ -1,0 +1,6 @@
+Validation layer requested but not available. Ignoring...
+indium: using Vulkan device "llvmpipe (LLVM 20.1.2, 256 bits)" (VkPhysicalDeviceType 4) => SOFTWARE
+vulkan device: llvmpipe (LLVM 20.1.2, 256 bits) => SOFTWARE (CPU Vulkan device), NOT hardware
+center px=26,26,38 bg px=26,26,38 => PASS
+wrote out/sw/metal-indium-clear-lavapipe-SOFTWARE-x86_64.png
+rc=0
