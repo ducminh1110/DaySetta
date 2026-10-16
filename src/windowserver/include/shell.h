@@ -20,6 +20,9 @@ struct dl_canvases;
 #define DL_DOCK_PANEL_HEIGHT 68
 #define DL_DOCK_BOTTOM_MARGIN 6
 
+/* 1 only when DSWS_DEBUG_CHROME=1: menu bar, Dock and wallpaper are labelled "DEBUG CHROME - not Apple UI". Default 0: clients on black. */
+int dl_shell_debug_chrome(void);
+
 void dl_shell_init(uint32_t screen_width, uint32_t screen_height);
 
 /* The process the menu bar names and the Dock highlights. */

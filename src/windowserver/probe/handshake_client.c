@@ -117,7 +117,7 @@ int main(void)
 		"32000 connection id and ports");
 	printf("connection id 0x%x\n", n.rep.connection_id);
 
-	/* An unimplemented routine on the connection port answers MIG_BAD_ID instead of hanging. */
+	/* Routine 32001 on the connection port now gets the default success reply (G1 canned handler), not MIG_BAD_ID. */
 	struct {
 		mach_msg_header_t head;
 		NDR_record_t ndr;
@@ -126,7 +126,7 @@ int main(void)
 	} e;
 	memset(&e, 0, sizeof(e));
 	kr = rpc(&e.head, sizeof(mach_msg_header_t), sizeof(e), n.rep.connection.name, 32001, 0);
-	check(kr == KERN_SUCCESS && e.ret == MIG_BAD_ID, "unimplemented routine answers MIG_BAD_ID");
+	check(kr == KERN_SUCCESS && e.ret == KERN_SUCCESS, "32001 on connection port answers default success");
 
 	printf("%s: %d failure(s)\n", failures ? "FAILED" : "ALL PASSED", failures);
 	return failures != 0;

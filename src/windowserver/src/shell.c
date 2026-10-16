@@ -248,6 +248,12 @@ static struct {
 	int panel_x, panel_y, panel_w, panel_h;
 } shell;
 
+int dl_shell_debug_chrome(void)
+{
+	const char *e = getenv("DSWS_DEBUG_CHROME");
+	return e && !strcmp(e, "1");
+}
+
 void dl_shell_init(uint32_t screen_width, uint32_t screen_height)
 {
 	memset(&shell, 0, sizeof(shell));
@@ -256,11 +262,12 @@ void dl_shell_init(uint32_t screen_width, uint32_t screen_height)
 	shell.hover = -1;
 	shell.last_minute = -1;
 	shell.dirty = 1;
-	const char *en = getenv("DAYLIGHT_SHELL");
-	if (en && (!strcmp(en, "0") || !strcmp(en, "off"))) {
+	/* Owner rule: no fake macOS UI. Chrome is off unless DSWS_DEBUG_CHROME=1. */
+	if (!dl_shell_debug_chrome()) {
 		shell.disabled = 1;
 		shell.dirty = 0;
-	}
+	} else
+		fprintf(stderr, "DEBUG CHROME - not Apple UI (DSWS_DEBUG_CHROME=1)\n");
 }
 
 void dl_shell_set_front(int32_t pid)
