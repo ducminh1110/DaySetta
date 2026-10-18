@@ -6,6 +6,7 @@
 #pragma once
 
 #include <atomic>
+#include <unordered_map>
 #include <cstdint>
 #include <string>
 
@@ -80,7 +81,8 @@ struct TrapEntry {
 
 class TrapTable {
 public:
-    static constexpr uint32_t kMax = 1u << 16;
+    static constexpr uint32_t kMax = (1u << 16) - 1;  // index 0xFFFF is the overflow marker
+    static constexpr uint32_t kOverflowIdx = 0xFFFF;
     int64_t add(uint64_t pc, uint32_t word);  // -1 when full
     const TrapEntry* find(uint32_t idx, uint64_t pc) const;
     uint32_t size() const { return n_.load(std::memory_order_acquire); }
@@ -88,6 +90,9 @@ public:
 private:
     TrapEntry e_[kMax];
     std::atomic<uint32_t> n_{0};
+    // BRK carries 16 bits: once kMax-1 entries exist, further ones use the reserved index 0xFFFF and are found by pc
+    std::unordered_map<uint64_t, TrapEntry> overflow_;
+    mutable std::atomic_flag overflow_lock_ = ATOMIC_FLAG_INIT;
 };
 
 TrapTable& trap_table();

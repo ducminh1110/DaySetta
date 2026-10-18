@@ -1,3 +1,4 @@
+#include <unordered_map>
 #include "lowering.hpp"
 
 namespace ds::exec {
@@ -229,13 +230,25 @@ bool is_known_unsupported(uint32_t w) {
 
 int64_t TrapTable::add(uint64_t pc, uint32_t word) {
     const uint32_t i = n_.load(std::memory_order_relaxed);
-    if (i >= kMax) return -1;
-    e_[i] = TrapEntry{pc, word, 0};
-    n_.store(i + 1, std::memory_order_release);
-    return i;
+    if (i < kMax) {
+        e_[i] = TrapEntry{pc, word, 0};
+        n_.store(i + 1, std::memory_order_release);
+        return i;
+    }
+    while (overflow_lock_.test_and_set(std::memory_order_acquire)) {}
+    overflow_[pc] = TrapEntry{pc, word, 0};
+    overflow_lock_.clear(std::memory_order_release);
+    return kOverflowIdx;
 }
 
 const TrapEntry* TrapTable::find(uint32_t idx, uint64_t pc) const {
+    if (idx == kOverflowIdx) {
+        while (overflow_lock_.test_and_set(std::memory_order_acquire)) {}
+        auto it = overflow_.find(pc);
+        const TrapEntry* r = it == overflow_.end() ? nullptr : &it->second;  // node-stable
+        overflow_lock_.clear(std::memory_order_release);
+        return r;
+    }
     if (idx >= n_.load(std::memory_order_acquire)) return nullptr;
     return e_[idx].pc == pc ? &e_[idx] : nullptr;
 }
@@ -270,7 +283,7 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
         if (!want) continue;
         const int64_t idx = trap_table().add(reinterpret_cast<uint64_t>(p), w);
         if (idx < 0) {
-            if (err) *err = "ds-exec: trap side table full (65536 entries)";
+            if (err) *err = "ds-exec: trap side table full (65536 distinct words)";
             return false;
         }
         *p = brk_word(static_cast<uint32_t>(idx));
