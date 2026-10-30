@@ -57,6 +57,13 @@ struct TrapStats {
     }
 };
 
+// Cross-ABI rule (arm64e Apple code calling plain-arm64 Darling shim code): a branch-with-authentication whose pointer
+// carries NO signature (PAC field zero) and whose target lies in a registered plain-arm64 executable range is accepted
+// unsigned.  A signed pointer that fails authentication, or an unsigned one outside the ranges, still faults.
+// The reverse direction (plain code using an arm64e pointer) is the shim's job: it strips with strip_ptr().
+void plain_range_add(uint64_t start, uint64_t size);
+bool plain_range_contains(uint64_t addr);
+
 // Emulate one decoded instruction at cpu.pc (advances pc, writes registers/memory).
 EmuOutcome emulate(const Insn& in, CpuState& cpu, const Pac& pac, TrapStats& stats);
 
