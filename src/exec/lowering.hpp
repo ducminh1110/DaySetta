@@ -103,12 +103,18 @@ struct LowerPolicy {
     bool svc = true;
     bool sysreg = true;  // mrs tpidrro_el0, LDAPUR
     bool ldapr = true;   // LDAPR -> LDAR rewrite
+    // Fast paths (aarch64 runtime only; tests keep the BRK-only default):
+    bool trampolines = false;  // rewrite to `b stub` (user-space emulation) where an island is in reach
+    uint64_t island_skip = 16ull << 20;  // new island chunks start at least this far above the code (loaders map data segments behind it)
+    uint64_t strip_mask = 0;   // nonzero: XPAC{I,D,LRI} become `and xd, xd, #strip_mask` in place (exact for pointers with bit 55 clear)
 };
 
 struct LowerCounts {
     uint64_t words = 0;
     uint64_t patched[static_cast<int>(Op::kCount)] = {};
     uint64_t unsupported_seen = 0;
+    uint64_t trampolined = 0;      // words rewritten to a branch into a user-space stub
+    uint64_t inlined_strip = 0;    // XPAC words rewritten to an inline AND
     uint64_t ldapr_rewritten = 0;  // LDAPR{,B,H} rewritten in place to LDAR{,B,H} (strengthening, see lower_range)
 };
 
