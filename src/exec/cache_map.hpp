@@ -7,6 +7,8 @@
 // fixups logic ported from tools/macos27/fixups.py.
 #pragma once
 
+#include <memory>
+#include <atomic>
 #include <cstdint>
 #include <mutex>
 #include <set>
@@ -84,7 +86,21 @@ private:
     void index_images();
 
     uint64_t base_ = 0;
-    struct PendingSlide { uint64_t addr = 0, size = 0; int final_prot = 0; uint32_t pages = 0; std::vector<uint8_t> buf; };
+    struct PendingSlide { uint64_t addr = 0, size = 0; int final_prot = 0; uint32_t pages = 0; bool lazy = false; std::vector<uint8_t> buf; };
+    struct LazyMap {
+        uint64_t addr = 0, size = 0; int final_prot = 0; uint32_t pages = 0, page_size = 0;
+        std::vector<uint8_t> buf;
+        std::unique_ptr<std::atomic<uint8_t>[]> done;
+    };
+    std::vector<LazyMap> lazy_;
+    std::mutex lazy_mu_;
+    const Pac* pac_ = nullptr;
+    uint64_t lazy_slid_ = 0;
+    public:
+    // Slide the page of a faulting access in a lazily slid data mapping (called from the SIGSEGV hook); false if `addr` is not one.
+    bool lazy_slide(uint64_t addr);
+    uint64_t lazy_pages_slid() const { return lazy_slid_; }
+    private:
     bool apply_slide_pages(const std::vector<uint8_t>& buf, uint64_t map_addr, const Pac& pac, uint32_t pg0, uint32_t pg1, std::string* err,
                            uint64_t* signed_out, uint64_t* rebased_out);
     bool slide_pending(std::vector<PendingSlide>& pending, const Pac& pac, std::string* err);

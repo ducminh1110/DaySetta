@@ -7,10 +7,10 @@ CACHE=/home/ubuntu/macos-re/cache-arm64e/dyld_shared_cache_arm64e; T=/Volumes/Sy
 [ -x ~/darltest/bench/micro ] || bash "$(dirname "$0")/build.sh" >/dev/null
 run() { # label timeout args...
   local label=$1 to=$2; shift 2
-  local f=$(mktemp); local s=$(date +%s.%N)
+  local f=$(mktemp); local s=$(date +%s%N)
   timeout -s KILL $to darling shell env MLDR_DSEXEC_TIMING=1 DARLING_DYLINKER=/usr/lib/dyl4 DARLING_DS_CACHE=$CACHE "$@" >"$f" 2>&1 </dev/null; local rc=$?
-  local e=$(date +%s.%N)
-  printf '%-34s wall=%6.2fs rc=%d\n' "$label" "$(echo "$e - $s" | bc)" $rc | tee -a "$OUT"
+  local e=$(date +%s%N)
+  printf '%-34s wall=%s.%02ds rc=%d\n' "$label" $(( (e - s) / 1000000000 )) $(( ((e - s) / 10000000) % 100 )) $rc | tee -a "$OUT"
   grep -E "^ds-exec: (cache map|emulated)" "$f" | sed 's/^/    /' | tee -a "$OUT"
   [ -n "$V" ] && grep -v "^ds-exec" "$f" | head -${V} | sed 's/^/    | /' | tee -a "$OUT"; rm -f "$f"
 }

@@ -77,6 +77,8 @@ struct TrapRuntime {
     // lazy_lower(pc): lower + make executable the page of an instruction fetch fault in the
     // mapped cache; false when pc is not in a lowerable range.  May be null.
     bool (*lazy_lower)(uint64_t pc, void* ctx, std::string* err) = nullptr;
+    // lazy_slide(addr): slide the page a faulting data access touched (lazily slid cache mappings); true = retry the access.
+    bool (*lazy_slide)(uint64_t addr, void* ctx) = nullptr;
     void* ctx = nullptr;
     bool log_svc = true;
     // Darwin syscall hook: called after a lowered `svc` was emulated (x0/carry preset to ENOSYS);
