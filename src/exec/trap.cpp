@@ -651,6 +651,7 @@ void thread_init() {
 bool install_trap_handlers(TrapRuntime* rt) {
     g_rt = rt;
     trampoline_set_handler(&tramp_entry);
+    trampoline_set_pac(rt->pac);
     thread_init();
     struct { int sig; void (*fn)(int, siginfo_t*, void*); } hs[] = {
         {SIGTRAP, on_trap}, {SIGILL, on_ill}, {SIGSEGV, on_segv}};

@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #include "lowering.hpp"
+#include "pac.hpp"
 
 namespace ds::exec {
 
@@ -26,6 +27,8 @@ constexpr int kFrameX = 0, kFrameNzcv = 31, kFrameSp = 32, kFrameNext = 33;
 // Handler called by the common block.  Set once by the trap engine; null disables trampolines.
 using TrampHandler = void (*)(uint64_t* frame, const SiteInfo* site);
 void trampoline_set_handler(TrampHandler h);
+// Pac used by the inline sign/auth sequences (keys are baked into the island constant blocks; set before the first island is made).
+void trampoline_set_pac(const Pac* p);
 
 // True when `op` is executed through a trampoline (when an island is in reach); others keep the BRK path.
 bool trampoline_wants(const Insn& in);
@@ -39,7 +42,7 @@ uint32_t trampoline_make(uint32_t* site, uint32_t word, const Insn& in, uint64_t
 void trampoline_set_mrs_tls(long off);
 
 struct TrampStats {
-    uint64_t sites = 0, islands = 0, no_island = 0;
+    uint64_t sites = 0, islands = 0, no_island = 0, inlined = 0;
 };
 TrampStats trampoline_stats();
 

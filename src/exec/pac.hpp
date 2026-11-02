@@ -42,6 +42,7 @@ public:
 
     unsigned va_bits() const { return va_bits_; }
     uint64_t field_mask() const { return field_; }  // bits [54:va_bits]
+    const PacKeys& keys() const { return keys_; }   // for the trampoline islands (same MAC computed inline)
 
     uint64_t sign(PacKey key, uint64_t ptr, uint64_t modifier) const;
     AuthResult auth(PacKey key, uint64_t ptr, uint64_t modifier) const;

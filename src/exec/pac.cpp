@@ -60,12 +60,20 @@ Pac::Pac(unsigned va_bits) : Pac(va_bits, [] {
 Pac::Pac(unsigned va_bits, const PacKeys& keys)
     : va_bits_(va_bits), field_(((uint64_t(1) << (55 - va_bits)) - 1) << va_bits), keys_(keys) {}
 
+// The MAC is a keyed multiply/xor-shift mix (splitmix64 finaliser constants) instead of SipHash: the trampoline islands compute the
+// same function inline in ~12 instructions (see trampoline.cpp), so a sign/auth costs ~10 ns instead of a call into the emulator.
+// It authenticates exactly like the hardware contract (secret key, pointer+modifier bound, failure poisons); it is not QARMA and
+// the 7-bit PAC field was never cryptographically strong.
 uint64_t Pac::mac(PacKey key, uint64_t extptr, uint64_t modifier) const {
-    uint8_t msg[16];
-    std::memcpy(msg, &extptr, 8);
-    std::memcpy(msg + 8, &modifier, 8);
     const int k = static_cast<int>(key);
-    return siphash24(keys_.lo[k], keys_.hi[k], msg, sizeof msg);
+    uint64_t x = extptr ^ (modifier * 0x9E3779B97F4A7C15ull);
+    x ^= keys_.lo[k];
+    x *= 0xBF58476D1CE4E5B9ull;
+    x ^= x >> 32;
+    x += keys_.hi[k];
+    x *= 0x94D049BB133111EBull;
+    x ^= x >> 29;
+    return x;
 }
 
 uint64_t Pac::sign(PacKey key, uint64_t ptr, uint64_t modifier) const {

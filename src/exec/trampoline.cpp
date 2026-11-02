@@ -15,13 +15,15 @@ namespace ds::exec {
 namespace {
 
 constexpr uint64_t kReach = 127ull << 20;      // B imm26 reaches +-128 MB; keep a margin
-constexpr size_t kChunk = 512 * 1024;
+constexpr size_t kChunk = 1024 * 1024;
 constexpr unsigned kQOff = 288;                                         // v0-v7, v16-v31 (caller-saved vector registers) follow the GPR frame
 constexpr unsigned kFrame = kQOff + 24 * 16, kRedZone = 128, kTotal = kFrame + kRedZone;  // 800, 16-aligned
 
 struct Chunk {
-    uint64_t base = 0, used = 0, common = 0;
+    uint64_t base = 0, used = 0, common = 0, consts = 0;
 };
+
+const Pac* g_pac = nullptr;
 
 std::mutex g_mu;
 std::vector<Chunk> g_chunks;
@@ -30,8 +32,8 @@ TrampHandler g_handler = nullptr;
 TrampStats g_stats;
 long g_mrs_tls = -1;
 
-uint32_t enc_stp(unsigned a, unsigned b, unsigned off) { return 0xA9000000u | ((off / 8) << 15) | (b << 10) | (31u << 5) | a; }
-uint32_t enc_ldp(unsigned a, unsigned b, unsigned off) { return 0xA9400000u | ((off / 8) << 15) | (b << 10) | (31u << 5) | a; }
+uint32_t enc_stp(unsigned a, unsigned b, int off) { return 0xA9000000u | ((uint32_t(off / 8) & 0x7F) << 15) | (b << 10) | (31u << 5) | a; }
+uint32_t enc_ldp(unsigned a, unsigned b, int off) { return 0xA9400000u | ((uint32_t(off / 8) & 0x7F) << 15) | (b << 10) | (31u << 5) | a; }
 uint32_t enc_stpq(unsigned a, unsigned b, unsigned off) { return 0xAD000000u | ((off / 16) << 15) | (b << 10) | (31u << 5) | a; }
 uint32_t enc_ldpq(unsigned a, unsigned b, unsigned off) { return 0xAD400000u | ((off / 16) << 15) | (b << 10) | (31u << 5) | a; }
 uint32_t enc_str(unsigned t, unsigned off) { return 0xF9000000u | ((off / 8) << 10) | (31u << 5) | t; }
@@ -96,6 +98,15 @@ Chunk* make_chunk(uint64_t near, uint64_t skip) {
             std::memcpy(p, code.data(), code.size() * 4);
             ch.common = cand;
             ch.used = (code.size() * 4 + 15) & ~15ull;
+            if (g_pac) {  // constants for the inline PAC sequences
+                uint64_t* k = reinterpret_cast<uint64_t*>(cand + ch.used);
+                const PacKeys& pk = g_pac->keys();
+                k[0] = 0x9E3779B97F4A7C15ull; k[1] = 0xBF58476D1CE4E5B9ull; k[2] = 0x94D049BB133111EBull;
+                for (int i = 0; i < 4; ++i) { k[3 + i] = pk.lo[i]; k[7 + i] = pk.hi[i]; }
+                ch.consts = cand + ch.used;
+                ch.used += 11 * 8 + 8;
+                ch.used = (ch.used + 15) & ~15ull;
+            }
             __builtin___clear_cache(reinterpret_cast<char*>(p), reinterpret_cast<char*>(p) + ch.used);
             g_chunks.push_back(ch);
             ++g_stats.islands;
@@ -105,8 +116,180 @@ Chunk* make_chunk(uint64_t near, uint64_t skip) {
     return nullptr;
 }
 
+
+// ---- inline PAC sequences -------------------------------------------------------------------------------------------------
+uint32_t enc_logic_imm(uint32_t base, unsigned rd, unsigned rn, uint64_t mask) {  // base: AND 0x92400000
+    for (unsigned immr = 0; immr < 64; ++immr)
+        for (unsigned ones = 1; ones < 64; ++ones) {
+            const uint64_t run = (1ull << ones) - 1;
+            const uint64_t rot = immr ? ((run >> immr) | (run << (64 - immr))) : run;
+            if (rot == mask) return base | (immr << 16) | ((ones - 1) << 10) | (rn << 5) | rd;
+        }
+    return 0;
+}
+uint32_t enc_mul(unsigned rd, unsigned rn, unsigned rm) { return 0x9B007C00u | (rm << 16) | (rn << 5) | rd; }
+uint32_t enc_eor(unsigned rd, unsigned rn, unsigned rm) { return 0xCA000000u | (rm << 16) | (rn << 5) | rd; }
+uint32_t enc_eor_lsr(unsigned rd, unsigned rn, unsigned rm, unsigned sh) { return 0xCA400000u | (rm << 16) | (sh << 10) | (rn << 5) | rd; }
+uint32_t enc_add(unsigned rd, unsigned rn, unsigned rm) { return 0x8B000000u | (rm << 16) | (rn << 5) | rd; }
+uint32_t enc_orr(unsigned rd, unsigned rn, unsigned rm) { return 0xAA000000u | (rm << 16) | (rn << 5) | rd; }
+uint32_t enc_mov(unsigned rd, unsigned rm) { return 0xAA0003E0u | (rm << 16) | rd; }
+uint32_t enc_lsl(unsigned rd, unsigned rn, unsigned sh) { return 0xD3400000u | ((64 - sh) << 16) | ((63 - sh) << 10) | (rn << 5) | rd; }
+uint32_t enc_ldr_lit(unsigned rt, int64_t from, int64_t to) { return 0x58000000u | ((uint32_t((to - from) / 4) & 0x7FFFF) << 5) | rt; }
+uint32_t enc_b(int64_t from, int64_t to) { return 0x14000000u | (uint32_t((to - from) / 4) & 0x03FFFFFFu); }
+uint32_t enc_cbnz(unsigned rt, int64_t from, int64_t to) { return 0xB5000000u | ((uint32_t((to - from) / 4) & 0x7FFFF) << 5) | rt; }
+uint32_t enc_tbnz(unsigned rt, unsigned bit, int64_t from, int64_t to) {
+    return 0x37000000u | ((bit >> 5) << 31) | ((bit & 31) << 19) | ((uint32_t((to - from) / 4) & 0x3FFF) << 5) | rt;
+}
+
+// Emit the inline sign/auth/branch-auth sequence for `in` at `stub`; empty when this form is not handled inline (caller uses the
+// generic stub).  Preconditions that fail at run time (non-canonical pointer, authentication failure) branch to `slow`, the generic
+// stub, which re-executes the exact emulation (poisoning, fault reports and statistics are unchanged).
+std::vector<uint32_t> build_inline(const Insn& in, uint64_t pc, uint64_t stub, uint64_t slow, uint64_t consts) {
+    std::vector<uint32_t> o;
+    if (!g_pac || !consts) return o;
+    const uint64_t FIELD = g_pac->field_mask(), BIT55 = 1ull << 55;
+    const unsigned va = g_pac->va_bits();
+    const PacKey key = in.key;
+    const bool is_sign = in.op == Op::PacSign, is_auth = in.op == Op::PacAuth;
+    const bool is_br = in.op == Op::BrAuth, is_ret = in.op == Op::RetAuth;
+    if (!is_sign && !is_auth && !is_br && !is_ret) return o;
+    if (key == PacKey::GA || in.mod == ModSrc::SpPc) return o;
+    const unsigned P = is_ret ? 30u : is_br ? in.rn : in.rd;  // pointer register
+    const ModSrc mod = is_ret ? ModSrc::Sp : in.mod;
+    const unsigned M = in.rm;                                  // modifier register for ModSrc::Reg
+    if (P == 31 || P == 18 || (mod == ModSrc::Reg && (M == 31 || M == 18))) return o;
+    if (is_br && in.link && P == 30) return o;
+    unsigned t[2], n = 0;  // temps a, b: x9..x15 not used by the instruction
+    for (unsigned r = 9; r <= 15 && n < 2; ++r)
+        if (r != P && !(mod == ModSrc::Reg && r == M)) t[n++] = r;
+    const unsigned A = t[0], B = t[1];
+    const int64_t kc1 = int64_t(consts), kc2 = kc1 + 8, kc3 = kc1 + 16;
+    const int64_t kk0 = kc1 + 24 + 8 * int(key), kk1 = kc1 + 56 + 8 * int(key);
+    auto at = [&](size_t idx) { return int64_t(stub) + int64_t(idx) * 4; };
+    auto E = [&](uint32_t w) { o.push_back(w); };
+    const uint32_t m_or = enc_logic_imm(0x92400000u, A, P, FIELD | BIT55);   // and a, P, #(field|bit55)
+    const uint32_t m_not = enc_logic_imm(0x92400000u, B, P, ~FIELD);         // and b, P, #~field
+    const uint32_t m_field = enc_logic_imm(0x92400000u, 18, 18, FIELD);      // and x18, x18, #field
+    const uint32_t m_field_a = enc_logic_imm(0x92400000u, A, P, FIELD);      // and a, P, #field
+    if (!m_or || !m_not || !m_field || !m_field_a) return {};
+    E(enc_stp(A, B, -144));
+    std::vector<size_t> fails;  // indices of the (placeholder) failure branches
+    unsigned ptr_reg;           // register holding the PAC-free pointer used as MAC input
+    if (is_sign) {
+        E(m_or);
+        fails.push_back(o.size()); E(0);   // cbnz a, fail
+        ptr_reg = P;
+    } else {
+        fails.push_back(o.size()); E(0);   // tbnz P, #55, fail
+        E(m_not);
+        ptr_reg = B;
+    }
+    if (mod == ModSrc::Zero) {
+        E(enc_mov(18, ptr_reg));
+    } else {
+        unsigned mreg = M;
+        if (mod == ModSrc::Sp) { E(0x910003E0u | 18); mreg = 18; }  // mov x18, sp
+        E(enc_ldr_lit(A, at(o.size()), kc1));
+        E(enc_mul(18, mreg, A));
+        E(enc_eor(18, 18, ptr_reg));
+    }
+    E(enc_ldr_lit(A, at(o.size()), kk0)); E(enc_eor(18, 18, A));
+    E(enc_ldr_lit(A, at(o.size()), kc2)); E(enc_mul(18, 18, A));
+    E(enc_eor_lsr(18, 18, 18, 32));
+    E(enc_ldr_lit(A, at(o.size()), kk1)); E(enc_add(18, 18, A));
+    E(enc_ldr_lit(A, at(o.size()), kc3)); E(enc_mul(18, 18, A));
+    E(enc_eor_lsr(18, 18, 18, 29));
+    E(enc_lsl(18, 18, va));
+    E(m_field);
+    if (is_sign) {
+        E(enc_orr(P, P, 18));
+    } else {
+        E(m_field_a);
+        E(enc_eor(A, A, 18));
+        fails.push_back(o.size()); E(0);   // cbnz a, fail (signature mismatch)
+        if (is_auth) E(enc_mov(P, B));
+        else E(enc_mov(18, B));            // branch target
+    }
+    E(enc_ldp(A, B, -144));
+    if (is_br || is_ret) {
+        if (in.link) {  // blraa*: lr = site+4 (48-bit address)
+            const uint64_t ret = pc + 4;
+            E(0xD2800000u | uint32_t((ret & 0xFFFF) << 5) | 30u);
+            E(0xF2A00000u | uint32_t(((ret >> 16) & 0xFFFF) << 5) | 30u);
+            E(0xF2C00000u | uint32_t(((ret >> 32) & 0xFFFF) << 5) | 30u);
+        }
+        E(0xD61F0240u);                    // br x18
+    } else {
+        E(enc_b(at(o.size()), int64_t(pc + 4)));
+    }
+    const size_t fail = o.size();
+    E(enc_ldp(A, B, -144));
+    E(enc_b(at(o.size()), int64_t(slow)));
+    for (size_t k = 0; k < fails.size(); ++k) {
+        const size_t idx = fails[k];
+        o[idx] = (k == 0 && !is_sign) ? enc_tbnz(P, 55, at(idx), at(fail)) : enc_cbnz(A, at(idx), at(fail));
+    }
+    return o;
+}
+
+// ---- inline LSE atomics (LL/SC loops; flags are never touched) -------------------------------------------------------------
+std::vector<uint32_t> build_inline_atomic(const Insn& in, uint64_t pc, uint64_t stub) {
+    std::vector<uint32_t> o;
+    if (in.op != Op::Cas && in.op != Op::Rmw) return o;
+    if (in.op == Op::Rmw && in.rmw != Rmw::Add && in.rmw != Rmw::Clr && in.rmw != Rmw::Eor && in.rmw != Rmw::Set && in.rmw != Rmw::Swp) return o;
+    if (in.op == Op::Cas && in.rs == 31) return o;
+    const unsigned sz = in.size;  // 0 B, 1 H, 2 W, 3 X
+    const unsigned rn = in.rn, rs = in.rs, rd = in.rd;
+    unsigned t[3], n = 0;
+    for (unsigned r = 9; r <= 15 && n < 3; ++r)
+        if (r != rn && r != rs && r != rd) t[n++] = r;
+    const unsigned A = t[0], B = t[1], C = t[2];
+    auto at = [&](size_t idx) { return int64_t(stub) + int64_t(idx) * 4; };
+    auto E = [&](uint32_t w) { o.push_back(w); };
+    const uint32_t sf = sz == 3 ? 0x80000000u : 0;  // 64-bit data processing for X, 32-bit for B/H/W
+    E(enc_stp(A, B, -144));
+    E(0xF9000000u | 0 | (31u << 5) | C);  // placeholder replaced below (str c,[sp,#-152] needs a signed-offset STUR)
+    o.back() = 0xF8000000u | (((uint32_t(-152)) & 0x1FF) << 12) | (31u << 5) | C;  // stur xC, [sp, #-152]
+    const size_t loop = o.size();
+    E((in.acquire ? 0x085FFC00u : 0x085F7C00u) | (sz << 30) | (rn << 5) | A);       // ldxr/ldaxr a, [rn]
+    std::vector<size_t> done_br;
+    if (in.op == Op::Cas) {
+        E((sz == 3 ? 0xCA000000u : 0x4A000000u) | (rs << 16) | (A << 5) | C);       // eor c, a, rs
+        if (sz == 0) E(0x12001C00u | (C << 5) | C);                                  // and wc, wc, #0xff
+        if (sz == 1) E(0x12003C00u | (C << 5) | C);                                  // and wc, wc, #0xffff
+        done_br.push_back(o.size()); E(0);                                           // cbnz c, done
+        E((in.release ? 0x0800FC00u : 0x08007C00u) | (sz << 30) | (B << 16) | (rn << 5) | rd);  // stxr/stlxr b, rt, [rn]
+    } else {
+        switch (in.rmw) {
+            case Rmw::Add: E((sz == 3 ? 0x8B000000u : 0x0B000000u) | (rs << 16) | (A << 5) | C); break;
+            case Rmw::Clr: E((sz == 3 ? 0x8A200000u : 0x0A200000u) | (rs << 16) | (A << 5) | C); break;
+            case Rmw::Eor: E((sz == 3 ? 0xCA000000u : 0x4A000000u) | (rs << 16) | (A << 5) | C); break;
+            case Rmw::Set: E((sz == 3 ? 0xAA000000u : 0x2A000000u) | (rs << 16) | (A << 5) | C); break;
+            default:       E((sz == 3 ? 0xAA0003E0u : 0x2A0003E0u) | (rs << 16) | C); break;  // swp: c = rs
+        }
+        E((in.release ? 0x0800FC00u : 0x08007C00u) | (sz << 30) | (B << 16) | (rn << 5) | C);  // stxr/stlxr b, c, [rn]
+    }
+    {   // cbnz wB, loop
+        const int64_t from = at(o.size());
+        E(0x35000000u | ((uint32_t((at(loop) - from) / 4) & 0x7FFFF) << 5) | B);
+    }
+    const size_t done = o.size();
+    if (in.op == Op::Cas) E((sz == 3 ? 0xAA0003E0u : 0x2A0003E0u) | (A << 16) | rs);   // mov rs, a (old value)
+    else if (rd != 31) E((sz == 3 ? 0xAA0003E0u : 0x2A0003E0u) | (A << 16) | rd);        // mov rt, a
+    for (size_t idx : done_br) {
+        const int64_t from = at(idx);
+        o[idx] = (sz == 3 ? 0xB5000000u : 0x35000000u) | ((uint32_t((at(done) - from) / 4) & 0x7FFFF) << 5) | C;
+    }
+    E(enc_ldp(A, B, -144));
+    E(0xF8400000u | (((uint32_t(-152)) & 0x1FF) << 12) | (31u << 5) | C);  // ldur xC, [sp, #-152]
+    E(enc_b(at(o.size()), int64_t(pc + 4)));
+    (void)sf;
+    return o;
+}
+
 }  // namespace
 
+void trampoline_set_pac(const Pac* p) { g_pac = p; }
 void trampoline_set_handler(TrampHandler h) { g_handler = h; }
 void trampoline_set_mrs_tls(long off) { g_mrs_tls = (off >= 0 && off < 32760 && (off & 7) == 0) ? off : -1; }
 
@@ -161,6 +344,19 @@ uint32_t trampoline_make(uint32_t* site, uint32_t word, const Insn& in, uint64_t
     std::memcpy(stub + 2, &sip, 8);
     __builtin___clear_cache(reinterpret_cast<char*>(stub), reinterpret_cast<char*>(stub) + 16);
     ++g_stats.sites;
+    if (!getenv("DS_TRAMP_NO_INLINE") && !((in.op == Op::Cas || in.op == Op::Rmw) && getenv("DS_TRAMP_NO_INLINE_ATOMIC"))) {  // fast path: inline PAC sequence in front of the generic stub, falling back to it
+        auto code = (in.op == Op::Cas || in.op == Op::Rmw) ? build_inline_atomic(in, pc, ch->base + ch->used)
+                                                            : build_inline(in, pc, ch->base + ch->used, reinterpret_cast<uint64_t>(stub), ch->consts);
+        if (!code.empty() && ch->used + code.size() * 4 + 16 <= kChunk - 1024) {
+            uint32_t* istub = reinterpret_cast<uint32_t*>(ch->base + ch->used);
+            std::memcpy(istub, code.data(), code.size() * 4);
+            ch->used += (code.size() * 4 + 15) & ~15ull;
+            __builtin___clear_cache(reinterpret_cast<char*>(istub), reinterpret_cast<char*>(istub) + code.size() * 4);
+            ++g_stats.inlined;
+            const int64_t to_i = (int64_t(reinterpret_cast<uint64_t>(istub)) - int64_t(pc)) / 4;
+            return 0x14000000u | (uint32_t(to_i) & 0x03FFFFFFu);
+        }
+    }
     if (getenv("DS_TRAMP_DEBUG")) fprintf(stderr, "tramp: site=%p stub=%p common=%p chunk=%p\n", (void*)site, (void*)stub, (void*)ch->common, (void*)ch->base);
     const int64_t to_stub = (int64_t(reinterpret_cast<uint64_t>(stub)) - int64_t(pc)) / 4;
     return 0x14000000u | (uint32_t(to_stub) & 0x03FFFFFFu);  // b stub
