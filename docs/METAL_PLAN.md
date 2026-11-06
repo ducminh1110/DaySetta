@@ -27,7 +27,7 @@ Reference comparison (verified on clones in ~/ref, treated as data, nothing exec
 | Hypothesis "use metal2vulkan translator + indium runtime" | not tested: owner decision forbids integration. Both translators were NOT run on the same AIR; only mtl2spv was run (fails, STACK s.5). | | |
 
 ## Milestones and acceptance tests
-- **M-1 Iridium on modern LLVM (blocker, first).** Port iridium off typed pointers: pointee from GEP source type / call types / AIR metadata (`air.arg_type_name`, `air.struct_type_info`), GEP result-type computation, `LLVMGlobalGetValueType` for function type. Alternative to evaluate: a small own AIR bitcode reader (metal2vulkan-air as design reference only). Accept: `mtl2spv` on `AAPLShaders.metallib` and `add.metallib` emits SPIR-V that passes `spirv-val`; then on genuine 27 `default.metallib` (air64_v29) emits or refuses with a typed reason, never crashes.
+- **M-1 Iridium on modern LLVM (DONE for AAPLShaders/add; see M2 results below).** Port iridium off typed pointers: pointee from GEP source type / call types / AIR metadata (`air.arg_type_name`, `air.struct_type_info`), GEP result-type computation, `LLVMGlobalGetValueType` for function type. Alternative to evaluate: a small own AIR bitcode reader (metal2vulkan-air as design reference only). Accept: `mtl2spv` on `AAPLShaders.metallib` and `add.metallib` emits SPIR-V that passes `spirv-val`; then on genuine 27 `default.metallib` (air64_v29) emits or refuses with a typed reason, never crashes.
 - **M0 Indium visual smoke (done).** `offscreen-triangle` (src/metal) -> clear + blit readback -> PNG on lavapipe: artifacts/screenshots/metal-indium-clear-llvmpipe-SOFTWARE-aarch64.png, exit 0. Accept on x86_64: same binary source, same PASS line.
 - **M1 Indium triangle + compute.** `DAYSETTA_TRY_AIR=1 offscreen-triangle` draws the triangle (centre pixel not background); `indium-test-basic-compute` prints "Compute results as expected". Software label retained.
 - **M2 Confirm IOGPU user-client contract.** REA decompile of `IOGPUDeviceCreateWithOptions`, `IOGPUResourceCreate`, `IOGPUCommandQueueCreate/Submit` with IOKit stub names; table of selectors, struct layouts, shmem mapping. Accept: STACK section 2 has no D/U rows.
@@ -38,3 +38,23 @@ Reference comparison (verified on clones in ~/ref, treated as data, nothing exec
 
 ## Build notes
 `cmake -S src/metal -B build-metal/smoke -G Ninja && ninja -C build-metal/smoke offscreen-triangle`; run with `VK_DRIVER_FILES=/usr/share/vulkan/icd.d/lvp_icd.json` (the default ICD set tries freedreno first and prints a harmless TU error because ubuntu is not in group `render`). Needs: libvulkan-dev, llvm-dev (iridium dlopens libLLVM), libpng-dev, xxd.
+
+## M2 results (2026-11-06, aarch64, LLVM 21.1.8, indium `daysetta/metal`)
+Root cause of M1 crashes (gdb): `LLVMGetElementType(ptr)` returns NULL on opaque pointers -> `Function::analyze` called `LLVMGetReturnType(NULL)` (SIGSEGV on add.metallib) and `LLVMCountParamTypes(garbage)` (`bad_alloc` on AAPLShaders). Fix: pointee types are derived from GEP source element type + indices, alloca/global value types, and (for arguments) the first GEP/load/store use; SPIR-V pointers are re-typed with OpBitcast where one LLVM pointer is used at several types. Function type via `LLVMGlobalGetValueType`. Upstream check: darlinghq/indium has no opaque-pointer fix (only PR #2, LLVM 23 `LLVMCondBr/UncondBr`, already in @68c2c18).
+
+| input | mtl2spv | spirv-val (vulkan1.3) |
+|---|---|---|
+| indium test `add.metallib` (kernel, air64 10.15) | ok | pass |
+| indium test `AAPLShaders.metallib` (vertex+fragment) | ok | pass |
+| genuine 27 `SafariSharedUI/default.metallib` (14770 B, air64_v29) | fail: "function 'safari_threshold' is not a vertex/fragment/kernel entry point (air.ci stitchable): unsupported", exit 3 | n/a |
+| genuine 27 iOSSupport `SafariSharedUI/default.metallib` | fail: same reason | n/a |
+| genuine 27 `PasswordManagerUI/default.metallib` | fail: 'pmDilate' stitchable/Core Image function: unsupported | n/a |
+| `CoreImage.metallib`, `SiriWaveArchive.metallib`, `QuartzCore default.metallib` | fail: not an `MTLB` container | n/a |
+| AGX `Archive_release*.metallib` | fail: Mach-O fat (`cafebabe`) archive, not `MTLB`; GPU binaries, not AIR | n/a |
+
+Not covered: no genuine 27 vertex/fragment/kernel function exists in the extracted store (all `MTLB` files are Core Image stitchable functions), so genuine 27 render/compute AIR is UNVERIFIED. Genuine 27 AIR bitcode itself parses in LLVM 21 (`llvm-dis` ok). Unsupported opcodes/intrinsics throw `std::runtime_error`; `mtl2spv` prints `UNSUPPORTED: <reason>`, exit 3, writes no output.
+
+Triangle: `DAYSETTA_TRY_AIR=1 offscreen-triangle` -> centre px 71,70,114, bg 26,26,38, PASS; `artifacts/screenshots/metal-indium-triangle-AIR-lavapipe-SOFTWARE-aarch64.png` (SOFTWARE, lavapipe). x86_64: no arch-specific code added; not built there (UNVERIFIED).
+
+## Runtime Vulkan device selection (owner decision)
+Rule (indium `initGlobalDeviceList`): among Vulkan>=1.3 devices with timelineSemaphore, order DISCRETE_GPU > INTEGRATED_GPU > VIRTUAL_GPU (virtio Venus/virgl) > other > CPU (lavapipe, fallback only). `DAYSETTA_METAL_DEVICE=hw|sw|<index>` overrides (`hw` = non-CPU, `sw` = CPU, index = Vulkan enumeration order); a non-matching value is logged and ignored. The choice is logged to stderr (`indium: using Vulkan device "<name>" (type N) => HW|SOFTWARE`); `Device::isSoftware()` drives the screenshot label (`lavapipe-SOFTWARE` vs `HW`). Verified here only on the software path (hw/sw/0/9 overrides exercised, all llvmpipe); HW path UNVERIFIED (no non-CPU Vulkan device on this host).

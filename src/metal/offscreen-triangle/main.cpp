@@ -22,8 +22,8 @@ int main(int argc, char** argv) {
 	auto device = Indium::createSystemDefaultDevice();
 	if (!device) { fprintf(stderr, "no Vulkan >=1.3 device with timelineSemaphore\n"); return 2; }
 	std::string name = device->name();
-	bool sw = name.find("llvmpipe") != std::string::npos || name.find("lavapipe") != std::string::npos || name.find("SwiftShader") != std::string::npos;
-	printf("vulkan device: %s => %s\n", name.c_str(), sw ? "SOFTWARE (llvmpipe/lavapipe), NOT hardware" : "non-CPU device (verify deviceType separately)");
+	bool sw = device->isSoftware();
+	printf("vulkan device: %s => %s\n", name.c_str(), sw ? "SOFTWARE (CPU Vulkan device), NOT hardware" : "HW (non-CPU Vulkan device)");
 	bool run = true;
 	std::thread poll([&] { while (run) device->pollEvents(UINT64_MAX); });
 
@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
 	bool ok = bg[0] >= 25 && bg[0] <= 27 && bg[2] >= 37 && bg[2] <= 39 && (!pso || (c[0] + c[1] + c[2]) > 150);
 	printf("center px=%u,%u,%u bg px=%u,%u,%u => %s\n", c[0], c[1], c[2], bg[0], bg[1], bg[2], ok ? "PASS" : "FAIL");
 
-	std::string tag = std::string(pso ? "triangle-" : "clear-") + (sw ? "llvmpipe-SOFTWARE" : "gpu");
+	std::string tag = std::string(pso ? "triangle-AIR-" : "clear-") + (sw ? "lavapipe-SOFTWARE" : "HW");
 	std::string path = std::string(outdir) + "/metal-indium-" + tag + "-" + std::string(getenv("DAYSETTA_ARCH") ? getenv("DAYSETTA_ARCH") : "host") + ".png";
 	FILE* f = fopen(path.c_str(), "wb");
 	auto png = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
