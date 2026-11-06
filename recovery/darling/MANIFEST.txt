@@ -3,7 +3,6 @@ src/external/AvailabilityVersions head=ea5d00a6fccbc57e7b01d3274efaf7cfb6d5dde2 
 src/external/IOKitUser head=2a91cc188424a71a6c80c1f536e6092a82d0afd5 branch=daysetta/arm64 local_commits=2 
 src/external/bootstrap_cmds head=ee3537315a887e99cebda42b8a767940b0cfeb9e branch=daysetta/arm64 local_commits=3 
 src/external/corecrypto head=875f1cd9e75b0029d872b88ce8a77da276c00c84 branch= local_commits=0 
-src/external/darlingserver head=40275fb61a877b603c2164aa705b0944b7207789 branch=daysetta/arm64 local_commits=0 
 src/external/foundation head=ce9e41921e35df1348cd2a64b9fb88f6168fae18 branch=daysetta/arm64 local_commits=2 
 src/external/iokitd head=e0bf47f85288579f622ff79f7f8aa86ed0e8298a branch=daysetta/recovered local_commits=1 
 src/external/libc head=15985b056bf6360c7c147fadd939bda33cd2a2b9 branch=daysetta/arm64 local_commits=2 
