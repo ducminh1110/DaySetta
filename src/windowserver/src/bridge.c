@@ -146,9 +146,14 @@ int dl_bridge_handle(dl_server *server, const dl_request *req, dl_reply *reply)
 	return 0;
 }
 
-/* Desktop: a vertical blue gradient. */
+/* Desktop: black; the debug-chrome gradient only with DSWS_DEBUG_CHROME=1 (not Apple UI). */
 static void desktop(uint8_t *rgba, uint32_t w, uint32_t h)
 {
+	if (!dl_shell_debug_chrome()) {
+		for (size_t i = 0; i < (size_t)w * h; i++)
+			((uint32_t *)rgba)[i] = 0xff000000u; /* R,G,B=0 A=255 on little-endian */
+		return;
+	}
 	for (uint32_t y = 0; y < h; y++) {
 		uint8_t r = (uint8_t)(40 + 20 * y / h), g = (uint8_t)(80 + 30 * y / h), b = (uint8_t)(140 + 40 * y / h);
 		uint8_t *p = rgba + (size_t)y * w * 4;
