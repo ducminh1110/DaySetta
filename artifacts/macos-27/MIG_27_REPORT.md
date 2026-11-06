@@ -53,3 +53,21 @@ CGXServices removed (stub 0 in 27 or outside range): 30204 30205 30525 30537 305
 - 26.6 baseline is x86_64, 27 is arm64e: differences may be arch-related. UNKNOWN.
 - Impl pointers exist but were not validated beyond lying in `__TEXT`.
 - The 4088 vs 4099 image-count difference: UNKNOWN (untouched).
+
+## Notes added after lead review (2026-11-06)
+- **Pointer encoding (VERIFIED, WP1a):** the 26A434 arm64e cache encodes `__DATA*`/`__AUTH*`
+  pointers with per-mapping dyld slide info **version 5** (all 14 slid mappings,
+  `value_add` 0x180000000), not per-image `LC_DYLD_CHAINED_FIXUPS`; SkyLight carries no
+  `LC_DYLD_CHAINED_FIXUPS` load command. Evidence: `artifacts/macos-27/fixups-selftest.json`.
+- **How 744 vs 738 was counted:** 27 = number of routine descriptors with a non-zero stub
+  pointer that decodes into SkyLight `__TEXT`, summed over the 9 accepted descriptors
+  (`mig-routines.json` `routine_count`); 26.6 = routine entries in
+  `/home/ubuntu/daylight/protocol/macos-26.6-x86_64.json`.
+- **The +6 is a net figure, not 6 specific new routines:** 14 ids are live in 27 but not in
+  26.6 (CGXRendezvous 29041; CGXServices 30523, 30535, 30592, 30600, 30603, 30607, 30637,
+  30638, 30639, 30640, 30644, 30645, 30646) and 8 26.6 ids are not live in 27 (CGXServices
+  30204, 30205, 30525, 30537, 30593, 30601, 30605, 30608): 14 - 8 = 6. Whether any added id
+  is a renumbered removed routine is `UNKNOWN`; all 14 added ids are named "?".
+- **Start-id-1 subsystems:** all three are named "?" with status `unknown`, as are their 6
+  routines; no evidence other than the start id was found to tell CGYSpinControl,
+  CGYCaptureReply and CGYEventTap apart.

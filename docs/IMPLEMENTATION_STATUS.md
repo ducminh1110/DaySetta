@@ -14,7 +14,7 @@ All commands ran in `/home/ubuntu/daysetta`. Artifacts: `build/Testing/Temporary
 | Configure | `cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo` | exit 0 | `VERIFIED` |
 | Build | `cmake --build build -j8` | exit 0; `-Wall -Wextra -Wpedantic -Werror` clean | `VERIFIED` |
 | CTest | `ctest --test-dir build --output-on-failure` | 1/1 target passed, 0.39 s | `VERIFIED` |
-| Direct suite | `./build/daysetta_tests` | **22/22 cases passed** | `VERIFIED` |
+| Direct suite | `./build/daysetta_tests` | **23/23 cases passed** (5 consecutive runs, all pass) | `VERIFIED` |
 | Docs | `python3 ci/check_docs.py` | 0 errors, 24 Markdown files, 58 path refs | `VERIFIED` |
 | Local CI | `bash ci/run.sh` | **CI PASSED** | `VERIFIED` |
 
@@ -45,7 +45,7 @@ load, soak, thread determinism and loader fixtures that do not exist yet.
 |---|---|---|---|
 | `ds-ipc` | `IMPLEMENTED` | `src/ipc/ipc.cpp`; `SOCK_SEQPACKET`, `SCM_RIGHTS`, `SO_PEERCRED` | Exercised by broker/SDK/e2e; no isolated fuzz test |
 | `ds-protocol` | `IMPLEMENTED` | `src/protocol/protocol.cpp`; 32-byte `DSM1` | Exercised by e2e/SDK; malformed corpus pending |
-| `ds-event` | `IMPLEMENTED` | `src/event/event.cpp`; 40-byte event, 32-byte ring header | e2e event delivery; move regression test missing |
+| `ds-event` | `IMPLEMENTED` | `src/event/event.cpp`; 40-byte event, 32-byte ring header | e2e event delivery; `event_ring_move` test; `poll_event` blocks on a per-client eventfd (no 5 ms sleep), e2e wakeup + 50 ms timeout timing checks |
 | `ds-scene` | `IMPLEMENTED` / `PARTIAL` | `src/scene/scene.cpp` | 8 `scene_*` cases pass; no spaces/notes/damage scheduling |
 | `ds-render` | `IMPLEMENTED` / `PARTIAL` | `src/render/` | 10 `compositor_*` cases pass; CPU single-threaded, no materials |
 | `ds-sdk` | `IMPLEMENTED` | `src/sdk/sdk.cpp`, `src/sdk/broker_proto.cpp` | `sdk_fake_server`, `sdk_hello_denied`, e2e |

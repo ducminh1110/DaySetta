@@ -17,7 +17,7 @@ compatibility layer.
 |---|---|
 | `cmake -S . -B build ... && cmake --build build -j8` | exit 0, `-Werror` clean |
 | `ctest --test-dir build --output-on-failure` | 1/1 target passed, 0.39 s |
-| `./build/daysetta_tests` | **22/22 cases passed** |
+| `./build/daysetta_tests` | **23/23 cases passed** |
 | `bash ci/run.sh` | **CI PASSED** (build + ctest + docs check) |
 | e2e path | broker + server + 2 windows + capture + input ring + JSON + PPM |
 | 26.6 baseline | 738 MIG routines / 9 subsystems (`protocol/macos-26.6-x86_64.json`) |
@@ -40,9 +40,7 @@ compatibility layer.
    SkyLight subsystems, diff ids against 26.6, emit `artifacts/macos-27/mig-routines.json`
    and `MIG_27_REPORT.md`. Never invent a routine name. If decoding is incomplete,
    publish the blocker and partial evidence, not a table.
-2. **Event-ring wakeup:** `poll_event` currently sleeps 5 ms; add a wakeup descriptor or
-   document the limitation. Add a `Ring` move regression test; the old move operations
-   munmapped the destination (fixed in `src/event/event.cpp`).
+2. **Event-ring wakeup:** done (eventfd sent with the ring; `event_ring_move` test added).
 3. **Close M1:** fuzz/property tests, 1 000 000-message loopback, fd-leak checks,
    peer-credential tests, and the missing `ds-loader`/`ds-rt` fixtures.
 4. **Complete M2:** multi-client, resize/occlusion, damage, golden frames, ASan/UBSan,

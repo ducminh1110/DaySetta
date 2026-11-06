@@ -14,6 +14,7 @@
 #include <poll.h>
 #include <sstream>
 #include <string>
+#include <sys/eventfd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -99,6 +100,7 @@ struct Client {
     std::string app_name;
     bool subscribed = false;
     event::Ring ring;
+    ipc::Fd wake;  // server end of the ring wakeup eventfd (the client holds a dup)
 
     std::uint64_t capabilities() const {
         switch (role) {
@@ -575,6 +577,12 @@ private:
             return Result<proto::Message>::ok(
                 proto::make_error(request, Code::state, "already subscribed"));
         }
+        int efd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+        if (efd < 0) {
+            return Result<proto::Message>::ok(
+                proto::make_error(request, Code::io, std::strerror(errno)));
+        }
+        ipc::Fd wake(efd);
         auto fd = event::create_ring_fd(event::kDefaultCapacity);
         if (!fd) {
             return Result<proto::Message>::ok(
@@ -586,13 +594,21 @@ private:
             return Result<proto::Message>::ok(
                 proto::make_error(request, ring.error().code, ring.error().message));
         }
+        int wake_dup = ::fcntl(wake.get(), F_DUPFD_CLOEXEC, 0);
+        if (wake_dup < 0) {
+            ::close(fd.value());
+            return Result<proto::Message>::ok(
+                proto::make_error(request, Code::io, std::strerror(errno)));
+        }
         client.ring = std::move(ring.value());
+        client.wake = std::move(wake);
         client.subscribed = true;
         proto::Writer writer;
         writer.put_u32(event::kDefaultCapacity);
         writer.put_u32(static_cast<std::uint32_t>(event::kEventSize));
         std::vector<ipc::Fd> fds;
         fds.emplace_back(fd.value());
+        fds.emplace_back(wake_dup);
         return Result<proto::Message>::ok(
             proto::make_reply(request, writer.take(), std::move(fds)));
     }
@@ -627,7 +643,11 @@ private:
             if (client.id == found.value().client && client.subscribed) {
                 event::Event copy = event;
                 copy.target_window = window;
-                (void)client.ring.push(copy);
+                if (client.ring.push(copy)) {
+                    // EAGAIN (counter full) means a wakeup is already pending.
+                    std::uint64_t one = 1;
+                    if (::write(client.wake.get(), &one, sizeof(one)) < 0) {}
+                }
                 return;
             }
         }

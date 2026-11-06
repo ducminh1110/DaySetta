@@ -11,6 +11,7 @@
 #include <poll.h>
 #include <string>
 #include <string_view>
+#include <sys/eventfd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <thread>
@@ -587,6 +588,12 @@ private:
         reply.put_u32(static_cast<std::uint32_t>(ds::event::kEventSize));
         std::vector<ds::ipc::Fd> fds;
         fds.emplace_back(fd);
+        int wake = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+        if (wake < 0) {
+            record_failure("cannot create wakeup eventfd");
+            return ds::proto::make_error(request, ds::Code::io, "cannot create eventfd");
+        }
+        fds.emplace_back(wake);
         return ds::proto::make_reply(request, reply.take(), std::move(fds));
     }
 
@@ -725,9 +732,13 @@ DS_TEST(sdk_fake_server) {
         DS_CHECK_EQ(event.value().b, 1);
         DS_CHECK_EQ(event.value().c, 2);
         DS_CHECK_EQ(event.value().d, 3);
+        auto t0 = std::chrono::steady_clock::now();
         auto timed_out = client.poll_event(50);
+        auto waited = std::chrono::steady_clock::now() - t0;
         DS_CHECK(!timed_out);
         DS_CHECK(timed_out.code() == ds::Code::timeout);
+        DS_CHECK(waited >= std::chrono::milliseconds(45));
+        DS_CHECK(waited < std::chrono::milliseconds(1000));
 
         auto frame = client.capture(2, 2);
         if (!frame) throw ds::test::Failure("capture: " + frame.error().message);
