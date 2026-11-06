@@ -160,6 +160,12 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
         case Op::BrAuth: {
             const AuthResult r = pac.auth(in.key, c.get(in.rn), modifier(in, c));
             if (in.link) c.x[30] = c.pc + 4;
+            {   // DEBUG spin sampler (MLDR_DSEXEC_SPIN)
+                static std::atomic<uint64_t> n{0};
+                if (n.fetch_add(1, std::memory_order_relaxed) % 200000 == 199999)
+                    fprintf(stderr, "ds-exec: br-auth spin sample at pc=0x%llx -> 0x%llx lr=0x%llx\n", (unsigned long long)c.pc,
+                            (unsigned long long)r.value, (unsigned long long)c.x[30]);
+            }
             c.pc = r.value;
             if (!r.ok) {
                 stats.auth_fail.fetch_add(1, std::memory_order_relaxed);
@@ -384,8 +390,9 @@ TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out, uint64_t tsd = 0) {
             if (g_rt->after_trap) g_rt->after_trap(g_rt->ctx);
             return TrapRes::Done;
         case Emu::AuthFault:
-            say("ds-exec: PAC authentication failure at pc=0x%llx (%s) word=0x%08x: poisoned 0x%llx\n",
-                (unsigned long long)pc, where(pc).c_str(), e->word, (unsigned long long)o.fault_addr);
+            say("ds-exec: PAC authentication failure at pc=0x%llx (%s) word=0x%08x: poisoned 0x%llx lr=0x%llx x0=0x%llx\n",
+                (unsigned long long)pc, where(pc).c_str(), e->word, (unsigned long long)o.fault_addr,
+                (unsigned long long)cs.x[30], (unsigned long long)cs.x[0]);
             if (in.op == Op::LdrAuth) {  // access through the poisoned address faults like hardware
                 die_default(SIGSEGV);
                 raise(SIGSEGV);
