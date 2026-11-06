@@ -18,6 +18,8 @@ struct CpuState {
     uint64_t sp = 0;
     uint64_t pc = 0;
     uint64_t pstate = 0;
+    // Emulated EffectiveCPTA/CPTM (SCTLR2_EL1.CPTA0/CPTM0 at EL0).  Both 0 = ADDPT behaves as ADD.
+    bool cpta = false, cptm = false;
     uint64_t tpidrro = 0;  // emulated TPIDRRO_EL0 (Darwin TSD base), loaded by the handler
     uint64_t get(unsigned r) const { return r == 31 ? 0 : x[r]; }       // XZR
     uint64_t get_sp(unsigned r) const { return r == 31 ? sp : x[r]; }  // SP

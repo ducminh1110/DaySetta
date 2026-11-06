@@ -415,6 +415,45 @@ DS_TEST(exec_emulate_pauth_lr) {
     DS_CHECK(decode(0xf3a0145f, in) && in.op == Op::PacAuth && in.key == PacKey::IB && in.imm == 0x288);  // autibsppc
 }
 
+DS_TEST(exec_emulate_cpa) {
+    // encodings from llvm-mc --mattr=+cpa; semantics: Arm ARM 2026-03 PointerCheckAtEL
+    Insn in;
+    DS_CHECK(decode(0x9a00229b, in) && in.op == Op::Cpa && !in.sub && !in.mul && in.rd == 27 && in.rn == 20 && in.rm == 0);
+    DS_CHECK(decode(0x9a022fe1, in) && in.op == Op::Cpa && in.rn == 31 && in.imm == 3 && in.rm == 2);  // addpt x1, sp, x2, lsl #3
+    DS_CHECK(decode(0xda032041, in) && in.sub);                                                        // subpt x1, x2, x3
+    DS_CHECK(decode(0x9b631041, in) && in.mul && !in.sub && in.rs == 4);                               // maddpt x1, x2, x3, x4
+    DS_CHECK(decode(0x9b639041, in) && in.mul && in.sub);                                              // msubpt
+    DS_CHECK(!decode(0x9b000000, in) && !decode(0x9a000000, in));                                      // madd / adc stay native
+    CpuState cs = fresh();
+    cs.x[2] = 0x0000000100000000ull; cs.x[3] = 5;
+    run(0x9a032041 | 0x0 /*addpt x1,x2,x3*/, cs);
+    DS_CHECK_EQ(cs.x[1], 0x0000000100000005ull);
+    run(0xda032041, cs);  // subpt
+    DS_CHECK_EQ(cs.x[1], 0x00000000fffffffbull);
+    cs.sp = 0x1000; cs.x[2] = 4;
+    run(0x9a022fe1, cs);  // addpt x1, sp, x2, lsl #3
+    DS_CHECK_EQ(cs.x[1], 0x1020ull);
+    // overflow into the tag byte: plain ADD while CPTA == 0, poisoned when CPTA == 1
+    cs.x[2] = 0x00ffffffffffffffull; cs.x[3] = 0x0100000000000010ull;
+    run(0x9a032041, cs);
+    DS_CHECK_EQ(cs.x[1], 0x020000000000000full);
+    cs.cpta = true;
+    run(0x9a032041, cs);
+    DS_CHECK_EQ(cs.x[1] >> 55, cs.x[2] >> 55);       // rv[63:55] = base[63:55]
+    DS_CHECK_EQ((cs.x[1] >> 54) & 1, 0ull);          // rv[54] = NOT rv[55] (base bit 55 = 1)
+    // multiply-add: product overflow only matters under CPTM
+    cs = fresh();
+    cs.x[2] = 1ull << 40; cs.x[3] = 1ull << 30; cs.x[4] = 0x1000;
+    run(0x9b631041, cs);  // maddpt x1, x2, x3, x4: product = 2^70, low 64 bits 0
+    DS_CHECK_EQ(cs.x[1], 0x1000ull);
+    cs.cptm = true;
+    run(0x9b631041, cs);
+    DS_CHECK_EQ((cs.x[1] >> 54) & 1, 1ull);
+    cs.x[2] = 3; cs.x[3] = 7; cs.cptm = false;
+    run(0x9b639041, cs);  // msubpt: 0x1000 - 21
+    DS_CHECK_EQ(cs.x[1], 0x1000ull - 21);
+}
+
 DS_TEST(exec_emulate_lse_semantics) {
     alignas(16) uint64_t m[2];
     auto rmw = [&](unsigned size, unsigned opc, bool swp, uint64_t mem0, uint64_t val, uint64_t* old_out) {
