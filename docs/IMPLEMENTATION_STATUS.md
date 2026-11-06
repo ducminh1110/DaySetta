@@ -104,6 +104,13 @@ review.
 | Wayland/X11/Vulkan output | `UNKNOWN` | Dev headers absent; ADR-0004 defers them |
 | GitHub Actions execution | `UNKNOWN` | Workflow exists; no remote run from this host |
 
+## Deferred: x86_64
+
+| Item | Class | Why |
+|---|---|---|
+| Build/run rebar (needs macOS x86_64 host) | `UNKNOWN` | No x86_64 machine; arm64 host only. Study is docs-only: [REF_ARM_TRANSLATORS](REF_ARM_TRANSLATORS.md) |
+| macOS 26.6 x86_64 guest re-runs | `UNKNOWN` | x86 guest was wiped; evidence is catalogued ([HANDOFF_FULL](HANDOFF_FULL.md) near line 382) |
+
 ## 7. Reproduce
 
 ```sh
