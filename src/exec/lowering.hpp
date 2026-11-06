@@ -32,7 +32,7 @@ enum class Op : uint8_t {
 };
 
 enum class Rmw : uint8_t { Add, Clr, Eor, Set, Smax, Smin, Umax, Umin, Swp, kCount };
-enum class ModSrc : uint8_t { Zero, Reg, Sp };
+enum class ModSrc : uint8_t { Zero, Reg, Sp, SpPc };  // SpPc: FEAT_PAuth_LR, SP combined with a PC (see emulate)
 
 struct Insn {
     Op op = Op::None;
@@ -47,7 +47,7 @@ struct Insn {
     bool release = false;
     bool link = false;   // BLRAA*
     bool writeback = false;
-    int32_t imm = 0;     // LDRAA offset, SVC immediate, LDAPUR offset
+    int32_t imm = 0;     // LDRAA offset, SVC immediate, LDAPUR offset, PAuth_LR label distance in bytes (pc - label)
     uint8_t sext = 0;    // LDAPUR: 0 zero-extend, 1 sign-extend to X, 2 sign-extend to W
     Rmw rmw = Rmw::Add;
 };

@@ -387,6 +387,34 @@ DS_TEST(exec_emulate_combined_auth_branches) {
     DS_CHECK_EQ(cs.pc, 0x400000ull);  // access faults at the instruction
 }
 
+DS_TEST(exec_emulate_pauth_lr) {
+    // encodings from llvm-mc --mattr=+pauth-lr; label 0x288 bytes back (echo slice: pacibsppc at 0x4f0, retabsppc at 0x778)
+    const uint32_t retabsppc = 0x5520145f;
+    const uint64_t lr = 0x0000aaaa00001000ull;
+    CpuState cs = fresh();
+    cs.x[30] = lr;
+    const uint64_t sign_pc = cs.pc;
+    run(0xdac1a7fe, cs);  // pacibsppc
+    DS_CHECK(cs.x[30] != lr);
+    DS_CHECK_EQ(tpac().strip(cs.x[30]), lr);
+    const uint64_t signed_lr = cs.x[30];
+    cs.pc = sign_pc + 0x288;
+    EmuOutcome o = run(retabsppc, cs);  // same sp, label == signing pc: authenticates
+    DS_CHECK(o.status == Emu::Ok);
+    DS_CHECK_EQ(cs.pc, lr);
+    cs.x[30] = signed_lr;  // wrong label (different pc) fails
+    cs.pc = sign_pc + 0x290;
+    o = run(retabsppc, cs);
+    DS_CHECK(o.status == Emu::AuthFault);
+    cs.x[30] = signed_lr;  // wrong sp fails
+    cs.pc = sign_pc + 0x288;
+    cs.sp += 16;
+    o = run(retabsppc, cs);
+    DS_CHECK(o.status == Emu::AuthFault);
+    Insn in;
+    DS_CHECK(decode(0xf3a0145f, in) && in.op == Op::PacAuth && in.key == PacKey::IB && in.imm == 0x288);  // autibsppc
+}
+
 DS_TEST(exec_emulate_lse_semantics) {
     alignas(16) uint64_t m[2];
     auto rmw = [&](unsigned size, unsigned opc, bool swp, uint64_t mem0, uint64_t val, uint64_t* old_out) {
