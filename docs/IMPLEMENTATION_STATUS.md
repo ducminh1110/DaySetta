@@ -120,3 +120,14 @@ If a count differs, record the exact command, output and timestamp here. Do not 
 previous pass or failure forward. The implementation and this status were committed
 locally after this green run; there is no remote. Use `git log -1` for the exact
 snapshot commit.
+
+## WP1a: macOS 27 cache pointer decoder
+
+`python3 -I tools/macos27/test_fixups.py` exited 0 (T1: unit decode of chained-pointer
+formats 1/2/6/7/13; T2: real SkyLight data). OBSERVED in
+`artifacts/macos-27/fixups-selftest.json`: all 14 slid mappings of the 26A434 arm64e cache
+use slide info v5, SkyLight has no `LC_DYLD_CHAINED_FIXUPS`, 141/141 non-zero `__got`
+slots decode into a mapping (122 equal an exported symbol address), 303/303 `__objc_classlist`
+slots equal `0x180000000 + (value & 0xFFFFFFFF)`. 2940 `__got`/`__auth_got` slots are zero
+(unbound, not decodable). `isa`/`superclass`/`ro` encoding: `UNKNOWN`, not tested. Decoder:
+`tools/macos27/fixups.py`. No macOS 27 compatibility is claimed.
