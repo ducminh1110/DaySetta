@@ -1,0 +1,37 @@
+diff --git a/src/stubs.c b/src/stubs.c
+index 91d11a1..04f2057 100644
+--- a/src/stubs.c
++++ b/src/stubs.c
+@@ -764,3 +764,32 @@ kern_return_t is_io_registry_entry_get_property_bin_buf
+ 	STUB();
+ 	return KERN_NOT_SUPPORTED;
+ }
++
++/* Routines added to device.defs in xnu 12377. */
++kern_return_t is_io_connect_map_shared_memory
++(
++	mach_port_t connection,
++	uint32_t memory_type,
++	task_t into_task,
++	mach_vm_address_t *address,
++	mach_vm_size_t *size,
++	uint32_t flags,
++	io_name_t property_name,
++	io_struct_inband_t inband_output,
++	mach_msg_type_number_t *inband_outputCnt
++)
++{
++    STUB();
++    return KERN_NOT_SUPPORTED;
++}
++
++kern_return_t is_io_service_wait_quiet_with_options
++(
++	mach_port_t service,
++	mach_timespec_t wait_time,
++	uint32_t options
++)
++{
++    STUB();
++    return KERN_NOT_SUPPORTED;
++}

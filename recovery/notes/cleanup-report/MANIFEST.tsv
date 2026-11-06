@@ -1,0 +1,5 @@
+path	bytes	class	reason	evidence
+/home/ubuntu/macos-re/ipsw/UniversalMac_27.0.1_26A434_Restore.ipsw	26640000000	KEEP	macOS 27 IPSW, PROTECTED	INVENTORY.tsv
+/home/ubuntu/macos-re/cache-arm64e	7050000000	KEEP	macOS 27 cache, PROTECTED (WP1 input)	INVENTORY.tsv
+/home/ubuntu/ia-cryptex	1598443858	ASK	unknown-version cryptex blob (file: data); referenced as input in daylight docs	daylight/docs/knowledge/RECOVERY_AND_RECONSTRUCTION.md:22
+/home/ubuntu/macos-re/metal2vulkan	1850000000	KEEP	not macOS 26; reference source tree	INVENTORY.tsv

@@ -1,0 +1,1 @@
+WP0 result: 0 DELETE rows; no macOS 26.x installer/IPSW/rootfs/x86_64 cache found on this arm64 host (largest pattern hits are macOS 27, PROTECTED). apply.sh not written: nothing to apply. Freed 0 B.

@@ -1,0 +1,154 @@
+diff --git a/src/NSUserDefaults.m b/src/NSUserDefaults.m
+index 5a9ffc7..3be7253 100644
+--- a/src/NSUserDefaults.m
++++ b/src/NSUserDefaults.m
+@@ -476,8 +476,12 @@ static void initQueues() {
+         [defaults removeObjectForKey: key];
+     }
+ 
+-    [defaults registerDefaults: domain];
++    // registerDefaults: only fills the volatile registration domain, so nothing would reach disk.
++    for (id key in domain) {
++        [defaults setObject: [domain objectForKey: key] forKey: key];
++    }
+     [defaults synchronize];
++    [defaults release];
+ 
+     // Post a notification on self.
+     [[NSNotificationCenter defaultCenter] postNotificationName:NSUserDefaultsDidChangeNotification object:self userInfo:nil];
+diff --git a/tools/defaults.m b/tools/defaults.m
+index a25174d..ab6d647 100644
+--- a/tools/defaults.m
++++ b/tools/defaults.m
+@@ -24,6 +24,8 @@
+ #include <stdio.h>
+ 
+ #import	"Foundation/NSArray.h"
++#import	"Foundation/NSData.h"
++#import	"Foundation/NSValue.h"
+ #import	"Foundation/NSDictionary.h"
+ #import	"Foundation/NSEnumerator.h"
+ #import	"Foundation/NSException.h"
+@@ -629,7 +631,109 @@ main(int argc, char** argv, char **env)
+ 	      value = [args objectAtIndex: i];
+ 	      ptr = [value UTF8String];
+ 
+-	      if (*ptr == '(' || *ptr == '{' || *ptr == '<' || *ptr == '"')
++	      domain = [[defs persistentDomainForName: owner] mutableCopy];
++	      if (domain == nil)
++		{
++		  domain = [NSMutableDictionary dictionaryWithCapacity:1];
++		}
++
++	      /*
++	       * macOS defaults(1) type flags, e.g. "defaults write dom key -int 7".
++	       */
++	      if (*ptr == '-' && [value length] > 1)
++		{
++		  NSUInteger	rest = [args count] - (i + 1);
++
++		  obj = nil;
++		  if ([value isEqual: @"-array"] || [value isEqual: @"-array-add"])
++		    {
++		      NSMutableArray	*a = [NSMutableArray array];
++		      id		old = [domain objectForKey: name];
++
++		      if ([value isEqual: @"-array-add"]
++			&& [old isKindOfClass: [NSArray class]])
++			{
++			  [a addObjectsFromArray: old];
++			}
++		      [a addObjectsFromArray: [args subarrayWithRange:
++			NSMakeRange(i + 1, rest)]];
++		      obj = a;
++		    }
++		  else if ([value isEqual: @"-dict"] || [value isEqual: @"-dict-add"])
++		    {
++		      NSMutableDictionary	*d = [NSMutableDictionary dictionary];
++		      id			old = [domain objectForKey: name];
++		      NSUInteger		j;
++
++		      if (rest % 2 != 0)
++			{
++			  fprintf(stderr, "defaults write: -dict needs key/value pairs\n");
++			  [pool release];
++			  exit(GSEXIT_FAILURE);
++			}
++		      if ([value isEqual: @"-dict-add"]
++			&& [old isKindOfClass: [NSDictionary class]])
++			{
++			  [d addEntriesFromDictionary: old];
++			}
++		      for (j = i + 1; j + 1 < [args count]; j += 2)
++			{
++			  [d setObject: [args objectAtIndex: j + 1]
++				forKey: [args objectAtIndex: j]];
++			}
++		      obj = d;
++		    }
++		  else if (rest == 1)
++		    {
++		      NSString	*arg = [args objectAtIndex: i + 1];
++		      const char	*a = [arg UTF8String];
++
++		      if ([value isEqual: @"-string"])
++			{
++			  obj = arg;
++			}
++		      else if ([value isEqual: @"-int"] || [value isEqual: @"-integer"])
++			{
++			  obj = [NSNumber numberWithLongLong: strtoll(a, NULL, 10)];
++			}
++		      else if ([value isEqual: @"-float"])
++			{
++			  obj = [NSNumber numberWithDouble: strtod(a, NULL)];
++			}
++		      else if ([value isEqual: @"-bool"] || [value isEqual: @"-boolean"])
++			{
++			  NSString	*b = [arg lowercaseString];
++
++			  if ([b isEqual: @"yes"] || [b isEqual: @"true"] || [b isEqual: @"1"])
++			    obj = [NSNumber numberWithBool: YES];
++			  else if ([b isEqual: @"no"] || [b isEqual: @"false"] || [b isEqual: @"0"])
++			    obj = [NSNumber numberWithBool: NO];
++			}
++		      else if ([value isEqual: @"-data"])
++			{
++			  NSMutableData	*data = [NSMutableData data];
++			  size_t	n = strlen(a);
++			  size_t	k;
++
++			  for (k = 0; k + 1 < n; k += 2)
++			    {
++			      char		hex[3] = { a[k], a[k + 1], 0 };
++			      unsigned char	byte = (unsigned char)strtoul(hex, NULL, 16);
++
++			      [data appendBytes: &byte length: 1];
++			    }
++			  obj = data;
++			}
++		    }
++		  if (obj == nil)
++		    {
++		      fprintf(stderr, "defaults write: unsupported or malformed "
++			"value '%s'\n", ptr);
++		      [pool release];
++		      exit(GSEXIT_FAILURE);
++		    }
++		}
++	      else if (*ptr == '(' || *ptr == '{' || *ptr == '<' || *ptr == '"')
+ 		{
+ 		  NS_DURING
+ 		    obj = [value propertyList];
+@@ -652,11 +756,6 @@ main(int argc, char** argv, char **env)
+ 		  obj = value;
+ 		}
+ 
+-	      domain = [[defs persistentDomainForName: owner] mutableCopy];
+-	      if (domain == nil)
+-		{
+-		  domain = [NSMutableDictionary dictionaryWithCapacity:1];
+-		}
+ 	      [domain setObject: obj forKey: name];
+ 	      [defs setPersistentDomain: domain forName: owner];
+ 	    }

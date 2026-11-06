@@ -1,0 +1,11 @@
+- [REA + Ghidra setup](rea-reverse-engineering-setup.md) — install paths, node pin for the rea MCP, arm64 Ghidra natives, DMG tools
+- [Daylight WindowServer project](daylight-windowserver.md) — hybrid plan, ~/daylight + ~/macos-re layout, protocol findings, blockers
+- [Darling xnu-12377 port](darling-xnu-port.md) — builds+runs on the x86 box; patches in ~/darling-port-patches; fixes and open issues
+- [Apple OSS version map](apple-oss-distribution-versions.md) — distribution-macOS release.json: exact component tags per macOS (26.5 = dyld-1378, xnu-12377.121.6)
+- [Apple userland on Darling](darling-apple-userland.md) — dyld-1378 port runs BaseSystem 26.6 binaries with the real shared cache; scripts, fixes, Mac access
+- [Handoff doc](handoff-doc.md) — ~/DARLING-MACOS26-HANDOFF.md is the full current state + ~/NEW-SESSION-PROMPT.md for a fresh session
+- [Never pkill/pgrep -f own command](feedback-pkill-own-session.md) — anchor patterns with ^ or kill by PID on the x86 box
+- [Goal: desktop + third-party apps](project-goal-desktop-apps.md) — BaseSystem apps are a stepping stone to full macOS apps, Office, Chrome; skip niche recovery apps
+- [Ponytail mode](feedback-ponytail-mode.md) — user wants lazy-senior-dev mode: minimal diffs, terse replies, saves tokens
+- [DaySetta owner decisions](daysetta-owner-decisions.md) — real Apple userland from IPSW; 27 arm64e on ARMv8.0 via explicit PAC/LSE emulation; no fake UI
+- [Reuse Daylight/Darling in briefs](feedback-reuse-daylight-darling.md) — every subagent brief cites Daylight docs, dyl4, Darling fork; require Reuse table

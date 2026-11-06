@@ -1,0 +1,7 @@
+diff --git a/deps/indium b/deps/indium
+index 43d7930..8423a7d 160000
+--- a/deps/indium
++++ b/deps/indium
+@@ -1 +1 @@
+-Subproject commit 43d793077e4ec9a74ab6f70b0fc77b9397f239a0
++Subproject commit 8423a7d2f053167030d2bc4a227f96243c740667

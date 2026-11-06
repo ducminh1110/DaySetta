@@ -1,0 +1,30 @@
+# D4 run transcript 2026-11-06 (host: aarch64 ARMv8.0, no PAC/LSE/LRCPC/CPA)
+# Task 1: FEAT_CPA (semantics from Arm ARM 2026-03 pseudocode ADDPT/SUBPT/MADDPT/MSUBPT + PointerCheckAtEL; EffectiveCPTA/CPTM emulated as 0 => plain add)
+
+$ darling shell <apple-27 slice2> hi   (default Darling dyld, genuine 27 arm64e binary)
+rc=0
+00000000: 6869 0a                                  hi.
+lowered words=171657 lowered pac-sign=7 lowered pac-auth=2 lowered pac-strip=8 lowered br-auth=8 lowered ret-auth=1 lowered cpa=1 trap pac-sign=9 trap br-auth=10 trap ret-auth=1 trap cpa=1 
+$ darling shell <apple-27 echo-fat> hi   (default Darling dyld, genuine 27 arm64e binary)
+rc=0
+00000000: 6869 0a                                  hi.
+lowered words=171657 lowered pac-sign=7 lowered pac-auth=2 lowered pac-strip=8 lowered br-auth=8 lowered ret-auth=1 lowered cpa=1 trap pac-sign=9 trap br-auth=10 trap ret-auth=1 trap cpa=1 
+$ darling shell <apple-27 slice1> hi   (default Darling dyld, genuine 27 arm64e binary)
+rc=0
+00000000: 6869 0a                                  hi.
+lowered words=171657 lowered pac-sign=7 lowered pac-auth=2 lowered pac-strip=8 lowered br-auth=8 lowered ret-auth=1 trap pac-sign=9 trap br-auth=10 trap ret-auth=1 
+# Regression (Darling-built): uname / bash / echo
+Darwin labexp 20.6.0 Darwin Kernel Version 20.6.0 arm64
+42
+hello
+
+# Task 3 state: genuine 27 dyld-1378 port (dyl4, arm64e) + 27 cache mapped by mldr (DARLING_DS_CACHE), slice1 hi
+rc=139
+lowered words=201637 lowered pac-sign=2474 lowered pac-auth=1348 lowered pac-strip=1192 lowered br-auth=539 lowered ret-auth=1003 trap pac-sign=115955 trap pac-auth=46589 trap pac-strip=44171 trap br-auth=56756 trap ret-auth=89214 trap cas=37 trap rmw=39 trap mrs-tpidrro=90 trap rmw-ldadd=4 trap rmw-swp=35 
+dyld[82]: symbol '_kpersona_pidinfo_audit_token' missing from root that overrides /usr/lib/system/libsystem_kernel.dylib. Use of that symbol in /usr/lib/system/libsystem_containermanager.dylib is being set to 0xBAD4007.
+ds-exec: PAC authentication failure at pc=0x180465e10 (?) word=0xd71f0830: poisoned 0x20000000000038
+ds-exec: lr in 180405000-180406000 r-xp 00005000 08:02 784673                           /home/ubuntu/macos-re/cache-arm64e/dyld_shared_cache_arm64e.01
+ (off+0x928)ds-exec: SIGSEGV addr=0x38 pc=0x38 () lr=0x180405928 (/usr/lib/libobjc.A.dylib+0x1928) x0=0x2000ebdb0
+ds-exec: PAC authentication failure at pc=0x180465e10 (?) word=0xd71f0830: poisoned 0x20000000000038
+ds-exec: lr in 180405000-180406000 r-xp 00005000 08:02 784673                           /home/ubuntu/macos-re/cache-arm64e/dyld_shared_cache_arm64e.01
+ (off+0x928)ds-exec: SIGSEGV addr=0x38 pc=0x38 () lr=0x180405928 (/usr/lib/libobjc.A.dylib+0x1928) x0=0x2000ebdb0

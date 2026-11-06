@@ -1,0 +1,75 @@
+diff --git a/ifconfig.tproj/CMakeLists.txt b/ifconfig.tproj/CMakeLists.txt
+index ace80fb..51df5a4 100644
+--- a/ifconfig.tproj/CMakeLists.txt
++++ b/ifconfig.tproj/CMakeLists.txt
+@@ -13,7 +13,7 @@ add_darling_executable(ifconfig
+ 	af_inet.c
+ 	af_inet6.c
+ 	af_link.c
+-	if6lowpan.c
++	# if6lowpan.c: 6LoWPAN interfaces were removed in xnu 12377.
+ 	ifbond.c
+ 	ifbridge.c
+ 	ifclone.c
+diff --git a/netstat.tproj/inet.c b/netstat.tproj/inet.c
+index 68e4ddb..08ff5ba 100644
+--- a/netstat.tproj/inet.c
++++ b/netstat.tproj/inet.c
+@@ -694,17 +694,17 @@ tcp_stats(uint32_t off , char *name, int af)
+ 	p(tcps_reordered_pkts, "\t\t%u time%s transmitted packets were reordered\n");
+ 	p(tcps_delay_recovery, "\t\t%u time%s fast recovery was delayed to handle reordering\n");
+ 	p(tcps_avoid_rxmt, "\t\t%u time%s retransmission was avoided by delaying recovery\n");
+-	p(tcps_unnecessary_rxmt, "\t\t%u retransmission%s not needed \n");
++/* tcps_unnecessary_rxmt: removed from struct tcpstat in xnu 12377 */
+ 	p(tcps_tailloss_rto, "\t%u retransmission%s due to tail loss\n");
+ 	p(tcps_dsack_sent, "\t%u time%s DSACK option was sent\n");
+ 	p(tcps_dsack_recvd, "\t\t%u time%s DSACK option was received\n");
+-	p(tcps_dsack_disable, "\t\t%u time%s DSACK was disabled on a connection\n");
++/* tcps_dsack_disable: removed from struct tcpstat in xnu 12377 */
+ 	p(tcps_dsack_badrexmt, "\t\t%u time%s recovered from bad retransmission using DSACK\n");
+ 	p(tcps_dsack_ackloss,"\t\t%u time%s ignored DSACK due to ack loss\n");
+ 	p(tcps_dsack_recvd_old,"\t\t%u time%s ignored old DSACK options\n");
+ 	p(tcps_pmtudbh_reverted, "\t%u time%s PMTU Blackhole detection, size reverted\n");
+ 	p(tcps_drop_after_sleep, "\t%u connection%s were dropped after long sleep\n");
+-	p(tcps_nostretchack, "\t%u connection%s had stretch ack algorithm disabled\n");
++/* tcps_nostretchack: removed from struct tcpstat in xnu 12377 */
+ 
+ 	p(tcps_tfo_cookie_sent,"\t%u time%s a TFO-cookie has been announced\n");
+ 	p(tcps_tfo_syn_data_rcv,"\t%u SYN%s with data and a valid TFO-cookie have been received\n");
+@@ -804,10 +804,10 @@ mptcp_stats(uint32_t off , char *name, int af)
+ 	p(tcps_mp_badcsum, "\t%u bad DSS checksum%s\n");
+ 	p(tcps_mp_oodata, "\t%u time%s received out of order data \n");
+ 	p3(tcps_mp_switches, "\t%u subflow switch%s\n");
+-	p3(tcps_mp_sel_symtomsd, "\t%u subflow switch%s due to advisory\n");
++/* tcps_mp_sel_symtomsd: removed from struct tcpstat in xnu 12377 */
+ 	p3(tcps_mp_sel_rtt, "\t%u subflow switch%s due to rtt\n");
+ 	p3(tcps_mp_sel_rto, "\t%u subflow switch%s due to rto\n");
+-	p3(tcps_mp_sel_peer, "\t%u subflow switch%s due to peer\n");
++/* tcps_mp_sel_peer: removed from struct tcpstat in xnu 12377 */
+ 	p3(tcps_mp_num_probes, "\t%u number of subflow probe%s\n");
+ 
+ 	if (interval > 0) {
+diff --git a/rtsol.tproj/probe.c b/rtsol.tproj/probe.c
+index 305d0a2..c6e5523 100644
+--- a/rtsol.tproj/probe.c
++++ b/rtsol.tproj/probe.c
+@@ -134,6 +134,11 @@ probe_init()
+ void
+ defrouter_probe(int ifindex)
+ {
++#ifndef SIOCGDRLST_IN6
++	/* xnu 12377 removed the default router list ioctl; there is nothing to probe. */
++	(void)ifindex;
++}
++#else
+ 	struct in6_drlist dr;
+ 	int s, i;
+ 	u_char ntopbuf[INET6_ADDRSTRLEN];
+@@ -171,6 +176,7 @@ defrouter_probe(int ifindex)
+ 	close(s);
+ 	return;
+ }
++#endif /* SIOCGDRLST_IN6 */
+ 
+ static void
+ sendprobe(struct in6_addr *addr, int ifindex)

@@ -1,0 +1,5 @@
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda2        98G   47G   47G  51% /
+
+Filesystem        1B-blocks        Used   Available Use% Mounted on
+/dev/sda2      105040531456 50372427776 50332221440  51% /

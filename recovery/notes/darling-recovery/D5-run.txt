@@ -1,0 +1,18 @@
+# D5 run transcript 2026-11-06 (round 2)
+# genuine 27 echo, 27 cache, dyl4
+STATE: no 'hi' yet. Progress: ulock hang fixed (commpage CPU_CLUSTERS=1, mrs TPIDR_EL0 lowered), libdispatch block-invoke re-sign, libxpc init now reached.
+Stop: libxpc __fetch_self_token brk #1 (task_info TASK_AUDIT_TOKEN val[7]==0) -> ESC-D5-darlingserver.md (2)
+$ MLDR_DSEXEC_LOG=1 slice1 hi
+ds-exec: guest brk #0x1 pc=0x18054ce70 (/usr/lib/system/libxpc.dylib+0x2e70) lr=0x18054ce34 (/usr/lib/system/libxpc.dylib+0x2e34) fp=0xfffff2130 x0=0x12 x1=0x0
+ds-exec:   x2=0x0 x8=0x0 x16=0x14 x17=0x1e7ff3990 x19=0x8478 x20=0x12 x23=0x1000004e0 x24=0x1
+# Regression (Darling libSystem, genuine 27 echo)
+$ darling shell slice2 hi
+00000000: 6869 0a                                  hi.
+$ darling shell echo-fat hi
+00000000: 6869 0a                                  hi.
+$ darling shell slice1 hi
+00000000: 6869 0a                                  hi.
+Darwin labexp 20.6.0 Darwin Kernel Version 20.6.0 arm64
+42
+hello
+48/48 tests passed

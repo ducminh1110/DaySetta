@@ -1,0 +1,15 @@
+diff --git a/libdarwin/h/cleanup.h b/libdarwin/h/cleanup.h
+index cbbd045..5e0caff 100644
+--- a/libdarwin/h/cleanup.h
++++ b/libdarwin/h/cleanup.h
+@@ -57,6 +57,10 @@
+ #include <mach/mach_port.h>
+ #include <mach/kern_return.h>
+ #include <mach/mach_right.h>
++// xnu 12377: mach_right.h no longer pulls in the private send/receive right types.
++#if __has_include(<mach/mach_right_private.h>)
++#include <mach/mach_right_private.h>
++#endif
+ 
+ #if DARWIN_TAPI
+ #include "tapi.h"

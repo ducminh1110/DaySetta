@@ -1,0 +1,458 @@
+/*
+ * Darling: launchd routines as sent by the libxpc of macOS 11 and later.
+ *
+ * That libxpc no longer speaks the MIG bootstrap protocol (job.defs) for lookups and registrations. It sends
+ * "pipe" messages to the bootstrap port with msgh_id 0x40000000 | routine; the body is one port descriptor per
+ * Mach port in the request (in the order those ports appear in the dictionary) followed by an XPC v5
+ * serialized dictionary ("@XPC", version 5). launchd answers with msgh_id 0x20000000 and the same encoding.
+ * Darling's launchd predates this, so programs from a real macOS (running on Darling with their own libSystem)
+ * could find no service at all. This file maps the routines such programs use onto the existing MIG
+ * implementations in core.c. Routine numbers and keys were recorded from a macOS 27 launchd.
+ */
+#include "config.h"
+#include "core.h"
+#include "runtime.h"
+#include "log.h"
+
+#include <errno.h>
+#include <mach/mach.h>
+#include <servers/bootstrap.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
+#include <syslog.h>
+#include <unistd.h>
+#include <uuid/uuid.h>
+
+// MIG implementations in core.c
+kern_return_t job_mig_look_up2(job_t j, mach_port_t srp, name_t servicename, mach_port_t *serviceportp,
+	pid_t target_pid, uuid_t instance_id, uint64_t flags);
+kern_return_t job_mig_register2(job_t j, name_t servicename, mach_port_t serviceport, uint64_t flags);
+kern_return_t job_mig_parent(job_t j, mach_port_t srp, mach_port_t *parentport);
+
+#define V5_MAGIC 0x40585043u
+#define V5_VERSION 5
+#define V5_ID_MASK 0xF0000000u
+#define V5_ID_ROUTINE 0x40000000u
+#define V5_ID_REPLY 0x20000000u
+
+enum {
+	T_NULL = 0x1000, T_BOOL = 0x2000, T_INT64 = 0x3000, T_UINT64 = 0x4000, T_DOUBLE = 0x5000, T_DATE = 0x7000,
+	T_DATA = 0x8000, T_STRING = 0x9000, T_UUID = 0xa000, T_FD = 0xb000, T_MACH_SEND = 0xd000, T_ARRAY = 0xe000,
+	T_DICT = 0xf000, T_MACH_RECV = 0x15000,
+};
+
+enum {
+	ROUTINE_REGISTER = 204, ROUTINE_PARENT = 203, ROUTINE_LOOKUP = 207, ROUTINE_GET_INTEGER = 301,
+	ROUTINE_LOOKUP_ENDPOINT = 804,
+};
+
+#define V5_MAX_KEYS 32
+#define V5_MAX_PORTS 8
+
+// Top-level entries of a request dictionary; nested containers are skipped.
+struct v5_entry {
+	const char *key;
+	uint32_t type;
+	uint64_t integer;      // bool, int64, uint64
+	const char *string;    // string
+	const uint8_t *bytes;  // uuid, data
+	uint32_t length;       // data
+	mach_port_t port;      // mach_send / mach_recv: taken from the descriptors in order
+	bool consumed;         // the handler kept this right
+};
+
+struct v5_request {
+	struct v5_entry entries[V5_MAX_KEYS];
+	unsigned count;
+};
+
+static bool skip_object(const uint8_t **p, const uint8_t *end, unsigned *port_index);
+
+static bool read_u32(const uint8_t **p, const uint8_t *end, uint32_t *out)
+{
+	if (end - *p < 4)
+		return false;
+	memcpy(out, *p, 4);
+	*p += 4;
+	return true;
+}
+
+static uint32_t pad4(uint32_t n)
+{
+	return (n + 3) & ~3u;
+}
+
+// Payload of one object of the given type; *p points just after the type word.
+static bool read_payload(uint32_t type, const uint8_t **p, const uint8_t *end, struct v5_entry *e,
+	unsigned *port_index)
+{
+	uint32_t n;
+	switch (type) {
+	case T_NULL:
+		return true;
+	case T_BOOL:
+		if (!read_u32(p, end, &n))
+			return false;
+		if (e)
+			e->integer = n != 0;
+		return true;
+	case T_INT64: case T_UINT64: case T_DOUBLE: case T_DATE:
+		if (end - *p < 8)
+			return false;
+		if (e)
+			memcpy(&e->integer, *p, 8);
+		*p += 8;
+		return true;
+	case T_STRING: case T_DATA:
+		if (!read_u32(p, end, &n) || (uint32_t)(end - *p) < pad4(n))
+			return false;
+		if (e) {
+			e->bytes = *p;
+			e->length = n;
+			if (type == T_STRING && n > 0 && (*p)[n - 1] == '\0')
+				e->string = (const char *)*p;
+		}
+		*p += pad4(n);
+		return true;
+	case T_UUID:
+		if (end - *p < 16)
+			return false;
+		if (e)
+			e->bytes = *p;
+		*p += 16;
+		return true;
+	case T_MACH_SEND: case T_MACH_RECV: case T_FD:
+		if (e)
+			e->integer = (*port_index)++;
+		else
+			(*port_index)++;
+		return true;
+	case T_ARRAY: case T_DICT: {
+		uint32_t len, count;
+		if (!read_u32(p, end, &len) || (uint32_t)(end - *p) < len || !read_u32(p, end, &count))
+			return false;
+		for (uint32_t i = 0; i < count; i++) {
+			if (type == T_DICT) {
+				const uint8_t *nul = memchr(*p, 0, end - *p);
+				if (!nul)
+					return false;
+				*p += pad4((uint32_t)(nul - *p) + 1);
+			}
+			if (!skip_object(p, end, port_index))
+				return false;
+		}
+		return true;
+	}
+	}
+	return false;
+}
+
+static bool skip_object(const uint8_t **p, const uint8_t *end, unsigned *port_index)
+{
+	uint32_t type;
+	return read_u32(p, end, &type) && read_payload(type, p, end, NULL, port_index);
+}
+
+static bool parse_request(const uint8_t *p, const uint8_t *end, const mach_port_t *ports, unsigned nports,
+	struct v5_request *req)
+{
+	uint32_t magic, version, type, len, count;
+	unsigned port_index = 0;
+
+	memset(req, 0, sizeof(*req));
+	if (!read_u32(&p, end, &magic) || magic != V5_MAGIC || !read_u32(&p, end, &version) ||
+		!read_u32(&p, end, &type) || type != T_DICT || !read_u32(&p, end, &len) || !read_u32(&p, end, &count))
+		return false;
+	for (uint32_t i = 0; i < count; i++) {
+		const uint8_t *nul = memchr(p, 0, end - p);
+		uint32_t t;
+		struct v5_entry scratch, *e = req->count < V5_MAX_KEYS ? &req->entries[req->count] : &scratch;
+
+		if (!nul)
+			return false;
+		memset(e, 0, sizeof(*e));
+		e->key = (const char *)p;
+		p += pad4((uint32_t)(nul - p) + 1);
+		if (!read_u32(&p, end, &t) || !read_payload(t, &p, end, e, &port_index))
+			return false;
+		e->type = t;
+		if ((t == T_MACH_SEND || t == T_MACH_RECV) && e->integer < nports)
+			e->port = ports[e->integer];
+		if (e != &scratch)
+			req->count++;
+	}
+	return true;
+}
+
+static struct v5_entry *find(const struct v5_request *req, const char *key)
+{
+	for (unsigned i = 0; i < req->count; i++)
+		if (strcmp(req->entries[i].key, key) == 0)
+			return (struct v5_entry *)&req->entries[i];
+	return NULL;
+}
+
+static uint64_t find_integer(const struct v5_request *req, const char *key, uint64_t fallback)
+{
+	const struct v5_entry *e = find(req, key);
+	return e && (e->type == T_INT64 || e->type == T_UINT64 || e->type == T_BOOL) ? e->integer : fallback;
+}
+
+// Reply writer: a flat dictionary of integers, strings and ports.
+struct v5_writer {
+	uint8_t *buf;
+	size_t capacity, used;
+	uint32_t dict_len_at;
+	uint32_t count;
+	mach_port_t ports[V5_MAX_PORTS];
+	mach_msg_type_name_t dispositions[V5_MAX_PORTS];
+	unsigned nports;
+	bool overflow;
+};
+
+static void put(struct v5_writer *w, const void *data, size_t n)
+{
+	if (w->used + pad4((uint32_t)n) > w->capacity) {
+		w->overflow = true;
+		return;
+	}
+	memcpy(w->buf + w->used, data, n);
+	memset(w->buf + w->used + n, 0, pad4((uint32_t)n) - n);
+	w->used += pad4((uint32_t)n);
+}
+
+static void put_u32(struct v5_writer *w, uint32_t v)
+{
+	put(w, &v, 4);
+}
+
+static void writer_begin(struct v5_writer *w)
+{
+	put_u32(w, V5_MAGIC);
+	put_u32(w, V5_VERSION);
+	put_u32(w, T_DICT);
+	w->dict_len_at = (uint32_t)w->used;
+	put_u32(w, 0); // length, patched in writer_end
+	put_u32(w, 0); // count
+}
+
+static void put_key(struct v5_writer *w, const char *key)
+{
+	put(w, key, strlen(key) + 1);
+	w->count++;
+}
+
+static void put_int(struct v5_writer *w, const char *key, uint32_t type, uint64_t v)
+{
+	put_key(w, key);
+	put_u32(w, type);
+	if (type == T_BOOL)
+		put_u32(w, (uint32_t)v);
+	else
+		put(w, &v, 8);
+}
+
+static void put_string(struct v5_writer *w, const char *key, const char *s)
+{
+	put_key(w, key);
+	put_u32(w, T_STRING);
+	put_u32(w, (uint32_t)strlen(s) + 1);
+	put(w, s, strlen(s) + 1);
+}
+
+static void put_port(struct v5_writer *w, const char *key, mach_port_t port, mach_msg_type_name_t disposition)
+{
+	if (w->nports == V5_MAX_PORTS) {
+		w->overflow = true;
+		return;
+	}
+	put_key(w, key);
+	put_u32(w, T_MACH_SEND);
+	w->ports[w->nports] = port;
+	w->dispositions[w->nports++] = disposition;
+}
+
+static void put_empty_dict(struct v5_writer *w, const char *key)
+{
+	put_key(w, key);
+	put_u32(w, T_DICT);
+	put_u32(w, 4);
+	put_u32(w, 0);
+}
+
+static void writer_end(struct v5_writer *w)
+{
+	uint32_t len = (uint32_t)(w->used - w->dict_len_at - 4);
+	memcpy(w->buf + w->dict_len_at, &len, 4);
+	memcpy(w->buf + w->dict_len_at + 4, &w->count, 4);
+}
+
+static void reply_error(struct v5_writer *w, int64_t error)
+{
+	put_int(w, "error", T_INT64, (uint64_t)error);
+}
+
+// launchd error for "no such service" as reported to libxpc (bootstrap_look_up then fails with
+// BOOTSTRAP_UNKNOWN_SERVICE).
+#define V5_ERR_NO_SERVICE 113
+
+// libxpc checks that a launchd reply names the requesting process: "req_pid" and "rec_execcnt" must equal the
+// pid and pid version in its own audit token.
+static void put_requester(struct v5_writer *w, mach_msg_header_t *request)
+{
+	const mach_msg_audit_trailer_t *tp =
+		(const mach_msg_audit_trailer_t *)((const uint8_t *)request + round_msg(request->msgh_size));
+	put_int(w, "rec_execcnt", T_UINT64, tp->msgh_audit.val[7]);
+	put_int(w, "req_pid", T_UINT64, tp->msgh_audit.val[5]);
+}
+
+static void handle(uint32_t routine, const struct v5_request *req, mach_msg_header_t *request, struct v5_writer *w)
+{
+	job_t j = job_mig_intran(request->msgh_local_port);
+	const struct v5_entry *name = find(req, "name");
+	kern_return_t kr;
+
+	switch (routine) {
+	case ROUTINE_LOOKUP:
+	case ROUTINE_LOOKUP_ENDPOINT: {
+		mach_port_t port = MACH_PORT_NULL;
+		uuid_t instance = { 0 };
+		const struct v5_entry *inst = find(req, "instance");
+
+		if (!name || !name->string) {
+			reply_error(w, EINVAL);
+			return;
+		}
+		if (inst && inst->type == T_UUID)
+			memcpy(instance, inst->bytes, sizeof(instance));
+		kr = job_mig_look_up2(j, request->msgh_remote_port, (char *)name->string, &port,
+			(pid_t)find_integer(req, "targetpid", 0), instance, find_integer(req, "flags", 0));
+		if (kr == BOOTSTRAP_SUCCESS && MACH_PORT_VALID(port)) {
+			put_requester(w, request);
+			put_port(w, "port", port, MACH_MSG_TYPE_COPY_SEND);
+		} else {
+			launchd_syslog(LOG_DEBUG, "xpc v5 lookup of %s failed: 0x%x", name->string, kr);
+			reply_error(w, V5_ERR_NO_SERVICE);
+		}
+		return;
+	}
+	case ROUTINE_REGISTER: {
+		struct v5_entry *port = find(req, "port");
+		if (!name || !name->string || !port) {
+			reply_error(w, EINVAL);
+			return;
+		}
+		kr = job_mig_register2(j, (char *)name->string, port->port, find_integer(req, "flags", 0));
+		if (kr == BOOTSTRAP_SUCCESS)
+			port->consumed = true;
+		else
+			reply_error(w, kr == BOOTSTRAP_SERVICE_ACTIVE ? EEXIST : EPERM);
+		return;
+	}
+	case ROUTINE_PARENT: {
+		mach_port_t parent = MACH_PORT_NULL;
+		kr = job_mig_parent(j, request->msgh_remote_port, &parent);
+		if (kr == BOOTSTRAP_SUCCESS && MACH_PORT_VALID(parent))
+			put_port(w, "parent", parent, MACH_MSG_TYPE_COPY_SEND);
+		else
+			reply_error(w, EPERM);
+		return;
+	}
+	case ROUTINE_GET_INTEGER:
+		// vproc_swap_* "get": the only key seen from apps is the session type (VPROC_GSK_MGR_NAME). Everything
+		// in a Darling prefix runs in the one console login session.
+		if (find_integer(req, "outgsk", 0) == 6) {
+			put_string(w, "out", "Aqua");
+			return;
+		}
+		reply_error(w, ENOTSUP);
+		return;
+	default:
+		launchd_syslog(LOG_NOTICE, "xpc v5: unsupported launchd routine %u (%u keys, first %s)", routine,
+			req->count, req->count ? req->entries[0].key : "-");
+		reply_error(w, ENOTSUP);
+		return;
+	}
+}
+
+boolean_t
+launchd_xpc_v5_demux(mach_msg_header_t *request, mach_msg_header_t *reply, mach_msg_size_t reply_capacity)
+{
+	mach_port_t ports[V5_MAX_PORTS];
+	unsigned nports = 0;
+	const uint8_t *p = (const uint8_t *)(request + 1);
+	const uint8_t *end = (const uint8_t *)request + request->msgh_size;
+	struct v5_request req;
+
+	if ((request->msgh_id & V5_ID_MASK) != V5_ID_ROUTINE || request->msgh_id == V5_ID_ROUTINE)
+		return false;
+
+	if (request->msgh_bits & MACH_MSGH_BITS_COMPLEX) {
+		const mach_msg_body_t *body = (const mach_msg_body_t *)p;
+		const mach_msg_descriptor_t *d = (const mach_msg_descriptor_t *)(body + 1);
+		for (mach_msg_size_t i = 0; i < body->msgh_descriptor_count; i++) {
+			if (d->type.type != MACH_MSG_PORT_DESCRIPTOR)
+				return false;
+			if (nports < V5_MAX_PORTS)
+				ports[nports++] = d->port.name;
+			d = (const mach_msg_descriptor_t *)((const uint8_t *)d + sizeof(mach_msg_port_descriptor_t));
+		}
+		p = (const uint8_t *)d;
+	}
+	if (!parse_request(p, end, ports, nports, &req)) {
+		launchd_syslog(LOG_ERR, "xpc v5: malformed request 0x%x", request->msgh_id);
+		return false;
+	}
+
+	// Reply: header, descriptors for the ports, then the serialized dictionary.
+	mach_msg_body_t *rbody = (mach_msg_body_t *)(reply + 1);
+	mach_msg_port_descriptor_t *rdesc = (mach_msg_port_descriptor_t *)(rbody + 1);
+	uint8_t scratch[2048];
+	struct v5_writer w = { .buf = scratch, .capacity = sizeof(scratch) };
+
+	writer_begin(&w);
+	handle(request->msgh_id & ~V5_ID_MASK, &req, request, &w);
+	writer_end(&w);
+
+	// Like a MIG server routine, we own the request's rights now: drop the ones not kept, and clear the
+	// descriptors so the pipe code's mach_msg_destroy() of the request cannot release them a second time.
+	if (request->msgh_bits & MACH_MSGH_BITS_COMPLEX) {
+		mach_msg_body_t *body = (mach_msg_body_t *)(request + 1);
+		mach_msg_port_descriptor_t *d = (mach_msg_port_descriptor_t *)(body + 1);
+		for (mach_msg_size_t i = 0; i < body->msgh_descriptor_count; i++) {
+			bool kept = false;
+			for (unsigned k = 0; k < req.count; k++)
+				if (req.entries[k].consumed && req.entries[k].port == d[i].name)
+					kept = true;
+			if (!kept && MACH_PORT_VALID(d[i].name))
+				mach_port_deallocate(mach_task_self(), d[i].name);
+			d[i].name = MACH_PORT_NULL;
+		}
+	}
+	if (w.overflow)
+		return false;
+
+	size_t header = sizeof(*reply) + (w.nports ? sizeof(*rbody) + w.nports * sizeof(*rdesc) : 0);
+	if (header + w.used > reply_capacity)
+		return false;
+
+	reply->msgh_bits = MACH_MSGH_BITS(MACH_MSGH_BITS_REMOTE(request->msgh_bits), 0);
+	reply->msgh_remote_port = request->msgh_remote_port;
+	reply->msgh_local_port = MACH_PORT_NULL;
+	reply->msgh_voucher_port = MACH_PORT_NULL;
+	reply->msgh_id = V5_ID_REPLY;
+	if (w.nports) {
+		reply->msgh_bits |= MACH_MSGH_BITS_COMPLEX;
+		rbody->msgh_descriptor_count = w.nports;
+		for (unsigned i = 0; i < w.nports; i++) {
+			memset(&rdesc[i], 0, sizeof(rdesc[i]));
+			rdesc[i].name = w.ports[i];
+			rdesc[i].disposition = w.dispositions[i];
+			rdesc[i].type = MACH_MSG_PORT_DESCRIPTOR;
+		}
+	}
+	memcpy((uint8_t *)reply + header, scratch, w.used);
+	reply->msgh_size = (mach_msg_size_t)(header + w.used);
+	return true;
+}

@@ -1,0 +1,16 @@
+diff --git a/src/pguard_malloc.c b/src/pguard_malloc.c
+index cfd80ff..48647cc 100644
+--- a/src/pguard_malloc.c
++++ b/src/pguard_malloc.c
+@@ -21,6 +21,11 @@
+  * @APPLE_LICENSE_HEADER_END@
+  */
+ 
++#include <mach/vm_statistics.h>
++#ifndef VM_MEMORY_MALLOC_PGUARD
++// xnu 12377 renamed this tag.
++#define VM_MEMORY_MALLOC_PGUARD VM_MEMORY_MALLOC_PROB_GUARD
++#endif
+ #include "pguard_malloc.h"
+ 
+ #include <TargetConditionals.h>

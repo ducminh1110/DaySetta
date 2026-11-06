@@ -1,0 +1,26 @@
+# D2 run transcripts 2026-11-06T11:51:07Z
+# Host: Linux 7.0.0-42-generic aarch64, page size 4096, VA bits 48 (CONFIG_ARM64_VA_BITS=48), Features:  fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid
+# Binaries below are DARLING-BUILT arm64 Mach-O (uname/echo/bash from this build), NOT Apple binaries.
+$ darling shell uname -a
+Darwin labexp 20.6.0 Darwin Kernel Version 20.6.0 arm64
+rc=0
+$ darling shell /bin/echo hello
+hello
+rc=0
+$ darling shell bash -c 'echo $((6*7))'
+42
+rc=0
+$ file (host) on the Darling-built echo
+/usr/local/libexec/darling/bin/echo: Mach-O 64-bit arm64 executable, flags:<NOUNDEFS|DYLDLINK|TWOLEVEL|PIE>
+
+# ---- Genuine Apple binary: macOS 27 /bin/echo (store-27), run via 'darling shell /Volumes/SystemRoot<scratch>/<slice> hi' (copies live in scratch, outside any git repo)
+# fat slices: [0] x86_64 (cpusubtype 3), [1] arm64e (cpusubtype 2), [2] 'arm64' cpusubtype 0xc (the plain-arm64 slice requested)
+$ darling shell slice2 hi
+rc=132 (132 = SIGILL)
+$ darling shell slice1 hi
+rc=132 (132 = SIGILL)
+$ darling shell echo-fat hi
+rc=132 (132 = SIGILL)
+# SIGILL si_addr=0x200057790 for all three = Darling dyld (/usr/local/libexec/darling/usr/lib/dyld, file offset 0x57790, image base 0x200000000): dyld3::MachOLoaded::ChainedFixupPointerOnDisk::Arm64e::signPointer+0x40: 'pacia x0, x1' (PAC) on a host without PAC.
+# slice2 (the 'arm64' slice) uses pointer_format 12 (DYLD_CHAINED_PTR_ARM64E_USERLAND24), __auth_stubs/__auth_got, 'pacibsppc' (offset 0x1000004f0) and 'braa'; it differs from slice1 (arm64e) only in cpusubtype+signature bytes (cmp: 380 bytes). So on macOS 27 there is NO non-PAC arm64 slice.
+# RESULT: genuine Apple macOS 27 /bin/echo (arm64 slice) on Darling aarch64 with Darling libSystem: DOES NOT RUN (SIGILL in dyld before main; never reached libSystem).

@@ -1,0 +1,14 @@
+IA_CRYPTEX report (read-only; target not deleted, moved, modified, mounted, or executed)
+
+path:       /home/ubuntu/ia-cryptex
+size:       1598443858 bytes
+version:    UNKNOWN (no ProductVersion/ProductBuildVersion/build string found in first 200MB; no macOS version in metadata)
+container:  RIDIFF10 delta/patch (not a full image). Header "RIDIFF10" at 0x00; "pbzx" at 0x3e; xz stream (FD 37 7A 58 5A 00) at 0x5a.
+            Not AEA1, not APFS (no NXSB at 0x20), not IMG4/IM4P, not LZFSE, not xar, not dmg (no koly trailer).
+            It needs a base image to apply against; the neighbor script mac_cryptex_extract.sh applies it with /tmp/ridiff_patch.py.
+
+references:
+  /home/ubuntu/daylight/docs/knowledge/RECOVERY_AND_RECONSTRUCTION.md:22 (lists ~/ia-cryptex as PRESENT)
+  /home/ubuntu/mac_cryptex_extract.sh:1-4 (describes applying the RIDIFF10 cryptex patch; default patchfile name contains x86_64)
+  /home/ubuntu/daysetta: 0 'cryptex' hits
+  Repo-wide: 33 'cryptex' hits across daysetta, daylight and ~/*.md; the other hits are unrelated (e.g. libcryptex.dylib entries in daylight/data/apple-api/objc-classes.json:50531).

@@ -1,0 +1,34 @@
+diff --git a/IOKitLib.c b/IOKitLib.c
+index 81ed8f7..eb1d247 100644
+--- a/IOKitLib.c
++++ b/IOKitLib.c
+@@ -166,7 +166,8 @@ IOMasterPort( mach_port_t bootstrapPort __unused, mach_port_t * masterPort )
+ #endif
+ 
+     host_port = mach_host_self();
+-    result = host_get_io_master(host_port, masterPort);
++    // host_get_io_master was renamed host_get_io_main in xnu 12377 (same MIG routine, id 205).
++    result = host_get_io_main(host_port, masterPort);
+ 
+     static dispatch_once_t versionOnce;
+     dispatch_once(&versionOnce, ^{
+diff --git a/darling/include/IOKit/IOMapTypes.h b/darling/include/IOKit/IOMapTypes.h
+new file mode 120000
+index 0000000..53c14e9
+--- /dev/null
++++ b/darling/include/IOKit/IOMapTypes.h
+@@ -0,0 +1 @@
++../../../darling/submodules/xnu/iokit/IOKit/IOMapTypes.h
+\ No newline at end of file
+diff --git a/kext.subproj/OSKextVersion.c b/kext.subproj/OSKextVersion.c
+index 929ca38..47655cd 100644
+--- a/kext.subproj/OSKextVersion.c
++++ b/kext.subproj/OSKextVersion.c
+@@ -30,6 +30,7 @@
+ #include <libkern/OSKextLibPrivate.h>
+ #else
+ #include <libc.h>
++#include <CoreFoundation/CoreFoundation.h> /* xnu 12377 OSKextLibPrivate.h uses CF types in userspace */
+ #include <System/libkern/OSKextLibPrivate.h>
+ #endif /* KERNEL */
+ #include <System/libkern/OSKextLibPrivate.h>

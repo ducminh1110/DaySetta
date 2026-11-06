@@ -1,0 +1,13 @@
+diff --git a/include/corecrypto/cc_config.h b/include/corecrypto/cc_config.h
+index 7aeca00..0f95c8c 100644
+--- a/include/corecrypto/cc_config.h
++++ b/include/corecrypto/cc_config.h
+@@ -425,7 +425,7 @@
+ 
+ // detect endianness using information from https://sourceforge.net/p/predef/wiki/Endianness/
+ #if defined(__has_include)
+-  #if __has_include(<endian.h>)
++  #if __has_include(<endian.h>) && !defined(__APPLE__) // DARLING: host glibc endian.h needs the multiarch include dir
+     #include <endian.h>
+   #endif
+ #endif

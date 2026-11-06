@@ -1,0 +1,93 @@
+# D3 run transcript 2026-11-06T12:03:37Z
+# Host: Linux 7.0.0-42-generic aarch64, Features: fp asimd evtstrm aes pmull sha1 sha2 crc32 cpuid (no paca/pacg/atomics/lrcpc)
+# mldr built with ds-exec: software PAC (SipHash, per-process random keys), PAC/LSE/LDAPR words in Mach-O code sections lowered to BRK at map time,
+# emulated from Darling's sigexc_handler via elfcalls->dsexec_sigtrap. Darling dyld (plain arm64, inline-asm pacia) goes through the same engine and keys.
+# Genuine Apple macOS 27 /bin/echo slices extracted from store-27 into scratch (not committed).
+
+$ darling shell <apple-27 slice1> hi   (slice1 = arm64e cpusubtype 2; slice2 = cpusubtype 0xc; echo-fat = fat of x86_64+arm64e+0xc)
+stdout (hexdump -C):
+00000000  68 69 0a                                          |hi.|
+00000003
+stderr bytes: 0  rc=0
+lowered / trap counts by kind (nonzero only):
+  lowered words=171657
+  lowered pac-sign=7
+  lowered pac-auth=2
+  lowered pac-strip=8
+  lowered br-auth=8
+  lowered ret-auth=1
+  trap pac-sign=9
+  trap br-auth=10
+  trap ret-auth=1
+
+$ darling shell <apple-27 slice1> hello world   (slice1 = arm64e cpusubtype 2; slice2 = cpusubtype 0xc; echo-fat = fat of x86_64+arm64e+0xc)
+stdout (hexdump -C):
+00000000  68 65 6c 6c 6f 20 77 6f  72 6c 64 0a              |hello world.|
+0000000c
+stderr bytes: 0  rc=0
+lowered / trap counts by kind (nonzero only):
+  lowered words=171657
+  lowered pac-sign=7
+  lowered pac-auth=2
+  lowered pac-strip=8
+  lowered br-auth=8
+  lowered ret-auth=1
+  trap pac-sign=9
+  trap br-auth=29
+  trap ret-auth=1
+
+$ darling shell <apple-27 slice1> -n x   (slice1 = arm64e cpusubtype 2; slice2 = cpusubtype 0xc; echo-fat = fat of x86_64+arm64e+0xc)
+stdout (hexdump -C):
+00000000  78                                                |x|
+00000001
+stderr bytes: 0  rc=0
+lowered / trap counts by kind (nonzero only):
+  lowered words=171657
+  lowered pac-sign=7
+  lowered pac-auth=2
+  lowered pac-strip=8
+  lowered br-auth=8
+  lowered ret-auth=1
+  trap pac-sign=9
+  trap br-auth=8
+  trap ret-auth=1
+
+$ darling shell <apple-27 slice2> hi   (slice1 = arm64e cpusubtype 2; slice2 = cpusubtype 0xc; echo-fat = fat of x86_64+arm64e+0xc)
+stdout (hexdump -C):
+stderr bytes: 0  rc=132
+lowered / trap counts by kind (nonzero only):
+  lowered words=171657
+  lowered pac-sign=7
+  lowered pac-auth=2
+  lowered pac-strip=8
+  lowered br-auth=8
+  lowered ret-auth=1
+  trap pac-sign=9
+  trap br-auth=4
+
+$ darling shell <apple-27 echo-fat> hi   (slice1 = arm64e cpusubtype 2; slice2 = cpusubtype 0xc; echo-fat = fat of x86_64+arm64e+0xc)
+stdout (hexdump -C):
+stderr bytes: 0  rc=132
+lowered / trap counts by kind (nonzero only):
+  lowered words=171657
+  lowered pac-sign=7
+  lowered pac-auth=2
+  lowered pac-strip=8
+  lowered br-auth=8
+  lowered ret-auth=1
+  trap pac-sign=9
+  trap br-auth=4
+
+# slice2/echo-fat blocker (verbatim, strace of the container process): --- SIGILL {si_signo=SIGILL, si_code=ILL_ILLOPC, si_addr=0x100000588} ---
+# word 0x9a00229b = 'addpt x27, x20, x0' (FEAT_CPA checked pointer arithmetic, ARMv9.5) in the exe __text after 'bl _strlen'; PAuth_LR (pacibsppc 0x4f0 / retabsppc 0x778) already handled.
+
+# ---- Darling-built binaries still run (regression)
+$ darling shell /bin/echo hello
+hello
+rc=0
+$ darling shell uname -a
+Darwin labexp 20.6.0 Darwin Kernel Version 20.6.0 arm64
+rc=0
+$ darling shell bash -c 'echo $((6*7))'
+42
+rc=0

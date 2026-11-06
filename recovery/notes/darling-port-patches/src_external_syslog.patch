@@ -1,0 +1,12 @@
+diff --git a/syslogd.tproj/dbserver.c b/syslogd.tproj/dbserver.c
+index 70eb86e..6596094 100644
+--- a/syslogd.tproj/dbserver.c
++++ b/syslogd.tproj/dbserver.c
+@@ -21,6 +21,7 @@
+  * @APPLE_LICENSE_HEADER_END@
+  */
+ 
++#include <sys/fileport.h> /* fileport_makeport(), moved out of <sys/fcntl.h> in xnu 12377 */
+ #include <TargetConditionals.h>
+ 
+ #include <sys/types.h>

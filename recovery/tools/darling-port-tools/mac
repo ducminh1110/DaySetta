@@ -1,0 +1,2 @@
+#!/bin/sh
+exec ssh -o LogLevel=ERROR -o BatchMode=yes lichen309@100.75.181.28 "$@"

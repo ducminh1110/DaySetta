@@ -1,0 +1,10 @@
+#!/bin/sh
+# Fetch the last Darling run log from the x86 box and symbolize its crash report.
+S=/tmp/claude-1001/-home-ubuntu/fa91baf1-5dd6-4aeb-8211-2202c0fc70d0/scratchpad
+scp -q -o LogLevel=ERROR ubuntu@remotemac.mooo.com:darltest/last.log $S/last.log
+if [ "$1" = "-r" ]; then
+  scp -q -o LogLevel=ERROR ubuntu@remotemac.mooo.com:/usr/local/libexec/darling/usr/lib/system/libsystem_kernel.dylib $S/libsystem_kernel.darling
+  llvm-lipo -thin x86_64 $S/libsystem_kernel.darling -o $S/libsk64
+  scp -q -o LogLevel=ERROR ubuntu@remotemac.mooo.com:dyld-port/dyld $S/dyld4.bin
+fi
+python3 ~/macos-re/tools/dsym.py $S/last.log ~/macos-re/recovery/bs/System/Library/dyld/dyld_shared_cache_x86_64.map ~/macos-re/dsc-x86_64 dyld=$S/dyld4.bin libsystem_kernel.dylib=$S/libsk64

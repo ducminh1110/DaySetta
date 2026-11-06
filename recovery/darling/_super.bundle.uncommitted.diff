@@ -1,0 +1,12 @@
+diff --git a/src/external/corecrypto b/src/external/corecrypto
+--- a/src/external/corecrypto
++++ b/src/external/corecrypto
+@@ -1 +1 @@
+-Subproject commit 875f1cd9e75b0029d872b88ce8a77da276c00c84
++Subproject commit 875f1cd9e75b0029d872b88ce8a77da276c00c84-dirty
+diff --git a/src/external/metal b/src/external/metal
+--- a/src/external/metal
++++ b/src/external/metal
+@@ -1 +1 @@
+-Subproject commit fd256bc0edf7f7e6dcd1ffd94ce22d43427ac5a7
++Subproject commit fd256bc0edf7f7e6dcd1ffd94ce22d43427ac5a7-dirty

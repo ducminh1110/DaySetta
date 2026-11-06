@@ -1,0 +1,212 @@
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/atm/atm_notification.defs
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/atm/atm_types.defs
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/i386/hw_lock_types.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/i386/io_map_entries.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/cpu_quiesce.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/ipc_sync.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/ltable.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/mach_node.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/mach_node_link.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/mk_timer.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/sync_lock.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/libkern/OSRuntime.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/lock_set.defs
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/cc.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/contiki-conf.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/contiki-default-conf.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/contiki-lib.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/contiki-net.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/contiki-version.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/contiki.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/frame802154.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/if_6lowpan_var.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/if_llatbl.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/linkaddr.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/sixxlowpan.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/tcp_debug.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/nfs/nfs_ioctl.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/nfs/nfs_lock.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/nfs/nfsdiskless.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/nfs/nfsmount.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/nfs/nfsnode.h
+ M Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/os/availability.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/kasl.h
+ M Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/kdebug_private.h
+ D Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/vnioctl.h
+ M basic-headers/Availability.h
+ M basic-headers/AvailabilityInternal.h
+ M basic-headers/AvailabilityMacros.h
+ M src/external/AvailabilityVersions
+ M src/frameworks/CoreServices/SystemVersion.plist
+ M src/frameworks/CoreServices/SystemVersionCompat.plist
+ M src/startup/mldr/stack.c
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalPrivate.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_commpage_pfz.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_inttypes.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_simple_getenv.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/i386/_endian.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/i386/lbr.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/i386/string.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/i386/trap_internal.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/compact_id.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/cpc.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/cpc_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/ecc_init.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/epoch_sync.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exception_policy.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_aoe.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_boot.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_conclave.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_debug.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_driverkit.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_frame_mint.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_inspection.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_internal.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_memory.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_panic.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_resource.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_sensor.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_shared_memory.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_stackshot.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_storage.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_test_stackshot.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_upcalls.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/exclaves_xnuproxy.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/ext_paniclog.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/iotrace.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/kcdata_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/kern_apfs_reflock.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/kern_stackshot.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/llc_error.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/lock_attr.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/lock_mtx.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/lock_ptr.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/lock_rw.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/lock_sleep.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/lock_types.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/locks_internal.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/mpsc_ring.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/panic_call.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/recount.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/sched_common.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/sched_hygiene.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/sched_rt.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/smr.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/smr_hash.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/smr_types.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/socd_client.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/socd_client_kern.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/stackshot_kpi.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/task_ref.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/testpoints.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/thread_test_context.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/ticket_lock.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/timeout.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/timeout_decl.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/trap_telemetry.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/upsi.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/workload_config.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/kern/zalloc_ro_shim.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/libproc_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/doubleagent_mig.defs
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/doubleagent_types.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/dyld_pager.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/exclaves.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/exclaves_l4.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/mach_test_upcall.defs
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/mach_time_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/memory_error_notification.defs
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/memory_object_control.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/task_policy_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/thread_policy_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/vm_reclaim.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/vm_reclaim_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/vm_region_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/mach/vm_types_unsafe.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/machine/_endian.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/machine/machine_cpc.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/machine/static_if.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/machine/string.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/machine/trap_internal.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/bloom_filter.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/bpf_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/dlil_sysctl.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/dlil_var_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/droptap.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/if_mib_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/if_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/if_redirect.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/if_var_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/if_var_status.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/kctl_test.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/mblist.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/net_sysctl.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/pktsched/pktsched_ops.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/remote_vif.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/route_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/siphash.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/sockaddr_utils.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/strict_type_cnv_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/net/trie_utility.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/in_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/inp_log.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/tcp_includes.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/tcp_pacing.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/tcp_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/tcp_syncookie.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/tcp_sysctls.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/tcp_utils.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet/udp_log.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netinet6/in6_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/netkey/keysock_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/os/alloc_util.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/os/cxx_safe_buffers.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/os/log_internal.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/os/log_queue.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/os/system_event_log.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/ptrcheck.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/spawn_filtering_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/__endian.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/_types/_graftdmg_un.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/_types/_mount_t.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/_types/_vnode_t.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/attr_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/coalition_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/code_signing.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/code_signing_internal.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/commpage_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/constrained_ctypes.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/crossarch.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/dirent_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/disk_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/event_log.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/event_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/fcntl_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/fsgetpath_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/kdebug_common.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/kdebug_triage.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/kern_control_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/kern_debug.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/kern_event_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/kern_memorystatus_xnu.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/lockdown_mode.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/mem_acct_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/mman_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/os_log_coprocessor.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/preoslog.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/proc_info_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/proc_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/proc_ro.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/resource_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/socket_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/sockio_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/sys_domain_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/trust_caches.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/trusted_execution_monitor.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/variant_internal.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/vsock_private.h
+?? Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/vfs/vfs_exclave_fs.h
+?? basic-headers/AvailabilityInternalLegacy.h
+?? basic-headers/AvailabilityInternalPrivate.h
+?? tools/sync-xnu-sdk-headers.py
