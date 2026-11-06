@@ -1,42 +1,58 @@
 # AI Agent Handoff
 
-Short, on purpose. Read this and then go to the docs.
+> Snapshot: **2026-11-06T08:21Z**. This is the short entry point; the full brief is
+> [`docs/HANDOFF_FULL.md`](docs/HANDOFF_FULL.md).
 
-## Entry points
+## What this project is
 
-| Question | Read |
+DaySetta is a Linux-native window server that re-implements the shape of Apple's
+SkyLight/CGX system without Apple's kernel, `launchd`, XPC or Metal. The first runtime
+target is **macOS 27.0.1 arm64e** (26A434, Mac14,3); macOS 26.6 x86_64 is the
+protocol/evidence baseline. Today it is a native `ds/1` prototype, **not** a macOS
+compatibility layer.
+
+## Verified now
+
+| Check | Result |
 |---|---|
-| What is DaySetta? | `daysetta/README.md`, `VISION.md` |
-| What does Daylight do today? | `daylight/docs/knowledge/DAYLIGHT_OVERVIEW.md` |
-| What is implemented? | `daylight/docs/knowledge/DAYLIGHT_IMPLEMENTATION_STATUS.md` |
-| What is broken? | `daylight/docs/knowledge/KNOWN_ISSUES.md` |
-| Why is it built this way? | `daylight/docs/knowledge/ENGINEERING_DECISIONS.md` |
-| What Apple API surface exists? | `daylight/docs/knowledge/apple-internals/API_INDEX.md` |
-| Which MIG routines exist? | `daylight/data/apple-api/mig-routines.json` |
-| Is symbol X exported? | `zcat daylight/data/apple-api/symbols/*.jsonl.gz \| grep -F x` |
-| What is the plan? | `daysetta/ROADMAP.md` |
-| What is next? | `knowledge-work/NEXT_TASKS.md` |
+| `cmake -S . -B build ... && cmake --build build -j8` | exit 0, `-Werror` clean |
+| `ctest --test-dir build --output-on-failure` | 1/1 target passed, 0.39 s |
+| `./build/daysetta_tests` | **22/22 cases passed** |
+| `bash ci/run.sh` | **CI PASSED** (build + ctest + docs check) |
+| e2e path | broker + server + 2 windows + capture + input ring + JSON + PPM |
+| 26.6 baseline | 738 MIG routines / 9 subsystems (`protocol/macos-26.6-x86_64.json`) |
+| 27 arm64e cache | 4 099 catalogue images, 4 574 612 exports, **0 ObjC names** |
+| 27 MIG table | **NOT SCANNED**; `tools/macos27/` and `artifacts/macos-27/` are empty |
+| Wayland/X11/Vulkan | not buildable; dev headers absent on this host |
 
-## Rules
+## Read in this order
 
-1. Every claim gets an evidence class + a reference.
-2. Never invent a constant, a line number, or an API signature.
-3. Check line numbers with `grep -n` before citing them.
-4. Documentation first; no source deletion, no git reset, no force-push.
-5. Local commits only — there is no remote.
-6. Short answers in Vietnamese to the user; English in code and docs.
-7. Use sub-agents only for independent batches; verify their output.
-8. Report progress concisely. Do not paste long internal reasoning.
+1. [`docs/HANDOFF_FULL.md`](docs/HANDOFF_FULL.md) — aim, architecture, Apple evidence, next tasks.
+2. [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md) — exact status and reproduce commands.
+3. [`docs/DS1_WIRE.md`](docs/DS1_WIRE.md) — byte-exact `ds/1` and broker protocol.
+4. [`adr/0001-target-macos-27.md`](adr/0001-target-macos-27.md) … [`adr/0004-headless-first.md`](adr/0004-headless-first.md).
+5. [`AGENTS.md`](AGENTS.md) — ownership, build and evidence rules.
+6. Apple evidence: `/home/ubuntu/daylight/docs/knowledge/`, `/home/ubuntu/daylight/data/apple-api/`.
 
-## Hard constraints
+## Immediate next work
 
-* Do **not** reinstall/rebuild the wiped x86 guest (`~/darltest`, `~/build-darling`).
-* The `~/daylight` repo is the source of truth; `~/macos-re` is read-only evidence.
-* Standard macOS app/Dock binaries must never be committed (they are Apple binaries).
-* The catalog (`data/apple-api/`) is an artifact — do not claim it is exhaustive.
+1. **macOS 27 MIG scan (critical path):** decode `LC_DYLD_CHAINED_FIXUPS`, find the 9
+   SkyLight subsystems, diff ids against 26.6, emit `artifacts/macos-27/mig-routines.json`
+   and `MIG_27_REPORT.md`. Never invent a routine name. If decoding is incomplete,
+   publish the blocker and partial evidence, not a table.
+2. **Event-ring wakeup:** `poll_event` currently sleeps 5 ms; add a wakeup descriptor or
+   document the limitation. Add a `Ring` move regression test; the old move operations
+   munmapped the destination (fixed in `src/event/event.cpp`).
+3. **Close M1:** fuzz/property tests, 1 000 000-message loopback, fd-leak checks,
+   peer-credential tests, and the missing `ds-loader`/`ds-rt` fixtures.
+4. **Complete M2:** multi-client, resize/occlusion, damage, golden frames, ASan/UBSan,
+   thread-count determinism, 8-hour soak.
+5. **Docs:** update `docs/IMPLEMENTATION_STATUS.md` after every run; keep this file
+   ≤ 60 lines (`ci/check_docs.py` enforces it).
 
-## Number you will use most
+## Rules that must not be broken
 
-738 MIG routines (9 subsystems) · 4 878 453 exported symbols (two releases) ·
-15 implemented handlers · bridge ids `0x44594c01..ff` · server version 600.0 ·
-window id `0x1f6` · window shm `0xb0` bytes · realtime block 4096 bytes / 16.666667 ms.
+Every claim gets an evidence class + path/artifact. Never invent Apple constants,
+selectors, MIG ids or line numbers. Do not call DaySetta "macOS 27 compatible". Do not
+add Apple binaries, dylibs or caches. Preserve user work; local commits only, no remote.
+Report to the user in Vietnamese; code and docs stay in English.
