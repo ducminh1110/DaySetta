@@ -14,7 +14,7 @@ index aed7e664..d035733c 100644
  #endif
  
 diff --git a/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/network/connect.c b/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/network/connect.c
-index 4c9a88cf..ce4a8996 100644
+index 4c9a88cf..5df7e191 100644
 --- a/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/network/connect.c
 +++ b/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/network/connect.c
 @@ -37,6 +37,7 @@ long sys_connect_nocancel(int fd, const void* name, int socklen)
@@ -25,18 +25,15 @@ index 4c9a88cf..ce4a8996 100644
  	// DARLING workaround: Darwin clients on Darling-arm64 often set
  	// O_NONBLOCK on the socket and then wait for connect completion via
  	// Mach kqueue paths that Darling's kqueue plumbing doesn't yet wire
-@@ -50,6 +51,10 @@ long sys_connect_nocancel(int fd, const void* name, int socklen)
+@@ -50,6 +51,7 @@ long sys_connect_nocancel(int fd, const void* name, int socklen)
  	if (was_nonblock) {
  		LINUX_SYSCALL(__NR_fcntl, fd, 4 /*F_SETFL*/, flags & ~0x800L);
  	}
-+#else
-+	int was_nonblock = 0;
-+	long flags = 0;
 +#endif
  
  #ifdef __NR_socketcall
  	ret = LINUX_SYSCALL(__NR_socketcall, LINUX_SYS_CONNECT, ((long[6]) { fd, fixed, socklen }));
-@@ -57,9 +62,11 @@ long sys_connect_nocancel(int fd, const void* name, int socklen)
+@@ -57,9 +59,11 @@ long sys_connect_nocancel(int fd, const void* name, int socklen)
  	ret = LINUX_SYSCALL(__NR_connect, fd, fixed, socklen);
  #endif
  

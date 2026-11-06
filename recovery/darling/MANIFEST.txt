@@ -14,7 +14,7 @@ src/external/libressl-2.2.9 head=c5e9edb9d82ccf5fde5d8ae32b162fec8fe11318 branch
 src/external/libressl-2.5.5 head=1f663b5bdc9082178717c080e4728fe3e7084de4 branch= local_commits=0 excluded_import=1f663b5bdc9082178717c080e4728fe3e7084de4(Install libcrypto, libssl, and libtls)
 src/external/libressl-2.6.5 head=30826df38d7c0f416158a94e0112c928188e0327 branch= local_commits=0 excluded_import=30826df38d7c0f416158a94e0112c928188e0327(Refactor CMakeList To Support Only Building 64bit)
 src/external/libressl-2.8.3 head=2a56b36b77a00573c53ccd8e6932eb136172c950 branch= local_commits=0 excluded_import=2a56b36b77a00573c53ccd8e6932eb136172c950(Install files to `/private/etc`, not `/etc`)
-src/external/metal head=fd256bc0edf7f7e6dcd1ffd94ce22d43427ac5a7 branch=daysetta/arm64 local_commits=0 
+src/external/metal head=f741e9708c9039b2ea4b23f8313eb2075c8893c5 branch=daysetta/metal local_commits=1 
 src/external/network_cmds head=372857b8768df75e4694b6871a46bf9bd87bdb16 branch=daysetta/recovered local_commits=1 
 src/external/syslog head=6be9628d2c1ae06d98c8cd746d19e88bd60a1230 branch=daysetta/recovered local_commits=1 
 src/external/xnu head=f10db40ce189d2a12ba2fe6428887e2dac2b1eea branch=daysetta/arm64 local_commits=25 excluded_import=ac9718fb1af618d5ce8678d0dc6e8a58f252216f(xnu-12377.121.6)
