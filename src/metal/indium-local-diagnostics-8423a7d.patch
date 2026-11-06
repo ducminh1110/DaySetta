@@ -1,0 +1,74 @@
+diff --git a/src/indium/device.cpp b/src/indium/device.cpp
+index 322e186..0504f34 100644
+--- a/src/indium/device.cpp
++++ b/src/indium/device.cpp
+@@ -1,3 +1,4 @@
++#include <cstdio>
+ #include <indium/device.private.hpp>
+ #include <indium/instance.private.hpp>
+ #include <indium/command-queue.private.hpp>
+@@ -32,6 +33,7 @@ void Indium::initGlobalDeviceList() {
+ 		return;
+ 	}
+ 
++	fprintf(stderr, "indium: %u physical device(s)\n", count);
+ 	physicalDevices.resize(count);
+ 	result = DynamicVK::vkEnumeratePhysicalDevices(globalInstance, &count, physicalDevices.data());
+ 	if (result != VK_SUCCESS && result != VK_INCOMPLETE) {
+@@ -44,7 +46,7 @@ void Indium::initGlobalDeviceList() {
+ 		DynamicVK::vkGetPhysicalDeviceProperties(device, &props);
+ 
+ 		if (VK_API_VERSION_VARIANT(props.apiVersion) != 0 || props.apiVersion < VK_API_VERSION_1_3) {
+-			// unsupported device
++			fprintf(stderr, "indium: skip %s: Vulkan %u.%u < 1.3 or variant\n", props.deviceName, VK_API_VERSION_MAJOR(props.apiVersion), VK_API_VERSION_MINOR(props.apiVersion));
+ 			continue;
+ 		}
+ 
+@@ -67,7 +69,7 @@ void Indium::initGlobalDeviceList() {
+ 		DynamicVK::vkGetPhysicalDeviceFeatures2(device, &features);
+ 
+ 		if (!features12.timelineSemaphore) {
+-			// unsupported device
++			fprintf(stderr, "indium: skip %s: no timelineSemaphore\n", props.deviceName);
+ 			continue;
+ 		}
+ 
+diff --git a/src/indium/indium.cpp b/src/indium/indium.cpp
+index e7c06fe..165374b 100644
+--- a/src/indium/indium.cpp
++++ b/src/indium/indium.cpp
+@@ -1,3 +1,4 @@
++#include <cstdio>
+ #include <indium/instance.private.hpp>
+ #include <indium/device.private.hpp>
+ #include <indium/dynamic-vk.hpp>
+@@ -30,12 +31,12 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityF
+ 
+ void Indium::init(const char** additionalExtensions, size_t additionalExtensionCount, bool enableValidation) {
+ 	if (!Iridium::init()) {
+-		// TODO: maybe warn?
++		fprintf(stderr, "indium: Iridium (LLVM) failed to load\n");
+ 		return;
+ 	}
+ 
+ 	if (!DynamicVK::init()) {
+-		// TODO: maybe warn?
++		fprintf(stderr, "indium: Vulkan loader (libvulkan.so.1) failed to load\n");
+ 		return;
+ 	}
+ 
+@@ -109,12 +110,12 @@ void Indium::init(const char** additionalExtensions, size_t additionalExtensionC
+ 
+ 	auto result = DynamicVK::vkCreateInstance(&createInfo, nullptr, &globalInstance);
+ 	if (result != VK_SUCCESS) {
+-		// TODO: maybe warn?
++		fprintf(stderr, "indium: vkCreateInstance failed (VkResult %d)\n", (int)result);
+ 		return;
+ 	}
+ 
+ 	if (!DynamicVK::eagerlyResolveRequired()) {
+-		// TODO: maybe warn?
++		fprintf(stderr, "indium: required Vulkan entry points missing\n");
+ 		return;
+ 	}
+ 
