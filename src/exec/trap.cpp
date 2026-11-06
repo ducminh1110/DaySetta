@@ -7,6 +7,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 namespace ds::exec {
@@ -354,7 +355,7 @@ enum class TrapRes { NotBrk, NotLowered, Done };
 
 // Emulate the lowered instruction under a SIGTRAP.  NotBrk/NotLowered leave the context untouched
 // (the BRK is the guest's own); Done means handled (or a terminal fault was raised).
-TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out) {
+TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out, uint64_t tsd = 0) {
     const uint64_t pc = uc->uc_mcontext.pc;
     const uint32_t word = *reinterpret_cast<const uint32_t*>(pc);
     if ((word & 0xFFE0001F) != 0xD4200000) return TrapRes::NotBrk;
@@ -365,7 +366,7 @@ TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out) {
     if (!e || !decode(e->word, in)) return TrapRes::NotLowered;
     CpuState cs;
     load_state(cs, uc);
-    if (g_rt->tsd) cs.tpidrro = g_rt->tsd(g_rt->ctx);
+    cs.tpidrro = g_rt->tsd ? g_rt->tsd(g_rt->ctx) : tsd;
     const uint64_t x0_in = cs.x[0], pstate_in = cs.pstate;
     const EmuOutcome o = emulate(in, cs, *g_rt->pac, g_rt->stats);
     switch (o.status) {
@@ -465,7 +466,40 @@ struct AltStack {
 
 }  // namespace
 
-bool handle_sigtrap(void* vuc) { return try_trap(static_cast<ucontext_t*>(vuc), nullptr) == TrapRes::Done; }
+bool handle_sigtrap(void* vuc, uint64_t tsd) { return try_trap(static_cast<ucontext_t*>(vuc), nullptr, tsd) == TrapRes::Done; }
+
+bool handle_sigsegv(void* vuc, void* vsi) {
+    auto* uc = static_cast<ucontext_t*>(vuc);
+    auto* si = static_cast<siginfo_t*>(vsi);
+    if (!g_rt) return false;
+    const uint64_t pc = uc->uc_mcontext.pc;
+    if (getenv("DS_EXEC_TRACE_STRIP") && !g_rt->pac->canonical(pc))
+        say("ds-exec: segv tid=%d code=%d addr=0x%llx pc=0x%llx sp=0x%llx\n", (int)gettid(), si->si_code,
+            (unsigned long long)reinterpret_cast<uint64_t>(si->si_addr), (unsigned long long)pc, (unsigned long long)uc->uc_mcontext.sp);
+    // Plain-arm64 callee (e.g. Darling's libsystem_kernel) reached through a pointer an arm64e caller signed:
+    // real arm64e hardware would fault the same way for a plain `blr`, so the Darling layer has no PAC.  Drop the
+    // signature (no authentication) and run the target.  Only fires for a fetch from a non-canonical address.
+    if (reinterpret_cast<uint64_t>(si->si_addr) == pc && !g_rt->pac->canonical(pc)) {
+        const uint64_t t = g_rt->pac->strip(pc);
+        if (t != pc && g_rt->pac->canonical(t)) {
+            if (getenv("DS_EXEC_TRACE_STRIP"))
+                say("ds-exec: fetch from signed pointer 0x%llx -> 0x%llx lr=0x%llx\n", (unsigned long long)pc,
+                    (unsigned long long)t, (unsigned long long)uc->uc_mcontext.regs[30]);
+            uc->uc_mcontext.pc = t;
+            g_rt->stats.by_op[static_cast<int>(Op::PacStrip)].fetch_add(1, std::memory_order_relaxed);
+            return true;
+        }
+    }
+    if (!g_rt->lazy_lower) return false;
+    if (si->si_code != SEGV_ACCERR || reinterpret_cast<uint64_t>(si->si_addr) != pc) return false;
+    std::string err;
+    if (!g_rt->lazy_lower(pc, g_rt->ctx, &err)) {
+        if (!err.empty()) say("ds-exec: lazy lowering failed: %s\n", err.c_str());
+        return false;
+    }
+    g_rt->stats.lazy_pages.fetch_add(1, std::memory_order_relaxed);
+    return true;
+}
 
 void thread_init() {
     thread_local AltStack alt;
