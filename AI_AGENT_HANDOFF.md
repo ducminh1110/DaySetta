@@ -5,11 +5,23 @@
 
 ## What this project is
 
-DaySetta is a Linux-native window server that re-implements the shape of Apple's
-SkyLight/CGX system without Apple's kernel, `launchd`, XPC or Metal. The first runtime
+DaySetta runs genuine Apple userland from the user's IPSW on Linux; its window server
+hosts real SkyLight clients. Darwin, launchd/XPC and Metal are compat layers. The first runtime
 target is **macOS 27.0.1 arm64e** (26A434, Mac14,3); macOS 26.6 x86_64 is the
-protocol/evidence baseline. Today it is a native `ds/1` prototype, **not** a macOS
-compatibility layer.
+protocol/evidence baseline. DaySetta is an IPSW-driven compatibility platform that runs
+genuine Apple macOS 27 arm64e userland and apps on Linux (Wine/Darling-like, not a VM);
+the native `ds/1` server is one component.
+
+## Owner decisions (read first; override older docs)
+
+- Authority: owner > verified evidence > reports > docs.
+- Genuine Apple components from the user's IPSW are used at runtime, never committed.
+- Target macOS 27 arm64e on ARMv8.0 via native execution + explicit PAC/LSE/LRCPC
+  lowering/emulation (no blanket PAC stripping).
+- Darling = reference/optional backend. AEA keys via `ipsw` (never hardcode). No fake/Qt/GTK/HTML macOS UI.
+- 33 known doc conflicts in `artifacts/assessment/conflicts.md` are not yet applied;
+  where a doc contradicts this section, this section wins.
+- Progress needs real screenshots in `artifacts/screenshots/`.
 
 ## Verified now
 
@@ -22,8 +34,8 @@ compatibility layer.
 | e2e path | broker + server + 2 windows + capture + input ring + JSON + PPM |
 | 26.6 baseline | 738 MIG routines / 9 subsystems (`protocol/macos-26.6-x86_64.json`) |
 | 27 arm64e cache | 4 099 catalogue images, 4 574 612 exports, **0 ObjC names** |
-| 27 MIG table | **NOT SCANNED**; `tools/macos27/` and `artifacts/macos-27/` are empty |
-| Wayland/X11/Vulkan | not buildable; dev headers absent on this host |
+| IPSW pipeline (27.0.1) | `tools/ipsw`, commit `e69288a`, `artifacts/ipsw-27/PIPELINE_REPORT.md` |
+| ds-exec R2 | genuine Apple functions run on ARMv8.0; commit `41fb8cf`, `artifacts/exec/r2-probe.txt`, 34/34 tests |
 
 ## Read in this order
 
@@ -36,21 +48,13 @@ compatibility layer.
 
 ## Immediate next work
 
-1. **macOS 27 MIG scan (critical path):** decode `LC_DYLD_CHAINED_FIXUPS`, find the 9
-   SkyLight subsystems, diff ids against 26.6, emit `artifacts/macos-27/mig-routines.json`
-   and `MIG_27_REPORT.md`. Never invent a routine name. If decoding is incomplete,
-   publish the blocker and partial evidence, not a table.
-2. **Event-ring wakeup:** done (eventfd sent with the ring; `event_ring_move` test added).
-3. **Close M1:** fuzz/property tests, 1 000 000-message loopback, fd-leak checks,
-   peer-credential tests, and the missing `ds-loader`/`ds-rt` fixtures.
-4. **Complete M2:** multi-client, resize/occlusion, damage, golden frames, ASan/UBSan,
-   thread-count determinism, 8-hour soak.
-5. **Docs:** update `docs/IMPLEMENTATION_STATUS.md` after every run; keep this file
-   ≤ 60 lines (`ci/check_docs.py` enforces it).
+1. **R3:** Apple dyld + `/bin/echo` via `ds-run` (in progress).
+2. **R5:** first window.
+3. Milestones M1/M2 and later work: see [`ROADMAP.md`](ROADMAP.md).
+4. **Docs:** update `docs/IMPLEMENTATION_STATUS.md` each run; this file stays ≤ 60 lines.
 
 ## Rules that must not be broken
 
 Every claim gets an evidence class + path/artifact. Never invent Apple constants,
-selectors, MIG ids or line numbers. Do not call DaySetta "macOS 27 compatible". Do not
-add Apple binaries, dylibs or caches. Preserve user work; local commits only, no remote.
+selectors, MIG ids or line numbers. Do not call DaySetta "macOS 27 compatible". Never commit Apple binaries/dylibs/caches (runtime use is intended). Preserve user work; local commits only, no remote.
 Report to the user in Vietnamese; code and docs stay in English.
