@@ -1,0 +1,71 @@
+{
+ "schema": 1,
+ "build": "26A434",
+ "product": "Mac14,3",
+ "counts": {
+  "files": 12187,
+  "symlinks": 81,
+  "macho": 873,
+  "macho_by_arch": {
+   "arm64e+arm64": 96,
+   "cpu0x1000017+cpu0x1000013": 12,
+   "cpu0x1000017+cpu0x1000013+cpu0x1000013+cpu0x1000013": 2,
+   "cpu0x1000017+cpu0x1000013+cpu0x1000013": 4,
+   "arm64e": 66,
+   "cpu0x1000017+cpu0x1000017": 1,
+   "x86_64+arm64e+arm64": 679,
+   "x86_64+arm64+arm64e+arm64": 7,
+   "x86_64+arm64e": 2,
+   "x86_64+x86_64+arm64e+arm64": 3,
+   "x86_64+arm64": 1
+  },
+  "apps": 9
+ },
+ "by_origin": {
+  "system_volume_files": 4803,
+  "system_volume_macho": 788,
+  "cryptex_files": 6511,
+  "cryptex_macho": 85,
+  "cryptex_symlinks": 8,
+  "system_volume_symlinks": 73
+ },
+ "images": {
+  "043-70701-651.dmg": {
+   "kind": "apfs-raw",
+   "size": 2879389696,
+   "sha256": "5fea3f16f856f3aa1b3f88aa3cedfe75977a36f70a17041d6cf6349ba9a0e4d2"
+  },
+  "043-70867-640.dmg": {
+   "kind": "apfs-raw",
+   "size": 14189330432,
+   "sha256": "fbfb1a38af09d65dc86bb9814a13b870d1895e4c435c38fde42e00b52cff21b3"
+  }
+ },
+ "apps_sample": {
+  "System/Applications/Utilities/Terminal.app": {
+   "bundle_id": "com.apple.Terminal",
+   "exec_archs": [
+    "arm64e",
+    "arm64"
+   ]
+  },
+  "System/Library/CoreServices/Dock.app": {
+   "bundle_id": "com.apple.dock",
+   "exec_archs": [
+    "arm64e",
+    "arm64"
+   ]
+  },
+  "System/Library/CoreServices/Finder.app": {
+   "bundle_id": "com.apple.finder",
+   "exec_archs": [
+    "arm64e",
+    "arm64"
+   ]
+  }
+ },
+ "decmpfs": {
+  "cryptex_lzbitmap_decoded": 3482,
+  "system_volume_decoded_by_7z_lzvn": true
+ }
+}

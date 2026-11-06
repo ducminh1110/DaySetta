@@ -16,3 +16,4 @@ core
 artifacts/macos-27/*.bin
 artifacts/macos-27/raw/
 tools/macos27/__pycache__/
+tools/ipsw/__pycache__/
