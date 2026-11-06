@@ -74,7 +74,8 @@ subsystems (3 more tables with ids 1..2 are other servers and are ignored). Name
 `src/windowserver/run-probe-demo.sh`: Xvfb + `darling shell windowserver` (bootstrap-registered
 `com.apple.windowserver`, `.active`) + host `daylight-x11` + arm64 probe `dsws_probe`. Probe calls 29000, 29010, 32000,
 30263, 30311 and the canvas messages; all PASS (`artifacts/ws27-logs/probe.log`, `server.log`). Screenshot:
-`artifacts/screenshots/windowserver27-probe-client.png` - **probe client, not Apple UI**.
+`artifacts/screenshots/windowserver27-probe-client.png` (G1, with Daylight's fake chrome - kept for history) and
+`windowserver27-probe-client-nochrome.png` (G2: client surface on black) - **probe client, not Apple UI**.
 
 ## Blocker: no cross-process memory (ESC-G1-1)
 `fileport_makeport` aborts ("old LKM API"), `mach_make_memory_entry_64` loops on `dserver_rpc_interrupt_enter ... -111`;
@@ -84,4 +85,25 @@ is prepared, UNVERIFIED (never run: needs darlingserver restored and libxpc).
 
 ## Not done
 - Genuine 27 AppKit client; 27-specific display-state blob (`DAYLIGHT_EMPTY_DISPLAY_STATE` workaround retained).
-- Added/changed routines have no handlers or sizes. `probe/handshake_client.c` last check is stale.
+- Added/changed routines have no handlers or sizes.
+
+## G2: no fake UI (OBSERVED 2026-11-06)
+Menu bar, Dock and the blue wallpaper gradient are off by default; screen = black + client surfaces. `DSWS_DEBUG_CHROME=1`
+re-enables them and logs "DEBUG CHROME - not Apple UI" (`dl_shell_debug_chrome`, src/shell.c). The old `DAYLIGHT_SHELL=0`
+switch is replaced by this. Real menu bar/Dock/desktop must come from SystemUIServer/ControlCenter, Dock, WindowManager.
+`probe/handshake_client.c` fixed: 32001 on the connection port now expects KERN_SUCCESS (default reply); PASS under Darling.
+
+## Plan: MIG dispatch in front of src/scene + src/render (ADR section 5) - NOT done, not small
+Why: windowserver is C compiled as Mach-O with the Darling clang (arm64/x86_64) and links only libSystem; src/scene,
+src/render, src/server are C++20 for the Linux host, tested via CMake. They are separate processes/ABIs. A direct link is impossible.
+Steps:
+1. Define the seam as the existing ds/1 wire (docs/DS1_WIRE.md): the windowserver (Darwin side) becomes a ds/1 *client* over a
+   host-visible unix socket/FIFO (like /tmp/daylight today), sending create-window, set-geometry/level/order, and surface
+   commit per `dl_window` / `dl_canvas` change (src/window.c, src/bridge.c `dl_canvases_flush`).
+2. Surface pixels: today canvases are host files (ESC-G1-1 fallback). Map those files into src/server as surface buffers
+   (shm path) instead of compositing in bridge.c `dl_canvases_composite`.
+3. Delete bridge.c compositor + PNG writer; src/render/output gets an X11 sink replacing frontends/x11 framebuffer read
+   (keep input FIFO path; translate X events to the existing `input` commands).
+4. Input: server-side hit-test from src/scene replaces `canvas_at` in src/input.c.
+5. Tests: a scene-level test replaying a recorded ds/1 stream from the probe; keep ./build/daysetta_tests and ci/run.sh green.
+Needs: owner approval to edit include/daysetta/*.hpp if ds/1 lacks window-level/order ops (UNVERIFIED; check DS1_WIRE.md).

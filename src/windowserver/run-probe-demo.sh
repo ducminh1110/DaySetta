@@ -13,7 +13,7 @@ for i in $(seq 30); do grep -q "serving com.apple.windowserver.active" "$L/serve
 DISPLAY=$DISP "$HERE/build-darling-arm64/daylight-x11" /tmp/daylight >"$L/x11.log" 2>&1 & FE=$!
 darling shell "$B/dsws_probe" </dev/null >"$L/probe.log" 2>&1
 sleep 3
-DISPLAY=$DISP import -window root "$SHOT/windowserver27-probe-client.png"
+DISPLAY=$DISP import -window root "$SHOT/windowserver27-probe-client-nochrome.png"
 cat "$L/probe.log"
 kill $FE $XV 2>/dev/null
 # server runs under setuid darling: stop it with sudo (by PID of the darling process, not by pattern)
