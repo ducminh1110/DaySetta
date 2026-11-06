@@ -84,7 +84,10 @@ bool install_trap_handlers(TrapRuntime* rt);
 // For runtimes that own the signal handlers (Darling's sigexc): emulate the lowered instruction
 // at the SIGTRAP context `uc` (a ucontext_t*).  False = not a lowered instruction (the BRK is the
 // guest's own; nothing changed, nothing printed).  Requires install_trap_handlers' TrapRuntime.
-bool handle_sigtrap(void* uc);
+bool handle_sigtrap(void* uc, uint64_t tsd = 0);  // tsd: emulated TPIDRRO_EL0 when TrapRuntime::tsd is null
+// Instruction-fetch fault in a lazily lowered range (TrapRuntime::lazy_lower): lowers the page and returns true
+// so the fetch can be retried.  `si` is a siginfo_t* (si_code/si_addr).  Nothing is printed on false.
+bool handle_sigsegv(void* uc, void* si);
 // Give the calling thread an alternate signal stack (the installing thread gets one already).
 void thread_init();
 
