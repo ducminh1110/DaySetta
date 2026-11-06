@@ -1,0 +1,6920 @@
+{
+ "schema_version": 1,
+ "source": {
+  "cache": "/home/ubuntu/macos-re/cache-arm64e/dyld_shared_cache_arm64e",
+  "build": "26A434",
+  "skylight_uuid": "8A3B348E4637368592D06CBC2F36A234",
+  "skylight_vmaddr": "0x187093000",
+  "text_start": "0x187093000",
+  "text_end": "0x1876ce780",
+  "baseline": "/home/ubuntu/daylight/protocol/macos-26.6-x86_64.json",
+  "sections_scanned": [
+   "__DATA_CONST,__const",
+   "__DATA_CONST,__objc_classlist",
+   "__DATA_CONST,__objc_protolist",
+   "__DATA_CONST,__objc_selrefs",
+   "__DATA_CONST,__objc_superrefs",
+   "__DATA_CONST,__objc_arraydata",
+   "__DATA_CONST,__got",
+   "__AUTH_CONST,__const",
+   "__AUTH_CONST,__cfstring",
+   "__AUTH_CONST,__objc_const",
+   "__AUTH_CONST,__objc_doubleobj",
+   "__AUTH_CONST,__objc_intobj",
+   "__AUTH_CONST,__objc_arrayobj",
+   "__AUTH_CONST,__objc_dictobj",
+   "__AUTH_CONST,__auth_got",
+   "__AUTH_CONST,__auth_ptr",
+   "__DATA,__objc_ivar",
+   "__DATA,__data",
+   "__DATA,__crash_info",
+   "__DATA,__bss",
+   "__DATA,__common"
+  ],
+  "rejected": {
+   "candidates_after_prefilter": 56,
+   "server_ptr_not_in_text": 47
+  }
+ },
+ "subsystems": [
+  {
+   "name": "?",
+   "name_status": "unknown",
+   "descriptor_vmaddr": "0x1e8743248",
+   "server_vmaddr": "0x187512950",
+   "start": 1,
+   "end": 3,
+   "routine_count": 2,
+   "routines": [
+    {
+     "id": 1,
+     "stub_vmaddr": "0x187512988",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 2,
+     "stub_vmaddr": "0x1875129f4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    }
+   ]
+  },
+  {
+   "name": "?",
+   "name_status": "unknown",
+   "descriptor_vmaddr": "0x1e8743e10",
+   "server_vmaddr": "0x187518a18",
+   "start": 1,
+   "end": 3,
+   "routine_count": 2,
+   "routines": [
+    {
+     "id": 1,
+     "stub_vmaddr": "0x187518a50",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 2,
+     "stub_vmaddr": "0x187518b00",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    }
+   ]
+  },
+  {
+   "name": "?",
+   "name_status": "unknown",
+   "descriptor_vmaddr": "0x1e8743e80",
+   "server_vmaddr": "0x1875192c8",
+   "start": 1,
+   "end": 3,
+   "routine_count": 2,
+   "routines": [
+    {
+     "id": 1,
+     "stub_vmaddr": "0x187519300",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 2,
+     "stub_vmaddr": "0x187519484",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    }
+   ]
+  },
+  {
+   "name": "CGXRendezvous",
+   "name_status": "inferred-from-26.6",
+   "descriptor_vmaddr": "0x1e87432b8",
+   "server_vmaddr": "0x187513308",
+   "start": 29000,
+   "end": 29042,
+   "routine_count": 42,
+   "routines": [
+    {
+     "id": 29000,
+     "stub_vmaddr": "0x187513348",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 60,
+     "name": "GetCoreGraphicsServerVersion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29001,
+     "stub_vmaddr": "0x1875136c8",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 40,
+     "name": "CreateSession",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29002,
+     "stub_vmaddr": "0x1875137b4",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 52,
+     "name": "CreateSessionWithAuditSessionID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29003,
+     "stub_vmaddr": "0x187513a5c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "CopySessionList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29004,
+     "stub_vmaddr": "0x187513b08",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "SessionDeathWatchPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29005,
+     "stub_vmaddr": "0x187513c44",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SpinControlSetNotificationPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29006,
+     "stub_vmaddr": "0x187513d60",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "ReleaseSession",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29007,
+     "stub_vmaddr": "0x187513ed8",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SwitchConsoleToSession",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29008,
+     "stub_vmaddr": "0x187514050",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SwitchConsoleToAuditSession",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29009,
+     "stub_vmaddr": "0x1875140f0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "SessionFullScreenAppPid",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29010,
+     "stub_vmaddr": "0x18751427c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetSessionPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29011,
+     "stub_vmaddr": "0x187514360",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetSessionScreenLockWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29012,
+     "stub_vmaddr": "0x187514554",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetSessionSleepWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29013,
+     "stub_vmaddr": "0x1875147e0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetSessionSwitchCubeAnimation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29014,
+     "stub_vmaddr": "0x187514824",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 68,
+     "name": "GetConsoleDevices",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29015,
+     "stub_vmaddr": "0x187514968",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "SetSessionClientDictionary",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29016,
+     "stub_vmaddr": "0x187514bbc",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 56,
+     "name": "CopySessionClientDictionary",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29017,
+     "stub_vmaddr": "0x187514d14",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 40,
+     "name": "FindSessionAuditSessionID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29018,
+     "stub_vmaddr": "0x187514da0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "EstablishTimelineConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29019,
+     "stub_vmaddr": "0x187514f38",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "EstablishXPCClientConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29020,
+     "stub_vmaddr": "0x187515358",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "EstablishScreenTelemetryConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29021,
+     "stub_vmaddr": "0x1875154c8",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 40,
+     "name": "TBAcquire",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29022,
+     "stub_vmaddr": "0x1875157f8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "TBRelease",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29023,
+     "stub_vmaddr": "0x187515920",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "TBSetNotificationPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29024,
+     "stub_vmaddr": "0x187515a7c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "TBCopyByID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29025,
+     "stub_vmaddr": "0x187515b2c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "TBCopyList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29026,
+     "stub_vmaddr": "0x187515bd4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 52,
+     "name": "TBGetSurfaceForIndex",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29027,
+     "stub_vmaddr": "0x187515c78",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "TBConfigureQueue",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29028,
+     "stub_vmaddr": "0x187515d20",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "TBQueryStatus",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29029,
+     "stub_vmaddr": "0x187515da0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 52,
+     "name": "TBGetTotalUpdateCount",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29030,
+     "stub_vmaddr": "0x187515e94",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "TBCopyDisplayInfoDictionary",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29031,
+     "stub_vmaddr": "0x187515f88",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "InitialConfigurationWasDeferred",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29032,
+     "stub_vmaddr": "0x187516044",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "PerformDeferredConfiguration",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29033,
+     "stub_vmaddr": "0x1875160e4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "DisplayCopyPreset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29034,
+     "stub_vmaddr": "0x1875161dc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayGetActivePresetIndex",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29035,
+     "stub_vmaddr": "0x187516290",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetRealtimeConsoleDisplayDataShmemPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29036,
+     "stub_vmaddr": "0x187516318",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "HMDCopyDisplayInfoDictionary",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29037,
+     "stub_vmaddr": "0x18751640c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "EstablishBootstrapXPCServiceConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29038,
+     "stub_vmaddr": "0x187516564",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "VerifyEventAuthenticationMessageSignature",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29039,
+     "stub_vmaddr": "0x18751675c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "FetchSigningKey",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29040,
+     "stub_vmaddr": "0x187516944",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "DisplayCopyActivePreset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 29041,
+     "stub_vmaddr": "0x187516a38",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "?",
+     "name_status": "unknown"
+    }
+   ]
+  },
+  {
+   "name": "CGXServices",
+   "name_status": "inferred-from-26.6",
+   "descriptor_vmaddr": "0x1e8744c50",
+   "server_vmaddr": "0x187526e78",
+   "start": 30000,
+   "end": 30647,
+   "routine_count": 580,
+   "routines": [
+    {
+     "id": 30000,
+     "stub_vmaddr": "0x187526eb8",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "EventPing",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30001,
+     "stub_vmaddr": "0x187526ef0",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "SetUniversalOwner",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30002,
+     "stub_vmaddr": "0x18752722c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetOtherUniversalConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30003,
+     "stub_vmaddr": "0x187527374",
+     "impl_vmaddr": "0x0",
+     "argc": 12,
+     "max_reply_msg": 56,
+     "name": "SetLoginwindowConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30004,
+     "stub_vmaddr": "0x1875277ac",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "SetLoginNameAndParameters",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30005,
+     "stub_vmaddr": "0x1875279a0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "TerminateWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30006,
+     "stub_vmaddr": "0x187527a38",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "MoveWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30007,
+     "stub_vmaddr": "0x187527ba4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "MoveWindowOnMatchingDisplayChangedSeed",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30008,
+     "stub_vmaddr": "0x187527cc0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "MoveWindowList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30009,
+     "stub_vmaddr": "0x187527e50",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "MoveWindowListOnMatchingDisplayChangedSeed",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30010,
+     "stub_vmaddr": "0x187527f9c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "OrderWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30011,
+     "stub_vmaddr": "0x18752809c",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "OrderWindowList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30012,
+     "stub_vmaddr": "0x1875281a8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowLevel",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30013,
+     "stub_vmaddr": "0x187528250",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowLevel",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30014,
+     "stub_vmaddr": "0x1875282d4",
+     "impl_vmaddr": "0x0",
+     "argc": 11,
+     "max_reply_msg": 52,
+     "name": "FindWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30015,
+     "stub_vmaddr": "0x1875283fc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetSystemWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30016,
+     "stub_vmaddr": "0x1875284c4",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetWindowRightHolder",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30019,
+     "stub_vmaddr": "0x18752858c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowIsBuffered",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30020,
+     "stub_vmaddr": "0x187528998",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowIsBuffered",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30021,
+     "stub_vmaddr": "0x187528a28",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowDepth",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30022,
+     "stub_vmaddr": "0x187528ac4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowDepth",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30023,
+     "stub_vmaddr": "0x187528b48",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "InvalidateWindowShadow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30024,
+     "stub_vmaddr": "0x187528be4",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "WindowSetShadowProperties",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30025,
+     "stub_vmaddr": "0x187528d18",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetWindowOpaqueShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30026,
+     "stub_vmaddr": "0x187528ed8",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 56,
+     "name": "GetWindowShadowParameters",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30027,
+     "stub_vmaddr": "0x187528f90",
+     "impl_vmaddr": "0x0",
+     "argc": 15,
+     "max_reply_msg": 36,
+     "name": "SetWindowCornerMask",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30028,
+     "stub_vmaddr": "0x187529230",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 52,
+     "name": "GetScreenRectForWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30029,
+     "stub_vmaddr": "0x18752934c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetWindowClipShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30030,
+     "stub_vmaddr": "0x187529480",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "GetWindowClipShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30031,
+     "stub_vmaddr": "0x187529534",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "SetWindowWarp",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30032,
+     "stub_vmaddr": "0x1875296a8",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "SetWindowTransformList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30033,
+     "stub_vmaddr": "0x187529770",
+     "impl_vmaddr": "0x0",
+     "argc": 10,
+     "max_reply_msg": 36,
+     "name": "SetWindowTransform",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30034,
+     "stub_vmaddr": "0x1875298d0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 64,
+     "name": "GetWindowTransform",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30035,
+     "stub_vmaddr": "0x187529a84",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowListBrightness",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30036,
+     "stub_vmaddr": "0x187529b40",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "DisableUpdateForConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30038,
+     "stub_vmaddr": "0x187529bb0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ReenableUpdateForConnectionSync",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30040,
+     "stub_vmaddr": "0x187529d54",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowListSystemAlpha",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30041,
+     "stub_vmaddr": "0x187529e20",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetWindowListAlpha",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30042,
+     "stub_vmaddr": "0x187529edc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowAlpha",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30043,
+     "stub_vmaddr": "0x187529f5c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 52,
+     "name": "GetPerformanceData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30044,
+     "stub_vmaddr": "0x18752a180",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 52,
+     "name": "GetPerformanceTotalUpdateCount",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30045,
+     "stub_vmaddr": "0x18752a200",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 556,
+     "name": "GetPerformanceUpdateCountPerDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30046,
+     "stub_vmaddr": "0x18752a28c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 44,
+     "name": "GetWindowTags",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30048,
+     "stub_vmaddr": "0x18752a30c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowProperty",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30049,
+     "stub_vmaddr": "0x18752a424",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "DeleteWindowProperty",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30050,
+     "stub_vmaddr": "0x18752a52c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "GetWindowProperty",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30051,
+     "stub_vmaddr": "0x18752a6f0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowEventMask",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30052,
+     "stub_vmaddr": "0x18752a790",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowEventMask",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30053,
+     "stub_vmaddr": "0x18752a814",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetBackgroundEventMaskAndShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30054,
+     "stub_vmaddr": "0x18752a9f0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 44,
+     "name": "AreEventsCaptured",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30055,
+     "stub_vmaddr": "0x18752aa94",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetEventCapture",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30056,
+     "stub_vmaddr": "0x18752aafc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowIsOneShot",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30058,
+     "stub_vmaddr": "0x18752abb0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "GetWindowShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30059,
+     "stub_vmaddr": "0x18752ac64",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 52,
+     "name": "GetWindowShapeBounds",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30060,
+     "stub_vmaddr": "0x18752ad6c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 68,
+     "name": "GetWindowFrameBounds",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30061,
+     "stub_vmaddr": "0x18752ae74",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowHasAlpha",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30062,
+     "stub_vmaddr": "0x18752aee4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowHasAlpha",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30063,
+     "stub_vmaddr": "0x18752af70",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowCount",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30064,
+     "stub_vmaddr": "0x18752afe4",
+     "impl_vmaddr": "0x0",
+     "argc": 15,
+     "max_reply_msg": 73824,
+     "name": "GetWindowSnappingRects2",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30065,
+     "stub_vmaddr": "0x18752b424",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SnappingInfoSetPrefs",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30066,
+     "stub_vmaddr": "0x18752b4fc",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 4140,
+     "name": "GetWindowListWithTags",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30067,
+     "stub_vmaddr": "0x18752b5f0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 4136,
+     "name": "GetWindowList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30068,
+     "stub_vmaddr": "0x18752b748",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetOnScreenWindowCount",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30069,
+     "stub_vmaddr": "0x18752b7bc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetSharedWindowState",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30070,
+     "stub_vmaddr": "0x18752b914",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 48,
+     "name": "GetWindowOwner",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30071,
+     "stub_vmaddr": "0x18752b9d0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "RequestNotificationsForWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30074,
+     "stub_vmaddr": "0x18752ba7c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "SystemStatusBarGetWindowPreferredPosition",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30075,
+     "stub_vmaddr": "0x18752bb70",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 44,
+     "name": "SystemStatusBarWindowGetDragState",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30076,
+     "stub_vmaddr": "0x18752bc98",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "SystemStatusBarGetCurrentNavigationWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30077,
+     "stub_vmaddr": "0x18752bd3c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SystemStatusBarNavigateFromWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30081,
+     "stub_vmaddr": "0x18752c044",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "FlushRegion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30082,
+     "stub_vmaddr": "0x18752c164",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 60,
+     "name": "GetWindowShmemReference",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30083,
+     "stub_vmaddr": "0x18752c2e4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowBackingInfo",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30084,
+     "stub_vmaddr": "0x18752c3dc",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 64,
+     "name": "GetWindowBackingPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30085,
+     "stub_vmaddr": "0x18752c54c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowAutofillColor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30086,
+     "stub_vmaddr": "0x18752c600",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SynchronizeWindowBackingStore",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30087,
+     "stub_vmaddr": "0x18752c8b0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetSecureEventInput",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30088,
+     "stub_vmaddr": "0x18752c950",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetMouseFocusWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30089,
+     "stub_vmaddr": "0x18752ca00",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetMouseEventEnableFlags",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30090,
+     "stub_vmaddr": "0x18752caa0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "AddSurface",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30091,
+     "stub_vmaddr": "0x18752cc60",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "RemoveSurface",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30092,
+     "stub_vmaddr": "0x18752cd00",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "RemoveAllSurfaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30093,
+     "stub_vmaddr": "0x18752cd98",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "BindSurface",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30094,
+     "stub_vmaddr": "0x18752ce58",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "MoveSurface",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30095,
+     "stub_vmaddr": "0x18752d0bc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "OrderSurface",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30096,
+     "stub_vmaddr": "0x18752d168",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "FlushSurfaceInline",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30097,
+     "stub_vmaddr": "0x18752d208",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "FlushSurface",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30099,
+     "stub_vmaddr": "0x18752d2b4",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "ShapeSurface",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30100,
+     "stub_vmaddr": "0x18752d374",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "ShapeSurfaceInline",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30101,
+     "stub_vmaddr": "0x18752d420",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 52,
+     "name": "GetSurfaceBounds",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30102,
+     "stub_vmaddr": "0x18752d4d8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetSurfaceCount",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30103,
+     "stub_vmaddr": "0x18752d578",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 4136,
+     "name": "GetSurfaceList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30104,
+     "stub_vmaddr": "0x18752d644",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetSurfaceOpacity",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30105,
+     "stub_vmaddr": "0x18752d6ec",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetSurfaceOpacity",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30106,
+     "stub_vmaddr": "0x18752d830",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "SetSurfaceLayerBackingOptions",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30107,
+     "stub_vmaddr": "0x18752d998",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "SetSurfaceProperty",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30108,
+     "stub_vmaddr": "0x18752dab0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "DeleteSurfaceProperty",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30109,
+     "stub_vmaddr": "0x18752dbb4",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 48,
+     "name": "GetSurfaceBinding",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30110,
+     "stub_vmaddr": "0x18752dce0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 52,
+     "name": "GetZoomParameters",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30111,
+     "stub_vmaddr": "0x18752de14",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "SetZoomParameters",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30112,
+     "stub_vmaddr": "0x18752df44",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 44,
+     "name": "ZoomTransformPoint",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30117,
+     "stub_vmaddr": "0x18752e0e4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "GetPortStreamOutofline",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30118,
+     "stub_vmaddr": "0x18752e300",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetFrontProcess",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30119,
+     "stub_vmaddr": "0x18752e364",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 40,
+     "name": "SetNotifications",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30120,
+     "stub_vmaddr": "0x18752e584",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "PostEventRecordTo",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30121,
+     "stub_vmaddr": "0x18752e6a8",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "PostEventRecord",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30122,
+     "stub_vmaddr": "0x18752e7e0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "PostBroadcastNotification",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30123,
+     "stub_vmaddr": "0x18752e878",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "PostNotificationToConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30124,
+     "stub_vmaddr": "0x18752e91c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "WarpCursorPosition",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30125,
+     "stub_vmaddr": "0x18752eab4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "InhibitLocalEvents",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30126,
+     "stub_vmaddr": "0x18752eb8c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "AssociateMouseAndMouseCursorPosition",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30127,
+     "stub_vmaddr": "0x18752ec90",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ForceWaitCursorActive",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30128,
+     "stub_vmaddr": "0x18752ed1c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetRegisteredCursor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30129,
+     "stub_vmaddr": "0x18752ede8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "IsCursorRegistered",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30130,
+     "stub_vmaddr": "0x18752eeb0",
+     "impl_vmaddr": "0x0",
+     "argc": 15,
+     "max_reply_msg": 40,
+     "name": "RegisterCursorWithData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30131,
+     "stub_vmaddr": "0x18752f008",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetRegisteredCursorDataSize",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30132,
+     "stub_vmaddr": "0x18752f130",
+     "impl_vmaddr": "0x0",
+     "argc": 12,
+     "max_reply_msg": 88,
+     "name": "GetRegisteredCursorData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30133,
+     "stub_vmaddr": "0x18752f288",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "RemoveRegisteredCursor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30134,
+     "stub_vmaddr": "0x18752f3c4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetCursorScale",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30135,
+     "stub_vmaddr": "0x18752f494",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetCursorScale",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30136,
+     "stub_vmaddr": "0x18752f4fc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "ModifyKeyFocus",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30137,
+     "stub_vmaddr": "0x18752f580",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "StealKeyFocusReturningID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30138,
+     "stub_vmaddr": "0x18752f604",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ReleaseKeyFocusWithID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30139,
+     "stub_vmaddr": "0x18752f664",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 48,
+     "name": "GetKeyFocusProcess",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30140,
+     "stub_vmaddr": "0x18752f738",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetTypingFocusProcess",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30141,
+     "stub_vmaddr": "0x18752f81c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "CompleteServiceReq",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30142,
+     "stub_vmaddr": "0x18752ff28",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 44,
+     "name": "GetWindowRightHolderPSN",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30143,
+     "stub_vmaddr": "0x18753002c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "AppShowHideOp",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30144,
+     "stub_vmaddr": "0x187530400",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "RegisterForKey",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30145,
+     "stub_vmaddr": "0x187530520",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "OverrideKeyRegistration",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30146,
+     "stub_vmaddr": "0x187530620",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "UnoverrideKeyRegistration",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30147,
+     "stub_vmaddr": "0x187530728",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 44,
+     "name": "GetKeyBinding",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30148,
+     "stub_vmaddr": "0x187530868",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ExitSpecialKeyMode",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30149,
+     "stub_vmaddr": "0x187530920",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 44,
+     "name": "GetNextToFrontProcess",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30150,
+     "stub_vmaddr": "0x187530a20",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "BringNextToFront",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30151,
+     "stub_vmaddr": "0x187530a98",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetAuxConn",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30152,
+     "stub_vmaddr": "0x187530bb0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetMainApplicationConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30153,
+     "stub_vmaddr": "0x187530d3c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetDefaultBootstrapPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30154,
+     "stub_vmaddr": "0x187530ecc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowRegion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30155,
+     "stub_vmaddr": "0x187530fe4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "DeleteWindowRegion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30156,
+     "stub_vmaddr": "0x1875310f0",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "SetTrackingAreaShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30157,
+     "stub_vmaddr": "0x18753123c",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "AddTrackingArea",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30158,
+     "stub_vmaddr": "0x1875313fc",
+     "impl_vmaddr": "0x0",
+     "argc": 12,
+     "max_reply_msg": 36,
+     "name": "AddTrackingAreas",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30159,
+     "stub_vmaddr": "0x187531550",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "MoveTrackingArea",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30160,
+     "stub_vmaddr": "0x187531628",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "RemoveTrackingArea",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30161,
+     "stub_vmaddr": "0x1875316dc",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "RemoveTrackingAreas",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30162,
+     "stub_vmaddr": "0x187531868",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "RemoveAllTrackingAreas",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30163,
+     "stub_vmaddr": "0x187531908",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetTrackingAreaEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30164,
+     "stub_vmaddr": "0x1875319cc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetTrackingAreasEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30165,
+     "stub_vmaddr": "0x187531b70",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetTrackingAreaClip",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30166,
+     "stub_vmaddr": "0x187531c3c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetConnectionIDForPSN",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30167,
+     "stub_vmaddr": "0x187531cb8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "BlockWindowOrdering",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30168,
+     "stub_vmaddr": "0x187531d58",
+     "impl_vmaddr": "0x0",
+     "argc": 10,
+     "max_reply_msg": 36,
+     "name": "DoDeferredOrdering",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30169,
+     "stub_vmaddr": "0x187531e40",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "OrderFrontConditionally",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30170,
+     "stub_vmaddr": "0x187531eac",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "MenuBarExists",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30171,
+     "stub_vmaddr": "0x187531f10",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetMenuBarDrawingStyle",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30172,
+     "stub_vmaddr": "0x187531f9c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetActiveMenuBarDrawingStyle",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30173,
+     "stub_vmaddr": "0x187532000",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetMenuBarAutohideEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30174,
+     "stub_vmaddr": "0x1875320c0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetMenuBarAutohideEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30175,
+     "stub_vmaddr": "0x187532138",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetAppearanceTheme",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30176,
+     "stub_vmaddr": "0x187532374",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetAppearanceTheme",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30177,
+     "stub_vmaddr": "0x1875323f8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetFrontWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30178,
+     "stub_vmaddr": "0x187532488",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowHasKeyAppearance",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30179,
+     "stub_vmaddr": "0x187532540",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowHasMainAppearance",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30180,
+     "stub_vmaddr": "0x1875325f8",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "ReorderWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30181,
+     "stub_vmaddr": "0x187532658",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetConnectionProperty",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30182,
+     "stub_vmaddr": "0x187532770",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "GetConnectionProperty",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30183,
+     "stub_vmaddr": "0x1875328a0",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "PackagesDragWindowRelativeToMouse",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30184,
+     "stub_vmaddr": "0x187532910",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "PackagesAddWindowToDraggingSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30185,
+     "stub_vmaddr": "0x187532ac8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "PackagesRemoveWindowFromDraggingSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30186,
+     "stub_vmaddr": "0x187532bd0",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "SetWindowOriginRelativeToWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30187,
+     "stub_vmaddr": "0x187532cf0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "GetWindowMovementGroup",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30188,
+     "stub_vmaddr": "0x187532df0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "GetWindowOrderingGroup",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30189,
+     "stub_vmaddr": "0x187532ef0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ClearWindowMovementGroup",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30190,
+     "stub_vmaddr": "0x187532fb0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "AddWindowToWindowMovementGroup",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30191,
+     "stub_vmaddr": "0x1875330a4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "RemoveWindowFromWindowMovementGroup",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30192,
+     "stub_vmaddr": "0x187533198",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ClearWindowOrderingGroup",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30193,
+     "stub_vmaddr": "0x187533248",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "AddWindowToWindowOrderingGroup",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30194,
+     "stub_vmaddr": "0x187533340",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "RemoveWindowFromWindowOrderingGroup",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30195,
+     "stub_vmaddr": "0x1875333f8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowLevelForGroup",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30196,
+     "stub_vmaddr": "0x1875334ac",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetLastDeactivated",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30197,
+     "stub_vmaddr": "0x1875334fc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "CycleWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30198,
+     "stub_vmaddr": "0x1875338a0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "TrackDirtyScreenRegion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30199,
+     "stub_vmaddr": "0x187533910",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 48,
+     "name": "GetHotKey",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30200,
+     "stub_vmaddr": "0x1875339d4",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "SetHotKey",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30201,
+     "stub_vmaddr": "0x187533ae0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetHotKeyEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30202,
+     "stub_vmaddr": "0x187533b90",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetHotKeyEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30203,
+     "stub_vmaddr": "0x187533c60",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "RemoveHotKey",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30206,
+     "stub_vmaddr": "0x187533cc8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "EventSetAppIsUnresponsiveNotificationTimeout",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30207,
+     "stub_vmaddr": "0x187533d28",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 44,
+     "name": "EventAppUnresponsiveStatus",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30208,
+     "stub_vmaddr": "0x187533e60",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "CoalesceEventsInMask",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30209,
+     "stub_vmaddr": "0x187533efc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetSymbolicHotKeyWithOption",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30210,
+     "stub_vmaddr": "0x187533ffc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetGlobalHotKeyOperatingMode",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30211,
+     "stub_vmaddr": "0x187534068",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetGlobalHotKeyOperatingMode",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30212,
+     "stub_vmaddr": "0x1875340f8",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "GetSpecifiedWindowShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30213,
+     "stub_vmaddr": "0x1875341d4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "AckNotification",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30214,
+     "stub_vmaddr": "0x187534298",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "UpdateSessionWorkspaceData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30215,
+     "stub_vmaddr": "0x187534398",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 88,
+     "name": "GetHotKeyRepresentation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30216,
+     "stub_vmaddr": "0x1875344dc",
+     "impl_vmaddr": "0x0",
+     "argc": 17,
+     "max_reply_msg": 36,
+     "name": "SetHotKeyRepresentation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30217,
+     "stub_vmaddr": "0x1875345bc",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 40,
+     "name": "NewTransition",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30218,
+     "stub_vmaddr": "0x187534784",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "InvokeTransition",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30219,
+     "stub_vmaddr": "0x187534854",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ReleaseTransition",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30220,
+     "stub_vmaddr": "0x1875348c0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetPrimaryConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30221,
+     "stub_vmaddr": "0x1875349b8",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "NewCIFilter",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30222,
+     "stub_vmaddr": "0x187534bc8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ReleaseCIFilter",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30223,
+     "stub_vmaddr": "0x187534c78",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetCIFilterValues",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30224,
+     "stub_vmaddr": "0x187534f24",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetWindowCIFilter",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30225,
+     "stub_vmaddr": "0x187535054",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetWindowEventShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30226,
+     "stub_vmaddr": "0x18753521c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetKeyTranslationTable",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30227,
+     "stub_vmaddr": "0x187535354",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "ScrollWindowRegionInline",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30228,
+     "stub_vmaddr": "0x1875358f4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowListGlobalClipShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30229,
+     "stub_vmaddr": "0x1875359d0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetHotKeyType",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30230,
+     "stub_vmaddr": "0x187535a8c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetHotKeyType",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30231,
+     "stub_vmaddr": "0x187535b48",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "RemoveWindowListGlobalClipShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30232,
+     "stub_vmaddr": "0x187535c50",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "FetchDirtyScreenRegion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30233,
+     "stub_vmaddr": "0x187535e38",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "OrderWindowListWithOperation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30234,
+     "stub_vmaddr": "0x187535f48",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "SetTrackingAreaOption",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30235,
+     "stub_vmaddr": "0x187536154",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 44,
+     "name": "GetConnectionPSN",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30236,
+     "stub_vmaddr": "0x18753621c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetProcessValidity",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30237,
+     "stub_vmaddr": "0x1875362ac",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetWindowCaptureExcludeShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30238,
+     "stub_vmaddr": "0x1875363b8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "RemoveWindowCaptureExcludeShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30239,
+     "stub_vmaddr": "0x18753644c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetApplicationBindingsForWorkspaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30240,
+     "stub_vmaddr": "0x1875365d4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetNotificationConnectionForWorkspaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30241,
+     "stub_vmaddr": "0x187536734",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 4136,
+     "name": "GetParentWindowList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30242,
+     "stub_vmaddr": "0x187536924",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "ShapeWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30243,
+     "stub_vmaddr": "0x187536a30",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 52,
+     "name": "CreateLayerContext",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30244,
+     "stub_vmaddr": "0x187536b28",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetSymbolicHotKeyEnabledForConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30245,
+     "stub_vmaddr": "0x187536ca8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetSymbolicHotKeyEnabledForConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30246,
+     "stub_vmaddr": "0x187536d4c",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "SetDockRectWithReason",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30247,
+     "stub_vmaddr": "0x187536dac",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 60,
+     "name": "GetDockRectWithReason",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30248,
+     "stub_vmaddr": "0x187536e2c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 52,
+     "name": "DequeueHideOrShowServiceReq",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30249,
+     "stub_vmaddr": "0x187537084",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowParent",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30250,
+     "stub_vmaddr": "0x187537168",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "SetWindowShadowParametersWithStretch",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30251,
+     "stub_vmaddr": "0x18753748c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetGestureEventSubmask",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30252,
+     "stub_vmaddr": "0x1875374f4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowColorProfile",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30253,
+     "stub_vmaddr": "0x187537590",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowColorProfile",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30254,
+     "stub_vmaddr": "0x187537614",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetSurfaceColorProfile",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30255,
+     "stub_vmaddr": "0x1875376bc",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetSurfaceColorProfile",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30256,
+     "stub_vmaddr": "0x1875377f0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetPreferencesForWorkspaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30257,
+     "stub_vmaddr": "0x1875379a0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowListSystemLevel",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30258,
+     "stub_vmaddr": "0x187537a94",
+     "impl_vmaddr": "0x0",
+     "argc": 22,
+     "max_reply_msg": 84,
+     "name": "HWCaptureDesktop",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30259,
+     "stub_vmaddr": "0x18753801c",
+     "impl_vmaddr": "0x0",
+     "argc": 23,
+     "max_reply_msg": 52,
+     "name": "HWCaptureWindowListToIOSurface",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30260,
+     "stub_vmaddr": "0x1875384a0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowBackgroundBlurRadius",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30261,
+     "stub_vmaddr": "0x187538648",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "SessionHasExcludeShapes",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30262,
+     "stub_vmaddr": "0x1875387dc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowRegionInline",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30263,
+     "stub_vmaddr": "0x1875388d8",
+     "impl_vmaddr": "0x0",
+     "argc": 13,
+     "max_reply_msg": 68,
+     "name": "CreateWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30264,
+     "stub_vmaddr": "0x187538c54",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowLayerContext",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30265,
+     "stub_vmaddr": "0x187538cfc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetDockCursorOverride",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30266,
+     "stub_vmaddr": "0x187538d6c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetSwipeScrollDirection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30268,
+     "stub_vmaddr": "0x187538ddc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "PersistenceWillLaunchApps",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30269,
+     "stub_vmaddr": "0x187538e84",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "PersistenceAnnounceAllAppsReady",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30270,
+     "stub_vmaddr": "0x187538edc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "PackagesEnableConnectionOcclusionNotifications",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30271,
+     "stub_vmaddr": "0x187538f78",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "PackagesEnableWindowOcclusionNotifications",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30272,
+     "stub_vmaddr": "0x18753901c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "PackagesEnableConnectionWindowModificationNotifications",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30274,
+     "stub_vmaddr": "0x1875390b8",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "GrantConnectionRightsOnWindowReserving",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30275,
+     "stub_vmaddr": "0x187539490",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "CompleteWindowRightsGrant",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30276,
+     "stub_vmaddr": "0x18753969c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 48,
+     "name": "GetHeldWindowRights",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30277,
+     "stub_vmaddr": "0x1875397f4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "WindowRightsRelinquish",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30278,
+     "stub_vmaddr": "0x18753999c",
+     "impl_vmaddr": "0x0",
+     "argc": 14,
+     "max_reply_msg": 44,
+     "name": "HWCaptureDisplayIntoIOSurface",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30279,
+     "stub_vmaddr": "0x187539f8c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowResolution",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30280,
+     "stub_vmaddr": "0x18753a038",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowResolution",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30281,
+     "stub_vmaddr": "0x18753a0c4",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetSurfaceResolution",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30282,
+     "stub_vmaddr": "0x18753a16c",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 48,
+     "name": "GetSurfaceResolution",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30283,
+     "stub_vmaddr": "0x18753a24c",
+     "impl_vmaddr": "0x0",
+     "argc": 19,
+     "max_reply_msg": 36,
+     "name": "CreateApplication",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30284,
+     "stub_vmaddr": "0x18753a394",
+     "impl_vmaddr": "0x0",
+     "argc": 16,
+     "max_reply_msg": 36,
+     "name": "SetMagicZoom",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30285,
+     "stub_vmaddr": "0x18753af00",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 96,
+     "name": "GetMagicZoomState",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30286,
+     "stub_vmaddr": "0x18753b094",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetMagicZoomWindowID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30287,
+     "stub_vmaddr": "0x18753b140",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 4136,
+     "name": "GetProcessMenuBarWindowList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30291,
+     "stub_vmaddr": "0x18753b354",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetMenuBarCompanionWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30292,
+     "stub_vmaddr": "0x18753b4a8",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "IsMenuBarVisibleOnSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30293,
+     "stub_vmaddr": "0x18753b5b0",
+     "impl_vmaddr": "0x0",
+     "argc": 15,
+     "max_reply_msg": 40,
+     "name": "RegisterCursorImages",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30294,
+     "stub_vmaddr": "0x18753b738",
+     "impl_vmaddr": "0x0",
+     "argc": 13,
+     "max_reply_msg": 1108,
+     "name": "GetRegisteredCursorImages",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30295,
+     "stub_vmaddr": "0x18753ba4c",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 84,
+     "name": "GetMenuBar",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30298,
+     "stub_vmaddr": "0x18753bc24",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetSurfaceListAlpha",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30306,
+     "stub_vmaddr": "0x18753bea0",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "SetChameleonOverrideColor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30308,
+     "stub_vmaddr": "0x18753c02c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 8236,
+     "name": "TakeCinematicBootWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30309,
+     "stub_vmaddr": "0x18753c1a8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "WasBootApplePreserved",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30310,
+     "stub_vmaddr": "0x18753c240",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetMenuBarSystemOverrideAlpha",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30311,
+     "stub_vmaddr": "0x18753c2ac",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "WindowIsOrderedIn",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30312,
+     "stub_vmaddr": "0x18753c38c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "WindowIsVisible",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30313,
+     "stub_vmaddr": "0x18753c460",
+     "impl_vmaddr": "0x0",
+     "argc": 17,
+     "max_reply_msg": 36,
+     "name": "DisplayStreamCreate",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30314,
+     "stub_vmaddr": "0x18753c574",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "DisplayStreamStart",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30315,
+     "stub_vmaddr": "0x18753c638",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "DisplayStreamStop",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30316,
+     "stub_vmaddr": "0x18753c700",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "DisplayStreamDestroy",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30317,
+     "stub_vmaddr": "0x18753c7c4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetUpdateInfoHandler",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30318,
+     "stub_vmaddr": "0x18753c918",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "ResetWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30319,
+     "stub_vmaddr": "0x18753ca14",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "AddWindowsToSpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30320,
+     "stub_vmaddr": "0x18753cadc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "RemoveWindowsFromSpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30321,
+     "stub_vmaddr": "0x18753cba4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "WillSwitchSpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30322,
+     "stub_vmaddr": "0x18753cc98",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "ShowSpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30323,
+     "stub_vmaddr": "0x18753cd8c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "HideSpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30324,
+     "stub_vmaddr": "0x18753ce80",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "CopySpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30325,
+     "stub_vmaddr": "0x18753cf54",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 56,
+     "name": "CopySpacesForWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30326,
+     "stub_vmaddr": "0x18753d0ac",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 56,
+     "name": "CopyWindowsWithOptionsAndTags",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30327,
+     "stub_vmaddr": "0x18753d23c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "CopyAssociatedWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30328,
+     "stub_vmaddr": "0x18753d320",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 44,
+     "name": "SpaceCreate",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30329,
+     "stub_vmaddr": "0x18753d45c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SpaceDestroy",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30330,
+     "stub_vmaddr": "0x18753d4f4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "SpaceCopyValues",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30331,
+     "stub_vmaddr": "0x18753d680",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SpaceSetValues",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30332,
+     "stub_vmaddr": "0x18753d808",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SpaceRemoveValuesForKeys",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30333,
+     "stub_vmaddr": "0x18753d99c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 1068,
+     "name": "SpaceCopyName",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30334,
+     "stub_vmaddr": "0x18753da70",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SpaceSetName",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30335,
+     "stub_vmaddr": "0x18753db4c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "SpaceGetType",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30339,
+     "stub_vmaddr": "0x18753dbd0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "SpaceCopyOwners",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30340,
+     "stub_vmaddr": "0x18753dca8",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SpaceSetOwners",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30341,
+     "stub_vmaddr": "0x18753de28",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SpaceAddOwner",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30342,
+     "stub_vmaddr": "0x18753df28",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SpaceRemoveOwner",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30343,
+     "stub_vmaddr": "0x18753e014",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "SpaceCopyShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30344,
+     "stub_vmaddr": "0x18753e0d0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SpaceSetShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30345,
+     "stub_vmaddr": "0x18753e1f4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 64,
+     "name": "SpaceGetTransform",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30346,
+     "stub_vmaddr": "0x18753e37c",
+     "impl_vmaddr": "0x0",
+     "argc": 10,
+     "max_reply_msg": 36,
+     "name": "SpaceSetTransform",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30347,
+     "stub_vmaddr": "0x18753e42c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "SpaceGetAbsoluteLevel",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30348,
+     "stub_vmaddr": "0x18753e4b0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SpaceSetAbsoluteLevel",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30349,
+     "stub_vmaddr": "0x18753e51c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 44,
+     "name": "SpaceWithName",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30350,
+     "stub_vmaddr": "0x18753e630",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SpaceResetMenuBar",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30351,
+     "stub_vmaddr": "0x18753e68c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SpaceSetFrontPSN",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30352,
+     "stub_vmaddr": "0x18753e704",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "ProcessAssignToSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30353,
+     "stub_vmaddr": "0x18753e7a0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ProcessAssignToAllSpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30354,
+     "stub_vmaddr": "0x18753e810",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetSpaceManagementMode",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30356,
+     "stub_vmaddr": "0x18753e86c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "CopyManagedDisplaySpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30357,
+     "stub_vmaddr": "0x18753e9c8",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "MoveManagedSpaceToDisplayIndex",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30359,
+     "stub_vmaddr": "0x18753eae4",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "ManagedDisplaySetCurrentSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30361,
+     "stub_vmaddr": "0x18753eb48",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "ManagedDisplaySetIsAnimating",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30362,
+     "stub_vmaddr": "0x18753ebb0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "SpaceCopyManagedShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30363,
+     "stub_vmaddr": "0x18753ec98",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "CopyPackagesPersistenceDictionary",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30364,
+     "stub_vmaddr": "0x18753f0c4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "RestorePackagesManagementPersistenceData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30365,
+     "stub_vmaddr": "0x18753fb94",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "CopyApplicationPersistencePropertyListsForWindowList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30367,
+     "stub_vmaddr": "0x18753fe10",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetActiveMenuBarDisplayIdentifier",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30368,
+     "stub_vmaddr": "0x18753fff0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 68,
+     "name": "GetRevealedMenuBarBounds",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30369,
+     "stub_vmaddr": "0x187540138",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 52,
+     "name": "CopyBestManagedDisplayForPoint",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30370,
+     "stub_vmaddr": "0x1875401e8",
+     "impl_vmaddr": "0x0",
+     "argc": 10,
+     "max_reply_msg": 52,
+     "name": "CopyBestManagedDisplayForRect",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30371,
+     "stub_vmaddr": "0x1875402f8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 52,
+     "name": "CopyManagedDisplayForWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30372,
+     "stub_vmaddr": "0x187540390",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 52,
+     "name": "CopyManagedDisplayForSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30373,
+     "stub_vmaddr": "0x187540430",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "ManagedDisplayCurrentSpaceAllowsWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30374,
+     "stub_vmaddr": "0x1875404f8",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "MoveWindowsToManagedSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30376,
+     "stub_vmaddr": "0x187540614",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 56,
+     "name": "ManagedDisplaysCopyRoleWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30377,
+     "stub_vmaddr": "0x187540928",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "ManagedDisplaySetRoleWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30378,
+     "stub_vmaddr": "0x187540a80",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetProcessNotifyInterests",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30379,
+     "stub_vmaddr": "0x187540f94",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetConnectionNotifyInterests",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30380,
+     "stub_vmaddr": "0x18754122c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "DeferWindowMoveEvents",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30381,
+     "stub_vmaddr": "0x187541290",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 44,
+     "name": "GetDisplayReconfigureTimeWhenWindowsLastMoved",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30382,
+     "stub_vmaddr": "0x18754130c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ConnectionSetSpinning",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30383,
+     "stub_vmaddr": "0x1875413d4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SpacePreferCurrentDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30384,
+     "stub_vmaddr": "0x187541440",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "PackagesAssignDraggedWindowToDestinationSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30385,
+     "stub_vmaddr": "0x1875414a8",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowListFadeProperties",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30386,
+     "stub_vmaddr": "0x187541580",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "WindowFreezeWithOptions",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30387,
+     "stub_vmaddr": "0x1875415b8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "WindowThaw",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30388,
+     "stub_vmaddr": "0x1875415f0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "ServerMightHaveAcceleration",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30389,
+     "stub_vmaddr": "0x18754169c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "CopyManagedDisplays",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30390,
+     "stub_vmaddr": "0x18754182c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetIOHIDEventSystemClientProperty",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30391,
+     "stub_vmaddr": "0x18754193c",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "ActuateDeviceWithPattern",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30392,
+     "stub_vmaddr": "0x187541b4c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetPressureConfigurationOverride",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30393,
+     "stub_vmaddr": "0x187541cc4",
+     "impl_vmaddr": "0x0",
+     "argc": 11,
+     "max_reply_msg": 36,
+     "name": "AddStructuralRegionOfType",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30394,
+     "stub_vmaddr": "0x1875420c0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "RemoveStructuralRegion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30395,
+     "stub_vmaddr": "0x187542150",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "StructuralRegionSetShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30396,
+     "stub_vmaddr": "0x18754225c",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "StructuralRegionMove",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30397,
+     "stub_vmaddr": "0x187542300",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "StructuralRegionSetLevel",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30398,
+     "stub_vmaddr": "0x187542444",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "StructuralRegionSetEventMask",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30399,
+     "stub_vmaddr": "0x1875424dc",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "StructuralRegionSetClippedByWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30400,
+     "stub_vmaddr": "0x187542574",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "StructuralRegionSetChildRegionTransform",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30401,
+     "stub_vmaddr": "0x1875427cc",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "TrackingRegionSetIsEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30402,
+     "stub_vmaddr": "0x187542864",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "TrackingRegionSetForceConfig",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30403,
+     "stub_vmaddr": "0x1875429c0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetGlobalForceConfig",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30404,
+     "stub_vmaddr": "0x187542ad4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "WindowRoutingRecordsForScreenLocation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30405,
+     "stub_vmaddr": "0x187542ee4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "PackagesSetFindCursorPrefs",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30407,
+     "stub_vmaddr": "0x187543084",
+     "impl_vmaddr": "0x0",
+     "argc": 14,
+     "max_reply_msg": 36,
+     "name": "PackagesSetWindowConstraints",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30408,
+     "stub_vmaddr": "0x1875432a8",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 84,
+     "name": "PackagesGetWindowConstraints",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30409,
+     "stub_vmaddr": "0x1875433a0",
+     "impl_vmaddr": "0x0",
+     "argc": 12,
+     "max_reply_msg": 36,
+     "name": "PackagesSetWindowDragTransform",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30410,
+     "stub_vmaddr": "0x187543608",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "PackagesRemoveWindowDragTransform",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30411,
+     "stub_vmaddr": "0x1875437fc",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SpaceSetOrderingWeight",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30412,
+     "stub_vmaddr": "0x1875438f0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 68,
+     "name": "SpaceGetRect",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30413,
+     "stub_vmaddr": "0x18754397c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 68,
+     "name": "WindowGetPrimarySpaceRect",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30414,
+     "stub_vmaddr": "0x187543a0c",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 44,
+     "name": "SpaceCreateTile",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30415,
+     "stub_vmaddr": "0x187543b70",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "SpaceSetEdgeReservation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30416,
+     "stub_vmaddr": "0x187543c48",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 44,
+     "name": "SpaceGetInterTileSpacing",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30417,
+     "stub_vmaddr": "0x187543d28",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SpaceSetInterTileSpacing",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30418,
+     "stub_vmaddr": "0x187543dfc",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "SpaceTileMoveToSpaceAtIndex",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30419,
+     "stub_vmaddr": "0x187543ea0",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 40,
+     "name": "SpaceCanCreateTile",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30420,
+     "stub_vmaddr": "0x187543f84",
+     "impl_vmaddr": "0x0",
+     "argc": 10,
+     "max_reply_msg": 84,
+     "name": "SpaceGetSpacersAtPoint",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30421,
+     "stub_vmaddr": "0x1875441a4",
+     "impl_vmaddr": "0x0",
+     "argc": 14,
+     "max_reply_msg": 36,
+     "name": "SpaceMoveSpacersToPoint",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30422,
+     "stub_vmaddr": "0x1875443d0",
+     "impl_vmaddr": "0x0",
+     "argc": 11,
+     "max_reply_msg": 36,
+     "name": "SpaceFinishedResizeForRect",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30423,
+     "stub_vmaddr": "0x1875444d8",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "SpaceCopyTileSpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30424,
+     "stub_vmaddr": "0x187544608",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 52,
+     "name": "SpaceGetSizeForProposedTile",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30425,
+     "stub_vmaddr": "0x187544c08",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "WindowListSetLockedBounds",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30426,
+     "stub_vmaddr": "0x187544cc4",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "OrderWindowListWithGroups",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30427,
+     "stub_vmaddr": "0x187544dc8",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 44,
+     "name": "GetSpacePermittedResizeDirections",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30428,
+     "stub_vmaddr": "0x187544fc4",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "InterruptMenuBarReveal",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30429,
+     "stub_vmaddr": "0x187545038",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "TransactionCommitAsync",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30430,
+     "stub_vmaddr": "0x18754512c",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "TransactionCommitSync",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30432,
+     "stub_vmaddr": "0x187545220",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "SpaceAddWindowsAndRemoveFromSpaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30434,
+     "stub_vmaddr": "0x187545360",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowSubLevel",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30435,
+     "stub_vmaddr": "0x187545408",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetWindowSubLevel",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30439,
+     "stub_vmaddr": "0x18754548c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetMenuBarUsesRTLLayoutOnDisplayLegacy",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30440,
+     "stub_vmaddr": "0x1875455b4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetSystemUIHasRTLDirection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30441,
+     "stub_vmaddr": "0x187545610",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetSystemUIHasRTLDirection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30442,
+     "stub_vmaddr": "0x187545688",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "SpaceGetAlpha",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30443,
+     "stub_vmaddr": "0x18754571c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SpaceSetAlpha",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30444,
+     "stub_vmaddr": "0x1875457c0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "WindowSetActiveShadowLegacy",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30445,
+     "stub_vmaddr": "0x187545874",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 44,
+     "name": "ReserveStructuralRegionIDRange",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30446,
+     "stub_vmaddr": "0x187545934",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 44,
+     "name": "GetTileSpaceDividerDirections",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30447,
+     "stub_vmaddr": "0x187545a28",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 52,
+     "name": "TileSpaceSetDividerWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30448,
+     "stub_vmaddr": "0x187545b90",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "TileSpaceMoveSpacersForSize",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30449,
+     "stub_vmaddr": "0x187545de4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "Stall",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30450,
+     "stub_vmaddr": "0x187545e40",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "EnsureSpaceSwitchToActiveProcess",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30451,
+     "stub_vmaddr": "0x187545ea8",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "TileSpaceReplaceWithSnapshotWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30452,
+     "stub_vmaddr": "0x187545f94",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SystemStatusBarPrepareToUnregisterWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30453,
+     "stub_vmaddr": "0x1875460cc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetAccessibilityAdjustments",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30456,
+     "stub_vmaddr": "0x1875464fc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "GetDevices",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30458,
+     "stub_vmaddr": "0x1875465dc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetCursorDragLock",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30459,
+     "stub_vmaddr": "0x187546724",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetCursorRegionLock",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30460,
+     "stub_vmaddr": "0x1875468ac",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 56,
+     "name": "CopyWindowsWithOptionsAndTagsAndSpaceOptions",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30461,
+     "stub_vmaddr": "0x1875469dc",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "TrackingRegionSetRespectsSystemAlphaThreshold",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30463,
+     "stub_vmaddr": "0x187546b38",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 40,
+     "name": "HMDAcquire",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30464,
+     "stub_vmaddr": "0x187546df0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "HMDRelease",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30465,
+     "stub_vmaddr": "0x187546ea4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "HMDSetNotificationPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30466,
+     "stub_vmaddr": "0x18754700c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "HMDCopyByID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30467,
+     "stub_vmaddr": "0x1875470bc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "HMDCopyList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30468,
+     "stub_vmaddr": "0x187547164",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 52,
+     "name": "HMDGetSurfaceForIndex",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30469,
+     "stub_vmaddr": "0x187547208",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "HMDConfigureQueue",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30470,
+     "stub_vmaddr": "0x1875472b0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "HMDQueryStatus",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30471,
+     "stub_vmaddr": "0x187547330",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 52,
+     "name": "HMDGetTotalUpdateCount",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30473,
+     "stub_vmaddr": "0x187547438",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayChangedSeedCheckValidity",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30474,
+     "stub_vmaddr": "0x1875474d0",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 16444,
+     "name": "WindowQuery",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30475,
+     "stub_vmaddr": "0x187547af8",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetWindowCursorRestrictionShape",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30476,
+     "stub_vmaddr": "0x187547c38",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "DisableCursorObscure",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30477,
+     "stub_vmaddr": "0x187547d4c",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "ReenableCursorObscure",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30478,
+     "stub_vmaddr": "0x187547dd0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "UpdateLastEventTime",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30479,
+     "stub_vmaddr": "0x187547f34",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 40,
+     "name": "ValidateUnobscuredRemoteRegionSecurityToken",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30480,
+     "stub_vmaddr": "0x187548050",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "WindowSetTrustedForObscuring",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30481,
+     "stub_vmaddr": "0x187548138",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 44,
+     "name": "PostCoordinatedDistributedNotification",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30482,
+     "stub_vmaddr": "0x1875481c8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "CoordinatedDistributedNotificationMarkCompletion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30483,
+     "stub_vmaddr": "0x1875483a0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetSurfaceFrontBufferID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30484,
+     "stub_vmaddr": "0x1875484ac",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "WindowSetSurfaceContext",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30485,
+     "stub_vmaddr": "0x1875486d4",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetSpaceMenuBarReveal",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30486,
+     "stub_vmaddr": "0x1875487b4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetZoomDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30487,
+     "stub_vmaddr": "0x1875488fc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetZoomDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30488,
+     "stub_vmaddr": "0x187548970",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "IsAccessibilityDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30489,
+     "stub_vmaddr": "0x1875489e8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "ScreenTimeSuppressWindows",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30490,
+     "stub_vmaddr": "0x187548d08",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetAppearanceThemeSwitchesAutomatically",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30491,
+     "stub_vmaddr": "0x18754901c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetAppearanceThemeSwitchesAutomatically",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30492,
+     "stub_vmaddr": "0x1875490b8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 44,
+     "name": "GetAutomaticAppearanceScheduleOverride",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30493,
+     "stub_vmaddr": "0x187549200",
+     "impl_vmaddr": "0x0",
+     "argc": 15,
+     "max_reply_msg": 36,
+     "name": "HWCaptureStreamCreate",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30494,
+     "stub_vmaddr": "0x18754930c",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "ConnectionBarrier",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30495,
+     "stub_vmaddr": "0x18754933c",
+     "impl_vmaddr": "0x0",
+     "argc": 12,
+     "max_reply_msg": 36,
+     "name": "DisplayStreamSidecarTouchBar",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30496,
+     "stub_vmaddr": "0x1875495d0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetMenuBarVisibilityOverrideOnDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30497,
+     "stub_vmaddr": "0x187549720",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetMenuBarVisibilityOverrideOnDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30498,
+     "stub_vmaddr": "0x1875497fc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "EyeCandyEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30499,
+     "stub_vmaddr": "0x187549860",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "SecureCursorPositionTakeAssertion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30500,
+     "stub_vmaddr": "0x18754992c",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "SecureCursorPositionDropAssertion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30501,
+     "stub_vmaddr": "0x1875499c8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "CopySystemStatusBarMetrics",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30502,
+     "stub_vmaddr": "0x187549b24",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 44,
+     "name": "DisplaysCurrentState_SL",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30503,
+     "stub_vmaddr": "0x187549bc8",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "IdleDisplays",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30504,
+     "stub_vmaddr": "0x187549bfc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetRealtimeDisplayDataShmemPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30505,
+     "stub_vmaddr": "0x187549c9c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplaySupportsHDRMode",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30506,
+     "stub_vmaddr": "0x187549d50",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayIsHDRModeEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30507,
+     "stub_vmaddr": "0x187549e04",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "DisplaySetHDRModeEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30508,
+     "stub_vmaddr": "0x187549ea0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "DisplaySetActivePresetIndex",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30509,
+     "stub_vmaddr": "0x187549f34",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayGetFactoryDefaultPresetIndex",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30510,
+     "stub_vmaddr": "0x187549fe8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayGetPresetCount",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30511,
+     "stub_vmaddr": "0x18754a09c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 52,
+     "name": "DisplayCopyPresetUniqueID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30512,
+     "stub_vmaddr": "0x18754a154",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "DisplayIsPresetValid",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30513,
+     "stub_vmaddr": "0x18754a20c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "DisplayIsPresetWritable",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30514,
+     "stub_vmaddr": "0x18754a2c4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "DisplaySetPreset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30517,
+     "stub_vmaddr": "0x18754a3ac",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "DisplayResetPreset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30519,
+     "stub_vmaddr": "0x18754a440",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "DisplayGetUserAdjustmentLuminanceCorrectionFactor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30520,
+     "stub_vmaddr": "0x18754a4bc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayIsThermallyLimited",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30521,
+     "stub_vmaddr": "0x18754a570",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "DisplayCopyUserAdjustment",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30522,
+     "stub_vmaddr": "0x18754a704",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "DisplaySetUserAdjustment",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30523,
+     "stub_vmaddr": "0x18754a7f8",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30526,
+     "stub_vmaddr": "0x18754a8dc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayIsUserAdjustmentValid",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30527,
+     "stub_vmaddr": "0x18754a990",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayInvalidateUserAdjustment",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30528,
+     "stub_vmaddr": "0x18754aa44",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "DisplayFactoryReset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30529,
+     "stub_vmaddr": "0x18754aad4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "DisplayCopyCalibrationInfo",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30530,
+     "stub_vmaddr": "0x18754ab6c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "SetUnderscanValue",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30531,
+     "stub_vmaddr": "0x18754ac60",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "GetUnderscanValue",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30532,
+     "stub_vmaddr": "0x18754ad04",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "CopyCoordinatedDistributedNotificationFencePort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30533,
+     "stub_vmaddr": "0x18754adb8",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "SetChameleonParentWindow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30534,
+     "stub_vmaddr": "0x18754affc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "DisplayGetPreferHDR10",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30535,
+     "stub_vmaddr": "0x18754b108",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30538,
+     "stub_vmaddr": "0x18754b1bc",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 52,
+     "name": "SelectiveSharingContextDestroy",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30539,
+     "stub_vmaddr": "0x18754b2ac",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SelectiveSharingContextCopyMainContext",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30540,
+     "stub_vmaddr": "0x18754b3c0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 52,
+     "name": "SelectiveSharingContextSetState",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30541,
+     "stub_vmaddr": "0x18754b540",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SelectiveSharingContextCopyState",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30542,
+     "stub_vmaddr": "0x18754b8e8",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "SelectiveSharingContextStart",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30543,
+     "stub_vmaddr": "0x18754bbcc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SelectiveSharingContextStop",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30544,
+     "stub_vmaddr": "0x18754bc60",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetCursorRestrictionMode",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30545,
+     "stub_vmaddr": "0x18754bcf4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetSarlaccPathShow",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30546,
+     "stub_vmaddr": "0x18754bd58",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "DumpSarlaccPath",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30547,
+     "stub_vmaddr": "0x18754bdb4",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "SetCursorRestrictionOptions",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30548,
+     "stub_vmaddr": "0x18754c2a4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "UpdateAssessmentMode",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30549,
+     "stub_vmaddr": "0x18754c2f4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "ResignActiveAppearanceWhileActive",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30550,
+     "stub_vmaddr": "0x18754c77c",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "SoftwareCursorRequested",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30551,
+     "stub_vmaddr": "0x18754c888",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "CopyWindowCornerMask",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30552,
+     "stub_vmaddr": "0x18754c928",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 100,
+     "name": "CopySessionSpaceState",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30553,
+     "stub_vmaddr": "0x18754cb48",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 64,
+     "name": "GetUnifiedKeyMapping",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30554,
+     "stub_vmaddr": "0x18754cd6c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "SetUnifiedKeyMapping",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30555,
+     "stub_vmaddr": "0x18754ce04",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SelectiveSharingContextCopy",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30556,
+     "stub_vmaddr": "0x18754ce6c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "SelectiveSharingContextShowPicker",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30557,
+     "stub_vmaddr": "0x18754d0a4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SelectiveSharingContextCancelPicker",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30558,
+     "stub_vmaddr": "0x18754d254",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SelectiveSharingManagerCopyAllSessions",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30559,
+     "stub_vmaddr": "0x18754d3fc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "PersistenceSetSessionStatus",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30560,
+     "stub_vmaddr": "0x18754d74c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "PersistenceSetSessionBitmapKey",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30561,
+     "stub_vmaddr": "0x18754d7e4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "GetLastUsedKeyboardID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30562,
+     "stub_vmaddr": "0x18754d890",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "TileSpaceTakeOwnership",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30563,
+     "stub_vmaddr": "0x18754d908",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowPrefersCurrentSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30564,
+     "stub_vmaddr": "0x18754dc98",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "GetSpaceNeedsAuxiliaryScale",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30565,
+     "stub_vmaddr": "0x18754dd5c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "HMDSetEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30566,
+     "stub_vmaddr": "0x18754de04",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "HMDEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30567,
+     "stub_vmaddr": "0x18754df64",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "SetTransactionCompletion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30568,
+     "stub_vmaddr": "0x18754e048",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetSpaceWindowManagementCapabilities",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30569,
+     "stub_vmaddr": "0x18754e174",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "ContentStreamCreate",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30570,
+     "stub_vmaddr": "0x18754e324",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "ContentStreamUpdate",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30571,
+     "stub_vmaddr": "0x18754e3e4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "GetWindowTransform3D",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30572,
+     "stub_vmaddr": "0x18754e4a4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 100,
+     "name": "DisconnectWindowManager",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30573,
+     "stub_vmaddr": "0x18754e568",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "GetSessionUID",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30574,
+     "stub_vmaddr": "0x18754e74c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "VirtualDisplayCreate",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30575,
+     "stub_vmaddr": "0x18754e7ec",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "VirtualDisplayApplySettings",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30576,
+     "stub_vmaddr": "0x18754ef7c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "VirtualDisplayDestroy",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30577,
+     "stub_vmaddr": "0x18754f1c0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetFrontProcessWithInfo",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30578,
+     "stub_vmaddr": "0x18754f2d8",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "GetWindowBackingStoreOverrideResolution",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30579,
+     "stub_vmaddr": "0x18754ff54",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "SelectiveSharingContextSetPresentationDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30580,
+     "stub_vmaddr": "0x18754ffdc",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "DonateActivationToken",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30581,
+     "stub_vmaddr": "0x1875500ec",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "DisplayCalibrationBegin",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30582,
+     "stub_vmaddr": "0x1875502f8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "DisplayCalibrationEnd",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30583,
+     "stub_vmaddr": "0x1875503a0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "DisplayCalibrationToolboxCommand",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30584,
+     "stub_vmaddr": "0x187550448",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 56,
+     "name": "DisplaySupportsDynamicGeometry",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30585,
+     "stub_vmaddr": "0x1875505b0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayIsDynamicGeometryEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30586,
+     "stub_vmaddr": "0x187550664",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplaySetDynamicGeometryEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30587,
+     "stub_vmaddr": "0x187550718",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetPhotosensitivityProcessingEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30588,
+     "stub_vmaddr": "0x1875508c0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetEventInterpolation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30589,
+     "stub_vmaddr": "0x187550a64",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "GetZoomParametersForDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30590,
+     "stub_vmaddr": "0x187550b08",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 52,
+     "name": "SetZoomParametersForDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30591,
+     "stub_vmaddr": "0x187550c10",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "PostCoordinatedDistributedNotificationFenced",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30592,
+     "stub_vmaddr": "0x187550d5c",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 44,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30594,
+     "stub_vmaddr": "0x187550e10",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "AllowPrivacyIndicatorSuppression",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30595,
+     "stub_vmaddr": "0x187550e94",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetSuppressPrivacyIndicatorOnExternalDisplays",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30596,
+     "stub_vmaddr": "0x187550f14",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetWindowBackingStorePixelDimensionsHint",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30597,
+     "stub_vmaddr": "0x187550fa0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 52,
+     "name": "TakeMouseFocusTracking",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30598,
+     "stub_vmaddr": "0x187551028",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "DisplayIsPerPresetUserAdjustmentSupported",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30599,
+     "stub_vmaddr": "0x1875511f8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayIsUserAdjustmentValidForAnyPreset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30600,
+     "stub_vmaddr": "0x1875512ac",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30602,
+     "stub_vmaddr": "0x187551360",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "DisplaySetUserAdjustmentForPreset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30603,
+     "stub_vmaddr": "0x187551458",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30606,
+     "stub_vmaddr": "0x187551540",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "DisplayInvalidateUserAdjustmentForPreset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30607,
+     "stub_vmaddr": "0x1875515f8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30609,
+     "stub_vmaddr": "0x18755168c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetPresentationDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30610,
+     "stub_vmaddr": "0x1875519e0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetWindowClientPerceivedType",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30611,
+     "stub_vmaddr": "0x187551a70",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetPresentationDisplayAlwaysHD",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30612,
+     "stub_vmaddr": "0x187551b94",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetPresentationDisplayApp",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30613,
+     "stub_vmaddr": "0x187551c30",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "IsEventMatchingSymbolicHotKey",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30614,
+     "stub_vmaddr": "0x187551d0c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 40,
+     "name": "GetMenuAppearanceThemeOnSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30615,
+     "stub_vmaddr": "0x187551e2c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "IsPresentationDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30616,
+     "stub_vmaddr": "0x187551f20",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "SetZoomScreenShare",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30617,
+     "stub_vmaddr": "0x187551fcc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "BeginGlobalPreferenceTransition",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30618,
+     "stub_vmaddr": "0x18755204c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetTVConnectDefaultPolicy",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30619,
+     "stub_vmaddr": "0x187552354",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "GetTVConnectDefaultPolicy",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30620,
+     "stub_vmaddr": "0x1875523d4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetAvailableDisplayWallGroups",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30621,
+     "stub_vmaddr": "0x18755243c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 41000,
+     "name": "ValidateDisplayWallConfiguration",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30622,
+     "stub_vmaddr": "0x18755251c",
+     "impl_vmaddr": "0x0",
+     "argc": 12,
+     "max_reply_msg": 40,
+     "name": "EnableDisplayWallWithConfiguration",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30623,
+     "stub_vmaddr": "0x187552640",
+     "impl_vmaddr": "0x0",
+     "argc": 11,
+     "max_reply_msg": 36,
+     "name": "DisableDisplayWall",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30624,
+     "stub_vmaddr": "0x187552740",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "IsDisplayWall",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30625,
+     "stub_vmaddr": "0x1875527d0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayGetUserAdjustmentRange",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30626,
+     "stub_vmaddr": "0x187552884",
+     "impl_vmaddr": "0x0",
+     "argc": 17,
+     "max_reply_msg": 140,
+     "name": "SymbolicHotKeyName",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30627,
+     "stub_vmaddr": "0x1875529a4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 1068,
+     "name": "UpdatePermittedFrontPSNList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30628,
+     "stub_vmaddr": "0x187552a84",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "CaptureContentToIOSurfaces",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30629,
+     "stub_vmaddr": "0x187552c98",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetMenuBarUseBlurredAppearance",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30630,
+     "stub_vmaddr": "0x187552d54",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "DisplayGetCustomPresetInfo",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30631,
+     "stub_vmaddr": "0x187552eec",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "DisplaySetCustomPresetData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30632,
+     "stub_vmaddr": "0x187552fe0",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "DisplayGetLuminanceCorrectionFactor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30633,
+     "stub_vmaddr": "0x1875530c8",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 44,
+     "name": "DisplayIsLiveUserAdjustmentSupported",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30634,
+     "stub_vmaddr": "0x1875531d0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "DisplayInvalidateLiveUserAdjustmentForPreset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30635,
+     "stub_vmaddr": "0x187553284",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "RegisterAXCursorColor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30636,
+     "stub_vmaddr": "0x187553318",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "MenuBarPrivacyIndicatorInset",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 30637,
+     "stub_vmaddr": "0x1875534d0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30638,
+     "stub_vmaddr": "0x187553590",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30639,
+     "stub_vmaddr": "0x187553848",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 52,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30640,
+     "stub_vmaddr": "0x1875538fc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30644,
+     "stub_vmaddr": "0x187553b40",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 44,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30645,
+     "stub_vmaddr": "0x187553d0c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    },
+    {
+     "id": 30646,
+     "stub_vmaddr": "0x187553fa8",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "?",
+     "name_status": "unknown"
+    }
+   ]
+  },
+  {
+   "name": "CGXWindowServer",
+   "name_status": "inferred-from-26.6",
+   "descriptor_vmaddr": "0x1e8743ef0",
+   "server_vmaddr": "0x18751ac08",
+   "start": 32000,
+   "end": 32074,
+   "routine_count": 72,
+   "routines": [
+    {
+     "id": 32000,
+     "stub_vmaddr": "0x18751ac44",
+     "impl_vmaddr": "0x0",
+     "argc": 11,
+     "max_reply_msg": 64,
+     "name": "NewConnectionPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32001,
+     "stub_vmaddr": "0x18751adac",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 44,
+     "name": "ConnectionGetPIDAndVersion",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32002,
+     "stub_vmaddr": "0x18751ae3c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 300,
+     "name": "GetLoginName",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32003,
+     "stub_vmaddr": "0x18751aefc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetDebugOptions",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32004,
+     "stub_vmaddr": "0x18751af58",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "SaveConfiguration",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32005,
+     "stub_vmaddr": "0x18751afd4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "GLCompositorSettings",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32006,
+     "stub_vmaddr": "0x18751b0e8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 52,
+     "name": "GetEventShmem",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32007,
+     "stub_vmaddr": "0x18751b288",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetRealtimeDisplayInfoShmem",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32008,
+     "stub_vmaddr": "0x18751b3a0",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "SavePerUserConfigurationData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32009,
+     "stub_vmaddr": "0x18751b578",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetPerUserConfigurationData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32010,
+     "stub_vmaddr": "0x18751b7b4",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "InitialEnableOfDisplayUpdates",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32011,
+     "stub_vmaddr": "0x18751b80c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 48,
+     "name": "GetSymbolicHotKeyValue",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32012,
+     "stub_vmaddr": "0x18751b8bc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetSymbolicHotKeyValue",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32013,
+     "stub_vmaddr": "0x18751b9b8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "IsSymbolicHotKeyEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32014,
+     "stub_vmaddr": "0x18751ba2c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetSymbolicHotKeyEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32015,
+     "stub_vmaddr": "0x18751bbf0",
+     "impl_vmaddr": "0x0",
+     "argc": 11,
+     "max_reply_msg": 4148,
+     "name": "GetSymbolicHotKeyValuesAndStates",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32016,
+     "stub_vmaddr": "0x18751bdd0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "HideCursor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32017,
+     "stub_vmaddr": "0x18751bec4",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "ShowCursor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32018,
+     "stub_vmaddr": "0x18751c018",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ObscureCursor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32019,
+     "stub_vmaddr": "0x18751c268",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "RevealCursor",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32022,
+     "stub_vmaddr": "0x18751c354",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 88,
+     "name": "GetSymbolicHotKeyRepresentation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32023,
+     "stub_vmaddr": "0x18751c3d0",
+     "impl_vmaddr": "0x0",
+     "argc": 15,
+     "max_reply_msg": 36,
+     "name": "SetSymbolicHotKeyRepresentation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32024,
+     "stub_vmaddr": "0x18751c48c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "GetSessionReadOnceData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32025,
+     "stub_vmaddr": "0x18751c5d8",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "PostFilteredEventTapData",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32026,
+     "stub_vmaddr": "0x18751c670",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "PostFilteredEventTapDataSync",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32027,
+     "stub_vmaddr": "0x18751c710",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "PostFilteredEventTapDataOOL",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32028,
+     "stub_vmaddr": "0x18751c7d8",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 44,
+     "name": "PlaceTap",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32029,
+     "stub_vmaddr": "0x18751cbb4",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 44,
+     "name": "PlaceTapOnConnection",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32030,
+     "stub_vmaddr": "0x18751cfa0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ReleaseEventTap",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32031,
+     "stub_vmaddr": "0x18751d090",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "EnableEventTap",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32032,
+     "stub_vmaddr": "0x18751d294",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "EventTapIsEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32033,
+     "stub_vmaddr": "0x18751d338",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "EventTapSendDataProcessedAck",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32034,
+     "stub_vmaddr": "0x18751d4ac",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 4136,
+     "name": "ConnectionsForPSN",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32035,
+     "stub_vmaddr": "0x18751d53c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "GetEventTapList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32036,
+     "stub_vmaddr": "0x18751d7fc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetEventTapTimeout",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32037,
+     "stub_vmaddr": "0x18751d85c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "GetEventTapTimeout",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32038,
+     "stub_vmaddr": "0x18751d8bc",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 52,
+     "name": "CreateEventSourceState",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32039,
+     "stub_vmaddr": "0x18751da60",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 64,
+     "name": "GetEventSourceState",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32040,
+     "stub_vmaddr": "0x18751dc24",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetEventTapOption",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32041,
+     "stub_vmaddr": "0x18751de0c",
+     "impl_vmaddr": "0x0",
+     "argc": 15,
+     "max_reply_msg": 56,
+     "name": "CopyWindowDescriptionList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32042,
+     "stub_vmaddr": "0x18751e01c",
+     "impl_vmaddr": "0x0",
+     "argc": 13,
+     "max_reply_msg": 56,
+     "name": "WindowListCreateDescriptionFromArray",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32043,
+     "stub_vmaddr": "0x18751e288",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "WindowListCreate",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32044,
+     "stub_vmaddr": "0x18751e454",
+     "impl_vmaddr": "0x0",
+     "argc": 32,
+     "max_reply_msg": 104,
+     "name": "WindowListCreateImageFromArray",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32045,
+     "stub_vmaddr": "0x18751e598",
+     "impl_vmaddr": "0x0",
+     "argc": 31,
+     "max_reply_msg": 104,
+     "name": "WindowListCreateImage",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32046,
+     "stub_vmaddr": "0x18751eac0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "GetSymbolicHotKeyRepresentationList",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32047,
+     "stub_vmaddr": "0x18751ec8c",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "SetDebugOptionsPSN",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32048,
+     "stub_vmaddr": "0x18751ed9c",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 56,
+     "name": "SetDebugOptionsWithDataObtainingResult",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32049,
+     "stub_vmaddr": "0x18751ee44",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 40,
+     "name": "SetDebugOptionsWithDataObtainingPort",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32050,
+     "stub_vmaddr": "0x18751f150",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 44,
+     "name": "GetDisplayMaxOpenGLSurfaceSize",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32051,
+     "stub_vmaddr": "0x18751f244",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "CreateWindowDebugInfo",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32052,
+     "stub_vmaddr": "0x18751f508",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "CreateShadowCacheDebugInfo",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32053,
+     "stub_vmaddr": "0x18751f54c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "RegisterColorSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32054,
+     "stub_vmaddr": "0x18751f674",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "CopyColorSpace",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32055,
+     "stub_vmaddr": "0x18751f74c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetUpdateClientPipe",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32056,
+     "stub_vmaddr": "0x18751f820",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 4136,
+     "name": "ConnectionsForPid",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32057,
+     "stub_vmaddr": "0x18751f8b0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 60,
+     "name": "GetHIDEventRecord",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32058,
+     "stub_vmaddr": "0x18751fb04",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "HIDEventRecordReplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32059,
+     "stub_vmaddr": "0x18751fe44",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "SessionQueueBarrier",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32060,
+     "stub_vmaddr": "0x18751fe74",
+     "impl_vmaddr": "0x0",
+     "argc": 12,
+     "max_reply_msg": 40,
+     "name": "WindowIDArrayIsDefaultScreenCapturable",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32061,
+     "stub_vmaddr": "0x18751ffd8",
+     "impl_vmaddr": "0x0",
+     "argc": 12,
+     "max_reply_msg": 40,
+     "name": "WindowListIsDefaultScreenCapturable",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32062,
+     "stub_vmaddr": "0x18752010c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ConsoleSetUpdatesAllowed",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32063,
+     "stub_vmaddr": "0x18752019c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 44,
+     "name": "GetWindowServerTimebase",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32064,
+     "stub_vmaddr": "0x187520254",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "GetDebugInfo",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32065,
+     "stub_vmaddr": "0x187520330",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetWindowBackingStoreOverrideResolution",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32066,
+     "stub_vmaddr": "0x187520448",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetZoomAllowCursorCrossDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32067,
+     "stub_vmaddr": "0x1875204a4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetZoomForceLockCursorInDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32068,
+     "stub_vmaddr": "0x187520598",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 36,
+     "name": "SetWindowBackingStorePixelDimensionsHint",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32069,
+     "stub_vmaddr": "0x1875206d4",
+     "impl_vmaddr": "0x0",
+     "argc": 6,
+     "max_reply_msg": 56,
+     "name": "SetDebugOptionsWithPlistObtainingPlist",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32070,
+     "stub_vmaddr": "0x187520cbc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetWindowWantsCaptureNotifications",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32071,
+     "stub_vmaddr": "0x187520f58",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetGlobalLightOptions",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32072,
+     "stub_vmaddr": "0x187521258",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 56,
+     "name": "CopyGlobalLightOptions",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 32073,
+     "stub_vmaddr": "0x1875213cc",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "CreateUserAccessibilityReport",
+     "name_status": "inferred-from-26.6"
+    }
+   ]
+  },
+  {
+   "name": "ServicesRelocated",
+   "name_status": "inferred-from-26.6",
+   "descriptor_vmaddr": "0x1e8743968",
+   "server_vmaddr": "0x1875170b8",
+   "start": 33000,
+   "end": 33029,
+   "routine_count": 29,
+   "routines": [
+    {
+     "id": 33000,
+     "stub_vmaddr": "0x1875170f8",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "InitializeGamma",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33001,
+     "stub_vmaddr": "0x18751718c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetDisplayRotation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33002,
+     "stub_vmaddr": "0x187517220",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetDisplayOption",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33003,
+     "stub_vmaddr": "0x1875172dc",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "EnableAmbientDisplay",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33004,
+     "stub_vmaddr": "0x187517370",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "IsAmbientDisplayEnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33005,
+     "stub_vmaddr": "0x187517400",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "SetDisplayIntention",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33006,
+     "stub_vmaddr": "0x1875174d8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetDisplayIntentionWiper",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33007,
+     "stub_vmaddr": "0x18751757c",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "SetDisplayTransferByTable",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33008,
+     "stub_vmaddr": "0x187517670",
+     "impl_vmaddr": "0x0",
+     "argc": 12,
+     "max_reply_msg": 36,
+     "name": "SetDisplayTransferByFormula",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33009,
+     "stub_vmaddr": "0x187517764",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 40,
+     "name": "CompleteDisplayConfiguration",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33010,
+     "stub_vmaddr": "0x18751786c",
+     "impl_vmaddr": "0x0",
+     "argc": 8,
+     "max_reply_msg": 36,
+     "name": "DisplayVisualBell",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33011,
+     "stub_vmaddr": "0x187517950",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "SetDisplayBrightness",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33012,
+     "stub_vmaddr": "0x187517a14",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "GetDisplayBrightness",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33013,
+     "stub_vmaddr": "0x187517ad8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetDisplayMaximumHDRValue",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33014,
+     "stub_vmaddr": "0x187517b8c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "EnableHDR",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33015,
+     "stub_vmaddr": "0x187517c20",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "IsHDREnabled",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33016,
+     "stub_vmaddr": "0x187517cc4",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "IsHDRSupported",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33017,
+     "stub_vmaddr": "0x187517d68",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "AcquireDisplayFadeReservation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33018,
+     "stub_vmaddr": "0x187517e1c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "ReleaseDisplayFadeReservation",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33019,
+     "stub_vmaddr": "0x187517eac",
+     "impl_vmaddr": "0x0",
+     "argc": 9,
+     "max_reply_msg": 36,
+     "name": "DisplayFade",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33020,
+     "stub_vmaddr": "0x187517f94",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "SetDisplayContrast",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33021,
+     "stub_vmaddr": "0x187518028",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "SetDisplayColorProfile",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33022,
+     "stub_vmaddr": "0x1875180bc",
+     "impl_vmaddr": "0x0",
+     "argc": 7,
+     "max_reply_msg": 36,
+     "name": "SetDisplayColorProfileAndTransfer",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33023,
+     "stub_vmaddr": "0x1875181c0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 52,
+     "name": "DisplayGetRefreshTiming",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33024,
+     "stub_vmaddr": "0x187518278",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "AirDisplayOnline",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33025,
+     "stub_vmaddr": "0x187518360",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "AirDisplayOffline",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33026,
+     "stub_vmaddr": "0x1875183e0",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 40,
+     "name": "MachineSupportsLowPowerVideo",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33027,
+     "stub_vmaddr": "0x187518484",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "CopyDisplayInfoDictionary",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 33028,
+     "stub_vmaddr": "0x187518578",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 52,
+     "name": "MainDisplayBoundsIgnoringCapture",
+     "name_status": "inferred-from-26.6"
+    }
+   ]
+  },
+  {
+   "name": "ServerRelocated",
+   "name_status": "inferred-from-26.6",
+   "descriptor_vmaddr": "0x1e8744aa0",
+   "server_vmaddr": "0x18752234c",
+   "start": 34000,
+   "end": 34010,
+   "routine_count": 10,
+   "routines": [
+    {
+     "id": 34000,
+     "stub_vmaddr": "0x187522388",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "GetSizeOfDisplayTransfer",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 34001,
+     "stub_vmaddr": "0x18752243c",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 56,
+     "name": "GetDisplayTransferByTable",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 34002,
+     "stub_vmaddr": "0x187522530",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 72,
+     "name": "GetDisplayTransferByFormula",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 34003,
+     "stub_vmaddr": "0x1875225e4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 56,
+     "name": "GetDisplaySystemState",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 34004,
+     "stub_vmaddr": "0x1875226d8",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 40,
+     "name": "ServiceForDisplayNumber",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 34005,
+     "stub_vmaddr": "0x1875227b4",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 52,
+     "name": "AcceleratorForDisplayNumber",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 34006,
+     "stub_vmaddr": "0x1875228a4",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 64,
+     "name": "GetDisplayShmem",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 34007,
+     "stub_vmaddr": "0x18752297c",
+     "impl_vmaddr": "0x0",
+     "argc": 2,
+     "max_reply_msg": 36,
+     "name": "Invoke77298158",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 34008,
+     "stub_vmaddr": "0x187522a10",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 40,
+     "name": "AcceleratorForHMD",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 34009,
+     "stub_vmaddr": "0x187522ae8",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "Invoke74155833",
+     "name_status": "inferred-from-26.6"
+    }
+   ]
+  },
+  {
+   "name": "CGXHMD",
+   "name_status": "inferred-from-26.6",
+   "descriptor_vmaddr": "0x1e8743160",
+   "server_vmaddr": "0x187511808",
+   "start": 35000,
+   "end": 35005,
+   "routine_count": 5,
+   "routines": [
+    {
+     "id": 35000,
+     "stub_vmaddr": "0x187511844",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 36,
+     "name": "HMDNextDrawable",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 35001,
+     "stub_vmaddr": "0x187511e64",
+     "impl_vmaddr": "0x0",
+     "argc": 5,
+     "max_reply_msg": 36,
+     "name": "HMDPresent",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 35002,
+     "stub_vmaddr": "0x18751244c",
+     "impl_vmaddr": "0x0",
+     "argc": 3,
+     "max_reply_msg": 36,
+     "name": "HMDSetWorkInterval",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 35003,
+     "stub_vmaddr": "0x1875127d0",
+     "impl_vmaddr": "0x0",
+     "argc": 4,
+     "max_reply_msg": 52,
+     "name": "HMDGetRefreshTiming",
+     "name_status": "inferred-from-26.6"
+    },
+    {
+     "id": 35004,
+     "stub_vmaddr": "0x187512888",
+     "impl_vmaddr": "0x0",
+     "argc": 1,
+     "max_reply_msg": 36,
+     "name": "HMDWakeUp",
+     "name_status": "inferred-from-26.6"
+    }
+   ]
+  }
+ ],
+ "diff_vs_26_6": {
+  "start_1@0x1e8743248": {
+   "added_ids": [],
+   "removed_ids": [],
+   "count_26_6": null,
+   "count_27": 2,
+   "note": "start id shared by 26.6 subsystems ['CGYSpinControl', 'CGYCaptureReply', 'CGYEventTap']; not attributable"
+  },
+  "start_1@0x1e8743e10": {
+   "added_ids": [],
+   "removed_ids": [],
+   "count_26_6": null,
+   "count_27": 2,
+   "note": "start id shared by 26.6 subsystems ['CGYSpinControl', 'CGYCaptureReply', 'CGYEventTap']; not attributable"
+  },
+  "start_1@0x1e8743e80": {
+   "added_ids": [],
+   "removed_ids": [],
+   "count_26_6": null,
+   "count_27": 2,
+   "note": "start id shared by 26.6 subsystems ['CGYSpinControl', 'CGYCaptureReply', 'CGYEventTap']; not attributable"
+  },
+  "CGXRendezvous": {
+   "added_ids": [
+    29041
+   ],
+   "removed_ids": [],
+   "count_26_6": 41,
+   "count_27": 42
+  },
+  "CGXServices": {
+   "added_ids": [
+    30523,
+    30535,
+    30592,
+    30600,
+    30603,
+    30607,
+    30637,
+    30638,
+    30639,
+    30640,
+    30644,
+    30645,
+    30646
+   ],
+   "removed_ids": [
+    30204,
+    30205,
+    30525,
+    30537,
+    30593,
+    30601,
+    30605,
+    30608
+   ],
+   "count_26_6": 575,
+   "count_27": 580
+  },
+  "CGXWindowServer": {
+   "added_ids": [],
+   "removed_ids": [],
+   "count_26_6": 72,
+   "count_27": 72
+  },
+  "ServicesRelocated": {
+   "added_ids": [],
+   "removed_ids": [],
+   "count_26_6": 29,
+   "count_27": 29
+  },
+  "ServerRelocated": {
+   "added_ids": [],
+   "removed_ids": [],
+   "count_26_6": 10,
+   "count_27": 10
+  },
+  "CGXHMD": {
+   "added_ids": [],
+   "removed_ids": [],
+   "count_26_6": 5,
+   "count_27": 5
+  }
+ }
+}

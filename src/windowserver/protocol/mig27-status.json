@@ -1,0 +1,330 @@
+{
+ "same": 677,
+ "changed": [
+  {
+   "id": 30521,
+   "name_26_6": "DisplayCopyUserAdjustment",
+   "size_26_6": 64,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30522,
+   "name_26_6": "DisplaySetUserAdjustment",
+   "size_26_6": 44,
+   "max_reply_msg_27": 56
+  },
+  {
+   "id": 30527,
+   "name_26_6": "DisplayInvalidateUserAdjustment",
+   "size_26_6": 44,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30529,
+   "name_26_6": "DisplayCopyCalibrationInfo",
+   "size_26_6": 64,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30531,
+   "name_26_6": "GetUnderscanValue",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30534,
+   "name_26_6": "DisplayGetPreferHDR10",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30540,
+   "name_26_6": "SelectiveSharingContextSetState",
+   "size_26_6": 44,
+   "max_reply_msg_27": 52
+  },
+  {
+   "id": 30541,
+   "name_26_6": "SelectiveSharingContextCopyState",
+   "size_26_6": 64,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30551,
+   "name_26_6": "CopyWindowCornerMask",
+   "size_26_6": 108,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30553,
+   "name_26_6": "GetUnifiedKeyMapping",
+   "size_26_6": 48,
+   "max_reply_msg_27": 64
+  },
+  {
+   "id": 30554,
+   "name_26_6": "SetUnifiedKeyMapping",
+   "size_26_6": 44,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30555,
+   "name_26_6": "SelectiveSharingContextCopy",
+   "size_26_6": 64,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30558,
+   "name_26_6": "SelectiveSharingManagerCopyAllSessions",
+   "size_26_6": 64,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30559,
+   "name_26_6": "PersistenceSetSessionStatus",
+   "size_26_6": 44,
+   "max_reply_msg_27": 56
+  },
+  {
+   "id": 30561,
+   "name_26_6": "GetLastUsedKeyboardID",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30564,
+   "name_26_6": "GetSpaceNeedsAuxiliaryScale",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30565,
+   "name_26_6": "HMDSetEnabled",
+   "size_26_6": 44,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30566,
+   "name_26_6": "HMDEnabled",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30571,
+   "name_26_6": "GetWindowTransform3D",
+   "size_26_6": 108,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30573,
+   "name_26_6": "GetSessionUID",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30575,
+   "name_26_6": "VirtualDisplayApplySettings",
+   "size_26_6": 44,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30578,
+   "name_26_6": "GetWindowBackingStoreOverrideResolution",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30579,
+   "name_26_6": "SelectiveSharingContextSetPresentationDisplay",
+   "size_26_6": 44,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30583,
+   "name_26_6": "DisplayCalibrationToolboxCommand",
+   "size_26_6": 64,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30584,
+   "name_26_6": "DisplaySupportsDynamicGeometry",
+   "size_26_6": 48,
+   "max_reply_msg_27": 56
+  },
+  {
+   "id": 30589,
+   "name_26_6": "GetZoomParametersForDisplay",
+   "size_26_6": 60,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30590,
+   "name_26_6": "SetZoomParametersForDisplay",
+   "size_26_6": 44,
+   "max_reply_msg_27": 52
+  },
+  {
+   "id": 30591,
+   "name_26_6": "PostCoordinatedDistributedNotificationFenced",
+   "size_26_6": 52,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30594,
+   "name_26_6": "AllowPrivacyIndicatorSuppression",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30597,
+   "name_26_6": "TakeMouseFocusTracking",
+   "size_26_6": 44,
+   "max_reply_msg_27": 52
+  },
+  {
+   "id": 30598,
+   "name_26_6": "DisplayIsPerPresetUserAdjustmentSupported",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30602,
+   "name_26_6": "DisplaySetUserAdjustmentForPreset",
+   "size_26_6": 44,
+   "max_reply_msg_27": 56
+  },
+  {
+   "id": 30606,
+   "name_26_6": "DisplayInvalidateUserAdjustmentForPreset",
+   "size_26_6": 44,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30619,
+   "name_26_6": "GetTVConnectDefaultPolicy",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30621,
+   "name_26_6": "ValidateDisplayWallConfiguration",
+   "size_26_6": 48,
+   "max_reply_msg_27": 41000
+  },
+  {
+   "id": 30622,
+   "name_26_6": "EnableDisplayWallWithConfiguration",
+   "size_26_6": 44,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30624,
+   "name_26_6": "IsDisplayWall",
+   "size_26_6": 48,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30625,
+   "name_26_6": "DisplayGetUserAdjustmentRange",
+   "size_26_6": 148,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30626,
+   "name_26_6": "SymbolicHotKeyName",
+   "size_26_6": 1076,
+   "max_reply_msg_27": 140
+  },
+  {
+   "id": 30627,
+   "name_26_6": "UpdatePermittedFrontPSNList",
+   "size_26_6": 44,
+   "max_reply_msg_27": 1068
+  },
+  {
+   "id": 30630,
+   "name_26_6": "DisplayGetCustomPresetInfo",
+   "size_26_6": 64,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30631,
+   "name_26_6": "DisplaySetCustomPresetData",
+   "size_26_6": 44,
+   "max_reply_msg_27": 56
+  },
+  {
+   "id": 30632,
+   "name_26_6": "DisplayGetLuminanceCorrectionFactor",
+   "size_26_6": 52,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 30633,
+   "name_26_6": "DisplayIsLiveUserAdjustmentSupported",
+   "size_26_6": 48,
+   "max_reply_msg_27": 44
+  },
+  {
+   "id": 30634,
+   "name_26_6": "DisplayInvalidateLiveUserAdjustmentForPreset",
+   "size_26_6": 44,
+   "max_reply_msg_27": 40
+  },
+  {
+   "id": 30636,
+   "name_26_6": "MenuBarPrivacyIndicatorInset",
+   "size_26_6": 52,
+   "max_reply_msg_27": 36
+  },
+  {
+   "id": 33020,
+   "name_26_6": "SetDisplayContrast",
+   "size_26_6": 180,
+   "max_reply_msg_27": 36
+  }
+ ],
+ "added": [
+  29041,
+  30523,
+  30535,
+  30592,
+  30600,
+  30603,
+  30607,
+  30637,
+  30638,
+  30639,
+  30640,
+  30644,
+  30645,
+  30646
+ ],
+ "removed": [
+  30204,
+  30205,
+  30525,
+  30537,
+  30593,
+  30601,
+  30605,
+  30608
+ ],
+ "ignored_subsystems": [
+  {
+   "start": 1,
+   "end": 3,
+   "descriptor": "0x1e8743248"
+  },
+  {
+   "start": 1,
+   "end": 3,
+   "descriptor": "0x1e8743e10"
+  },
+  {
+   "start": 1,
+   "end": 3,
+   "descriptor": "0x1e8743e80"
+  }
+ ]
+}

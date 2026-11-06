@@ -1,0 +1,11 @@
+daylight: serving com.apple.windowserver
+daylight: serving com.apple.windowserver.active
+daylight: CGXRendezvous.GetCoreGraphicsServerVersion (29000) pid 37
+daylight: CGXRendezvous.GetSessionPort (29010) pid 37
+daylight: CGXWindowServer.NewConnectionPort (32000) pid 37
+daylight: new connection 0x1103 for pid 37 (dsws_probe)
+daylight: CGXServices.CreateWindow (30263) pid 37
+daylight: window region (16 bytes): 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+daylight: window 0x1f6 created for pid 37
+daylight: canvas for window 0x1f6: 640x360
+daylight: CGXServices.WindowIsOrderedIn (30311) pid 37
