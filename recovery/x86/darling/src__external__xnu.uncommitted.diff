@@ -1,0 +1,195 @@
+diff --git a/darling/src/libsystem_kernel/emulation/include/xnu_syscall/bsd/impl/bsdthread/bsdthread_register.h b/darling/src/libsystem_kernel/emulation/include/xnu_syscall/bsd/impl/bsdthread/bsdthread_register.h
+index 04991d91..792e2f78 100644
+--- a/darling/src/libsystem_kernel/emulation/include/xnu_syscall/bsd/impl/bsdthread/bsdthread_register.h
++++ b/darling/src/libsystem_kernel/emulation/include/xnu_syscall/bsd/impl/bsdthread/bsdthread_register.h
+@@ -10,6 +10,11 @@ extern int pthread_obj_size;
+ extern bsdthread_entry_t pthread_entry_point;
+ extern bsdwqthread_entry_t wqueue_entry_point;
+ 
++// Set when a workqueue thread is re-armed for another work item (as opposed to being
++// freshly created). Defined here because both the registration code and the workqueue
++// syscall handler need to agree on it.
++#define WQ_FLAG_THREAD_REUSE 0x00020000
++
+ struct _pthread_registration_data;
+ 
+ long sys_bsdthread_register(void* thread_start, void* wqthread, int pthsize,
+diff --git a/darling/src/libsystem_kernel/emulation/src/linux_premigration/signal/sigexc.c b/darling/src/libsystem_kernel/emulation/src/linux_premigration/signal/sigexc.c
+index 065a942c..b4bdd53f 100644
+--- a/darling/src/libsystem_kernel/emulation/src/linux_premigration/signal/sigexc.c
++++ b/darling/src/libsystem_kernel/emulation/src/linux_premigration/signal/sigexc.c
+@@ -391,6 +391,25 @@ void sigexc_handler(int linux_signum, struct linux_siginfo* info, struct linux_u
+ 					// when it has not set up a frame yet.
+ 					report_address("rip", ctxt->uc_mcontext.gregs.rip);
+ 					report_address("[rsp]", *(unsigned long long*) ctxt->uc_mcontext.gregs.rsp);
++					// PROBE: decode the call that faulted; return address is [rsp].
++					{
++						unsigned long long prsp = ctxt->uc_mcontext.gregs.rsp;
++						unsigned long long pret = *(unsigned long long*) prsp;
++						unsigned char* pb = (unsigned char*) prsp;
++						__simple_printf("Darling:   probe ret=0x%llx [rsp+8]=0x%llx [rsp+16]=0x%llx\n",
++							pret, *(unsigned long long*)(prsp+8), *(unsigned long long*)(prsp+16));
++						if (pb[-5] == 0xE8) {
++							long long d = *(int*)(prsp-4);
++							__simple_printf("Darling:   probe direct call -> 0x%llx\n", pret + d);
++						} else if (pb[-6] == 0xFF && pb[-5] == 0x15) {
++							long long d = *(int*)(prsp-4);
++							unsigned long long mem = pret + d;
++							__simple_printf("Darling:   probe indirect call mem=0x%llx value=0x%llx\n",
++								mem, *(unsigned long long*) mem);
++						} else if (pb[-2] == 0xFF) {
++							__simple_printf("Darling:   probe indirect register call op=0x%02x 0x%02x\n", pb[-2], pb[-1]);
++						}
++					}
+ 					__simple_printf("Darling:   rax 0x%llx rdi 0x%llx rsi 0x%llx rdx 0x%llx\n",
+ 						(unsigned long long) ctxt->uc_mcontext.gregs.rax, (unsigned long long) ctxt->uc_mcontext.gregs.rdi,
+ 						(unsigned long long) ctxt->uc_mcontext.gregs.rsi, (unsigned long long) ctxt->uc_mcontext.gregs.rdx);
+@@ -416,7 +435,12 @@ void sigexc_handler(int linux_signum, struct linux_siginfo* info, struct linux_u
+ 
+ 				// Resend signal to self. Not kill(0, ...): pid 0 means the whole process group, which
+ 				// took the parent (e.g. shellspawn) down with the crashing process.
++				// PROBE: tgkill so the core captures the faulting thread.
++#if defined(__NR_tgkill) && defined(__NR_gettid)
++				LINUX_SYSCALL(__NR_tgkill, LINUX_SYSCALL0(__NR_getpid), LINUX_SYSCALL0(__NR_gettid), linux_signum);
++#else
+ 				LINUX_SYSCALL(__NR_kill, LINUX_SYSCALL0(__NR_getpid), linux_signum);
++#endif
+ 			}
+ 		}
+ 	}
+diff --git a/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/bsdthread/bsdthread_register.c b/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/bsdthread/bsdthread_register.c
+index b445c121..83384668 100644
+--- a/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/bsdthread/bsdthread_register.c
++++ b/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/bsdthread/bsdthread_register.c
+@@ -2,6 +2,7 @@
+ 
+ #include <sys/errno.h>
+ #include <stdint.h>
++#include <stdbool.h>
+ #include <pthread/tsd_private.h>
+ #include <darling/emulation/other/mach/libkernel_table.h>
+ 
+@@ -157,22 +158,48 @@ void pthread_entry_point_wrapper(void* self, int thread_port, void* funptr,
+ #define WQ_STACK_SLOTS 1024
+ static struct { int port; void* stack; } wq_stacks[WQ_STACK_SLOTS];
+ 
+-void wqueue_remember_stack(int thread_port, void* stackaddr)
++/*
++ * Look up the slot belonging to the given thread's Mach port.
++ * If `create` is set, allocate a new slot if the port isn't known yet.
++ * Returns -1 if no slot could be found (or created).
++ */
++static int wq_slot_for_port(int thread_port, bool create)
+ {
+ 	for (int i = 0; i < WQ_STACK_SLOTS; i++) {
+-		if (wq_stacks[i].port == thread_port || __sync_bool_compare_and_swap(&wq_stacks[i].port, 0, thread_port)) {
+-			wq_stacks[i].stack = stackaddr;
+-			return;
++		if (wq_stacks[i].port == thread_port)
++			return i;
++	}
++
++	if (!create)
++		return -1;
++
++	for (int i = 0; i < WQ_STACK_SLOTS; i++) {
++		if (__sync_bool_compare_and_swap(&wq_stacks[i].port, 0, thread_port)) {
++			// A freshly claimed slot has never been used before, so its stack
++			// pointer is still NULL. Another thread might have created a slot
++			// for the same port concurrently, so prefer the first match.
++			for (int j = 0; j < WQ_STACK_SLOTS; j++) {
++				if (wq_stacks[j].port == thread_port)
++					return j;
++			}
++			return i;
+ 		}
+ 	}
++
++	return -1;
++}
++
++void wqueue_remember_stack(int thread_port, void* stackaddr)
++{
++	int slot = wq_slot_for_port(thread_port, true);
++	if (slot >= 0)
++		wq_stacks[slot].stack = stackaddr;
+ }
+ 
+ void* wqueue_stack_for_port(int thread_port)
+ {
+-	for (int i = 0; i < WQ_STACK_SLOTS; i++)
+-		if (wq_stacks[i].port == thread_port)
+-			return wq_stacks[i].stack;
+-	return NULL;
++	int slot = wq_slot_for_port(thread_port, false);
++	return slot >= 0 ? wq_stacks[slot].stack : NULL;
+ }
+ 
+ void wqueue_entry_point_wrapper(void* self, int thread_port, void* stackaddr,
+@@ -208,8 +235,31 @@ void wqueue_entry_point_asm_jump(void* self, int thread_port, void* stackaddr,
+ 	register int   arg6 asm("esi") = nevents;
+ #endif
+ 
++	/*
++	 * A workqueue thread is re-armed by jumping back into `_start_wqthread`. On XNU the kernel
++	 * hands the thread a fresh stack pointer every time; here the jump would otherwise reuse the
++	 * stack pointer of the previous invocation, so every reuse would pile another set of frames
++	 * onto the thread's stack until it overflows.
++	 *
++	 * That is exactly what used to kill the QuartzCore renderer: the workqueue stack is only
++	 * 8 MB, and after a few hundred reuses the accumulated frames ran into the guard page, which
++	 * surfaced as a SIGSEGV inside `___chkstk_darwin` (fault address == stack bottom - 8).
++	 *
++	 * The thread's stack is allocated by the loader right below the thread structure, so the
++	 * thread structure itself (`self`) marks the top of the stack. We therefore always re-arm
++	 * the thread with the very same stack pointer: 256 bytes below the top of the stack, 16-byte
++	 * aligned (which is what `_start_wqthread` expects, since it aligns the stack itself before
++	 * calling into libpthread).
++	 *
++	 * The same value is used for the first entry and for every reuse, so the thread always sees
++	 * exactly the same stack layout.
++	 */
+ #if __x86_64__
++	void* rearm_rsp = (void*)(((uintptr_t)self & ~(uintptr_t)15) - 256);
++
+ 	__asm__ __volatile__ (
++		// Re-arm the thread with a clean stack pointer.
++		"movq %[rearm_rsp], %%rsp\n\t"
+ 		// `_start_wqthread` does not expect the stack to be aligned (using the 
+ 		// call instruction will add the return address to the stack, causing 
+ 		// it to be aligned).
+@@ -217,9 +267,13 @@ void wqueue_entry_point_asm_jump(void* self, int thread_port, void* stackaddr,
+ 		::
+ 		// Arguments follow the usual x86_64 calling conventions.
+ 		"r"(arg1),"r"(arg2),"r"(arg3),"r"(arg4),"r"(arg5),"r"(arg6),
++		[rearm_rsp] "r"(rearm_rsp),
+ 		[wqueue_entry_point] "r"(wqueue_entry_point)
++		: "memory"
+ 	);
+ #elif __i386__
++	// TODO: the 32-bit port doesn't have enough registers to re-arm the stack pointer
++	// without spilling, so it keeps the old (leaky) behaviour. macOS 26 is 64-bit only.
+ 	__asm__ __volatile__ (
+ 		// `_start_wqthread` does not expect the stack to be aligned.
+ 		"jmpl *%[wqueue_entry_point]\n"
+@@ -229,6 +283,7 @@ void wqueue_entry_point_asm_jump(void* self, int thread_port, void* stackaddr,
+ 		// the arguments are stored in the registers.
+ 		"r"(arg1),"r"(arg2),"r"(arg3),"r"(arg4),"r"(arg5),"r"(arg6),
+ 		[wqueue_entry_point] "rmi"(wqueue_entry_point)
++		: "memory"
+ 	);
+ #else
+ 	#error "Missing assembly for architecture"
+diff --git a/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/bsdthread/workq_kernreturn.c b/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/bsdthread/workq_kernreturn.c
+index 789d8608..3d3d3b9e 100644
+--- a/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/bsdthread/workq_kernreturn.c
++++ b/darling/src/libsystem_kernel/emulation/src/xnu_syscall/bsd/impl/bsdthread/workq_kernreturn.c
+@@ -51,7 +51,7 @@
+ #define WQ_FLAG_THREAD_PRIO_MASK     0x00000fff
+ 
+ #define WQ_FLAG_THREAD_OVERCOMMIT    0x00010000
+-#define WQ_FLAG_THREAD_REUSE         0x00020000
++// WQ_FLAG_THREAD_REUSE is defined in bsdthread_register.h (included above).
+ #define WQ_FLAG_THREAD_NEWSPI        0x00040000
+ #define WQ_FLAG_THREAD_KEVENT        0x00080000
+ #define WQ_FLAG_THREAD_EVENT_MANAGER 0x00100000

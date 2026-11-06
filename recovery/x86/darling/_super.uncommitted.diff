@@ -1,0 +1,12 @@
+diff --git a/src/external/OpenDirectory b/src/external/OpenDirectory
+--- a/src/external/OpenDirectory
++++ b/src/external/OpenDirectory
+@@ -1 +1 @@
+-Subproject commit 43a143a4dc02b43f566b03ee39358f8886995738
++Subproject commit 43a143a4dc02b43f566b03ee39358f8886995738-dirty
+diff --git a/src/external/xnu b/src/external/xnu
+--- a/src/external/xnu
++++ b/src/external/xnu
+@@ -1 +1 @@
+-Subproject commit e23775efe76edd27729ce241253e3393739016e3
++Subproject commit e23775efe76edd27729ce241253e3393739016e3-dirty

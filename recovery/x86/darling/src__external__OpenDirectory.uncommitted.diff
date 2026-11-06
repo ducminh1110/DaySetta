@@ -1,0 +1,104 @@
+diff --git a/opendirectoryd/com.apple.opendirectoryd.plist b/opendirectoryd/com.apple.opendirectoryd.plist
+index 556e493..9e7ce31 100644
+--- a/opendirectoryd/com.apple.opendirectoryd.plist
++++ b/opendirectoryd/com.apple.opendirectoryd.plist
+@@ -37,10 +37,16 @@
+ 		-->
+ 		<key>com.apple.system.opendirectoryd.membership</key>
+ 		<true/>
++		<key>com.apple.system.opendirectoryd.libinfo</key>
++		<true/>
+ 	</dict>
+ 	<key>POSIXSpawnType</key>
+ 	<string>Interactive</string>
+ 	<key>Program</key>
+ 	<string>/usr/libexec/opendirectoryd</string>
++	<key>StandardErrorPath</key>
++	<string>/private/tmp/opendirectoryd.log</string>
++	<key>StandardOutPath</key>
++	<string>/private/tmp/opendirectoryd.log</string>
+ </dict>
+ </plist>
+diff --git a/opendirectoryd/src/main.c b/opendirectoryd/src/main.c
+index d578c60..f5a4563 100644
+--- a/opendirectoryd/src/main.c
++++ b/opendirectoryd/src/main.c
+@@ -27,6 +27,7 @@
+ #include <pwd.h>
+ #include <grp.h>
+ #include <string.h>
++#include <stdio.h>
+ #include <arpa/inet.h>
+ 
+ #include "log.h"
+@@ -301,6 +302,39 @@ static void handle_new_membership_connection(xpc_connection_t connection) {
+ 	xpc_connection_resume(connection);
+ };
+ 
++static void libinfo_log_message(const char* what, xpc_object_t object) {
++	char* desc = xpc_copy_description(object);
++	fprintf(stderr, "opendirectoryd: libinfo %s: %s\n", what, desc ? desc : "(null)");
++	free(desc);
++}
++
++static dispatch_queue_t libinfo_service_queue = NULL;
++static xpc_connection_t libinfo_service_listener = NULL;
++
++static void handle_new_libinfo_connection(xpc_connection_t connection) {
++	xpc_connection_set_event_handler(connection, ^(xpc_object_t object) {
++		xpc_type_t type = xpc_get_type(object);
++
++		if (type == XPC_TYPE_DICTIONARY) {
++			const char* rpc_name = xpc_dictionary_get_string(object, OD_RPC_NAME);
++			char* desc = xpc_copy_description(object);
++			fprintf(stderr, "opendirectoryd: libinfo RPC \"%s\": %s\n", rpc_name ? rpc_name : "(null)", desc ? desc : "(null)");
++			free(desc);
++
++			/* Diagnostic build: refuse everything so the caller falls back to the next module. */
++			xpc_object_t reply = xpc_dictionary_create_reply(object);
++			xpc_dictionary_set_int64(reply, OD_RPC_ERROR, ENOENT);
++			xpc_connection_send_message(xpc_dictionary_get_remote_connection(object), reply);
++			xpc_release(reply);
++		} else if (type == XPC_TYPE_ERROR) {
++			libinfo_log_message("connection error", object);
++		} else {
++			libinfo_log_message("unknown object", object);
++		}
++	});
++	xpc_connection_resume(connection);
++};
++
+ int main(int argc, char** argv) {
+ 	membership_service_queue = dispatch_queue_create(ODD_MEMBERSHIP_SERVICE_NAME, DISPATCH_QUEUE_CONCURRENT);
+ 	if (!membership_service_queue) {
+@@ -326,6 +360,30 @@ int main(int argc, char** argv) {
+ 
+ 	xpc_connection_resume(membership_service_listener);
+ 
++	libinfo_service_queue = dispatch_queue_create(ODD_LIBINFO_SERVICE_NAME, DISPATCH_QUEUE_CONCURRENT);
++	if (!libinfo_service_queue) {
++		abort();
++	}
++
++	libinfo_service_listener = xpc_connection_create_mach_service(ODD_LIBINFO_SERVICE_NAME, libinfo_service_queue, XPC_CONNECTION_MACH_SERVICE_LISTENER);
++	if (!libinfo_service_listener) {
++		abort();
++	}
++
++	xpc_connection_set_event_handler(libinfo_service_listener, ^(xpc_object_t object) {
++		xpc_type_t type = xpc_get_type(object);
++
++		if (type == XPC_TYPE_CONNECTION) {
++			handle_new_libinfo_connection(object);
++		} else if (type == XPC_TYPE_ERROR) {
++			general_log_error("libinfo service listener received XPC error: %@", object);
++		} else {
++			general_log_error("unknown XPC object received on libinfo listener: %@", object);
++		}
++	});
++
++	xpc_connection_resume(libinfo_service_listener);
++
+ 	dispatch_main();
+ 	return 0;
+ };

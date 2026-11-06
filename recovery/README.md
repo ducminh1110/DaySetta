@@ -22,3 +22,7 @@ git submodule update --init --recursive
 cd src/external/<name> && git fetch <path>/darling/src__external__<name>.bundle HEAD:daysetta/arm64 && git checkout daysetta/arm64
 # apply *.uncommitted.diff with git apply where present
 ```
+
+## x86/ (restored x86_64 VPS, 2026-11-07)
+
+Canonical owner trees from the x86 box: `darling` branch `port/macos26` (superproject plus submodules, including darlingserver's 8 owner commits), dyld-1378 (full bundle, no remote), and daylight `dev` (full bundle plus uncommitted diff). `port-tools.tgz` holds darling-port-tools, port-patches, patches and the handoff. `MANIFEST.txt` lists each repo's HEAD.
