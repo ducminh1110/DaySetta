@@ -55,7 +55,7 @@ load, soak, thread determinism and loader fixtures that do not exist yet.
 | `daysetta-ctl` | `IMPLEMENTED` | `src/ctl/main.cpp` | No automated CLI test; commands built |
 | Headless output | `IMPLEMENTED` | `src/render/output.cpp` | PPM/PAM/BGRA test passes |
 | Wayland / X11 / Vulkan | `PLANNED` | ADR-0004 | Development headers absent; not buildable on this host |
-| macOS 27 MIG scan | **ABSENT** | `tools/macos27/`, `artifacts/macos-27/` | Directories exist, no files |
+| macOS 27 MIG scan | **DONE (WP1b, static)** | `tools/macos27/scan_mig.py`, `artifacts/macos-27/mig-routines.json` | 9 subsystems, 744 routines; see WP1b section |
 
 The 22 cases are `broker_proto_roundtrip`, `broker_proto_malformed`,
 `broker_live_registry`, 10 `compositor_*` cases, `e2e_two_windows_capture_and_input`,
@@ -86,7 +86,7 @@ review.
 | Catalogue | 4 099 images, 4 574 612 exports, 0 ObjC class/selector names, 3 137 ObjC metadata images | `VERIFIED` from `daylight/data/apple-api/coverage.json` |
 | IPSW | 26 637 307 067 bytes; SHA-256 `2f016638293c3e641b8b25391a76fbc16563b3711915a5551cf8aa0f5598a5c1`; manifest 27.0.1/26A434, `Mac14,3` supported | `VERIFIED` |
 | 26.6 protocol baseline | 738 MIG routines, 9 subsystems | `VERIFIED` |
-| 27 MIG ids | Not scanned; empty `tools/macos27/` and `artifacts/macos-27/` | `UNKNOWN` |
+| 27 MIG ids | Scanned: 9 subsystems, 744 routines (addresses; 724 names inferred from 26.6) | `OBSERVED` (WP1b) |
 | 27 ObjC names | `__objc_classname`/`__objc_methname` size 0; pointer salt partially decoded (D-20/D-21) | `UNKNOWN` |
 | 27 runtime | No loader, ObjC runtime or arm64e execution probe; host lacks `pauth` | `UNKNOWN` |
 
@@ -131,3 +131,13 @@ slots decode into a mapping (122 equal an exported symbol address), 303/303 `__o
 slots equal `0x180000000 + (value & 0xFFFFFFFF)`. 2940 `__got`/`__auth_got` slots are zero
 (unbound, not decodable). `isa`/`superclass`/`ro` encoding: `UNKNOWN`, not tested. Decoder:
 `tools/macos27/fixups.py`. No macOS 27 compatibility is claimed.
+
+## WP1b: macOS 27 MIG scan
+
+`python3 -I tools/macos27/scan_mig.py` exited 0; `bash tools/macos27/verify_wp1.sh | tail -1` printed
+VERIFY PASS. OBSERVED in `artifacts/macos-27/mig-routines.json`: 9 subsystems, 744 routines (26.6: 9, 738).
+Counts 27/26.6: CGXRendezvous 42/41, CGXServices 580/575 (13 ids added, 8 removed), CGXWindowServer 72/72,
+ServicesRelocated 29/29, ServerRelocated 10/10, CGXHMD 5/5, three start-1 subsystems 2/2 each
+(not attributable to CGYSpinControl/CGYCaptureReply/CGYEventTap, names "?"). Names are
+`inferred-from-26.6` by (start, id) only: 724 named, 20 "?". Report: `artifacts/macos-27/MIG_27_REPORT.md`.
+No macOS 27 compatibility is claimed.
