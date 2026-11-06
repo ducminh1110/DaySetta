@@ -10,10 +10,4 @@ index fd256bc0e..f741e9708 160000
 +++ b/src/external/metal
 @@ -1 +1 @@
 -Subproject commit fd256bc0edf7f7e6dcd1ffd94ce22d43427ac5a7
-+Subproject commit f741e9708c9039b2ea4b23f8313eb2075c8893c5
-diff --git a/src/external/xnu b/src/external/xnu
---- a/src/external/xnu
-+++ b/src/external/xnu
-@@ -1 +1 @@
--Subproject commit f10db40ce189d2a12ba2fe6428887e2dac2b1eea
-+Subproject commit f10db40ce189d2a12ba2fe6428887e2dac2b1eea-dirty
++Subproject commit f741e9708c9039b2ea4b23f8313eb2075c8893c5-dirty

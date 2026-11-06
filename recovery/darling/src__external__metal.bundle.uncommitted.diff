@@ -1,0 +1,6 @@
+diff --git a/deps/indium b/deps/indium
+--- a/deps/indium
++++ b/deps/indium
+@@ -1 +1 @@
+-Subproject commit 68c2c18a8f2026046651c227121c24d51fccb55d
++Subproject commit 68c2c18a8f2026046651c227121c24d51fccb55d-dirty
