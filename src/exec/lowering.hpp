@@ -29,6 +29,7 @@ enum class Op : uint8_t {
     Mrs,       // mrs Xt, tpidrro_el0 (Darwin TSD base; reads 0 on Linux)
     Ldapur,    // FEAT_LRCPC2 LDAPUR{B,H,SB,SH,SW,}: emulated with an acquire (LDAR-class) load
     Cpa,       // FEAT_CPA ADDPT/SUBPT/MADDPT/MSUBPT (Arm ARM 2026-03 pseudocode, PointerAddCheck)
+    MrsTpidr,  // mrs Xt, tpidr_el0: Darwin keeps a CPU/cluster hint there (libmalloc xzone index); the Linux host value is a TLS pointer, so emulate as 0
     kCount
 };
 
