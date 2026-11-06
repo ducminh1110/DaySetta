@@ -1,0 +1,48 @@
+# R3: genuine /bin/echo (arm64e) under genuine 27 /usr/lib/dyld via ds-run -- NOT REACHED
+command: DS_TRACE=1 ./build/ds-run /home/ubuntu/macos-re/store-27/root/bin/echo hello from macOS 27
+stdout: (empty)
+exit status: 133 (SIGTRAP: genuine Apple 'brk #0xb001' at /usr/lib/system/libsystem_platform.dylib+0x3d40, not a lowered instruction)
+furthest point: dyld (on-disk) -> restart into dyld-in-cache -> cache found via shared_region_check_np+fsgetpath -> main exe parsed -> libSystem initializer running (libsystem_kernel init) -> first UNIMPLEMENTED mach 15 _kernelrpc_mach_vm_map_trap, then genuine brk
+
+## syscall histogram (from DS_TRACE log, count name)
+     46 mach _kernelrpc_mach_vm_protect_trap
+     45 bsd stat64
+     23 bsd sysctl
+      9 bsd open
+      7 bsd munmap
+      5 bsd csrctl
+      4 mach _kernelrpc_mach_vm_deallocate_trap
+      4 mach _kernelrpc_mach_vm_allocate_trap
+      4 bsd sys_close
+      4 bsd shared_region_check_np
+      4 bsd getpid
+      4 bsd __mac_syscall
+      3 mach task_self_trap
+      3 mach mach_reply_port
+      2 machdep 2
+      2 bsd thread_selfid
+      2 bsd sys_fcntl
+      2 bsd openat
+      1 bsd mprotect
+      1 bsd mmap
+      1 bsd fsgetpath
+      1 bsd csops
+      1 bsd access
+  (+ mach_absolute_time fast trap (-3) x18)
+
+## UNIMPLEMENTED (ENOSYS+carry / KERN_FAILURE returned, never success)
+      1 UNIMPLEMENTED bsd 336 proc_info
+      6 UNIMPLEMENTED bsd 38 sys_crossarch_trap
+      1 UNIMPLEMENTED bsd 550 map_with_linking_np
+      5 UNIMPLEMENTED mach 15 _kernelrpc_mach_vm_map_trap
+      1 UNIMPLEMENTED mach 19 _kernelrpc_mach_port_mod_refs_trap
+      1 UNIMPLEMENTED sysctl name2oid(security.mac.lockdown_mode_state)
+
+## explicitly stubbed (hit)
+__mac_syscall: ENOSYS (no MAC policy)
+csrctl: SIP enabled answers (CHECK(nonzero mask)=EPERM, active config 0)
+fcntl(F_CHECK_LV) accepted; F_ADDFILESIGS* EINVAL (not hit yet)
+
+## lowering counts (words scanned, patched)
+lowered /home/ubuntu/macos-re/store-27/root/bin/echo: words=233 pac-sign=3 br-auth=8 ret-auth=1 ldapr->ldar=0
+lowered /home/ubuntu/macos-re/store-27/root/usr/lib/dyld: words=169637 pac-sign=3609 pac-auth=1372 pac-strip=761 br-auth=819 ret-auth=1771 cas=35 rmw=25 svc=167 mrs-tpidrro=37 ldapr->ldar=12

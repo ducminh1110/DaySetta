@@ -239,6 +239,26 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
             c.set(in.rd, old);  // Rt == XZR discards (ST* aliases)
             break;
         }
+        case Op::Mrs:
+            c.set(in.rd, c.tpidrro);
+            break;
+        case Op::Ldapur: {
+            // Acquire load (LDAR-class on this host): RCsc is stronger than the RCpc the original has.
+            const uint64_t a = c.get_sp(in.rn) + int64_t(in.imm);
+            uint64_t v = 0;
+            switch (in.size) {
+                case 0: v = __atomic_load_n(reinterpret_cast<uint8_t*>(a), __ATOMIC_ACQUIRE); break;
+                case 1: v = __atomic_load_n(reinterpret_cast<uint16_t*>(a), __ATOMIC_ACQUIRE); break;
+                case 2: v = __atomic_load_n(reinterpret_cast<uint32_t*>(a), __ATOMIC_ACQUIRE); break;
+                default: v = __atomic_load_n(reinterpret_cast<uint64_t*>(a), __ATOMIC_ACQUIRE); break;
+            }
+            if (in.sext) {
+                v = uint64_t(sext(v, in.size));
+                if (in.sext == 2) v &= 0xFFFFFFFFull;
+            }
+            c.set(in.rd, v);
+            break;
+        }
         case Op::Svc:
             out.svc = true;
             out.svc_x16 = int64_t(c.x[16]);
@@ -317,10 +337,17 @@ void on_trap(int sig, siginfo_t*, void* vuc) {
     }
     CpuState cs;
     load_state(cs, uc);
+    if (g_rt->tsd) cs.tpidrro = g_rt->tsd(g_rt->ctx);
+    const uint64_t x0_in = cs.x[0], pstate_in = cs.pstate;
     const EmuOutcome o = emulate(in, cs, *g_rt->pac, g_rt->stats);
     switch (o.status) {
         case Emu::Ok:
-            if (o.svc && g_rt->log_svc)
+            if (o.svc && g_rt->svc) {
+                cs.x[0] = x0_in;  // emulate() preset ENOSYS; the hook sees the guest's original x0 and flags
+                cs.pstate = pstate_in;
+                g_rt->svc(cs, o.svc_imm, g_rt->ctx);
+            }
+            else if (o.svc && g_rt->log_svc)
                 say("ds-exec: Darwin syscall x16=%lld svc #0x%x at pc=0x%llx (%s) -> ENOSYS(%llu), carry set\n",
                     (long long)o.svc_x16, o.svc_imm, (unsigned long long)pc, where(pc).c_str(),
                     (unsigned long long)kDarwinENOSYS);

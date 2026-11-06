@@ -26,6 +26,8 @@ enum class Op : uint8_t {
     Casp,
     Rmw,       // LD<op>/ST<op>/SWP, all sizes and orderings
     Svc,       // svc #imm (Darwin uses #0x80)
+    Mrs,       // mrs Xt, tpidrro_el0 (Darwin TSD base; reads 0 on Linux)
+    Ldapur,    // FEAT_LRCPC2 LDAPUR{B,H,SB,SH,SW,}: emulated with an acquire (LDAR-class) load
     kCount
 };
 
@@ -45,7 +47,8 @@ struct Insn {
     bool release = false;
     bool link = false;   // BLRAA*
     bool writeback = false;
-    int32_t imm = 0;     // LDRAA offset, SVC immediate
+    int32_t imm = 0;     // LDRAA offset, SVC immediate, LDAPUR offset
+    uint8_t sext = 0;    // LDAPUR: 0 zero-extend, 1 sign-extend to X, 2 sign-extend to W
     Rmw rmw = Rmw::Add;
 };
 
@@ -55,7 +58,9 @@ const char* rmw_name(Rmw r);
 // True when `w` is an instruction the host cannot execute faithfully; fills `out`.
 bool decode(uint32_t w, Insn& out);
 
-// Recognised but NOT lowered (reported, never skipped): FEAT_LRCPC LDAPR{,B,H}.
+// FEAT_LRCPC LDAPR{,B,H}: not trap-lowered; lower_range rewrites them in place to the
+// LDAR{,B,H} encoding (RCsc acquire is stronger than RCpc: a valid strengthening, counted in
+// LowerCounts::ldapr_rewritten).  Returns true for those words.
 bool is_known_unsupported(uint32_t w);
 
 constexpr uint32_t brk_word(uint32_t idx) { return 0xD4200000u | (idx << 5); }
@@ -87,12 +92,15 @@ struct LowerPolicy {
     bool pac = true;
     bool lse = true;
     bool svc = true;
+    bool sysreg = true;  // mrs tpidrro_el0, LDAPUR
+    bool ldapr = true;   // LDAPR -> LDAR rewrite
 };
 
 struct LowerCounts {
     uint64_t words = 0;
     uint64_t patched[static_cast<int>(Op::kCount)] = {};
     uint64_t unsupported_seen = 0;
+    uint64_t ldapr_rewritten = 0;  // LDAPR{,B,H} rewritten in place to LDAR{,B,H} (strengthening, see lower_range)
 };
 
 // Patch the words [begin, end) in place (memory must be writable; caller flushes the icache
