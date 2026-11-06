@@ -1,0 +1,42 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux / C++20 / headless
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          cmake --version
+          g++ --version
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      - name: Build
+        run: cmake --build build --parallel 8
+
+      - name: Test
+        id: test
+        continue-on-error: true
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Documentation
+        if: always()
+        run: python3 ci/check_docs.py
+
+      - name: Enforce test result
+        if: always() && steps.test.outcome == 'failure'
+        run: |
+          echo "ctest failed; see the Test step." >&2
+          exit 1
