@@ -4,7 +4,8 @@ namespace ds::exec {
 
 const char* op_name(Op op) {
     static const char* names[] = {"none",    "pac-sign", "pac-auth", "pac-strip", "pacga", "br-auth",
-                                  "ret-auth", "ldr-auth", "cas",      "casp",      "rmw",   "svc"};
+                                  "ret-auth", "ldr-auth", "cas",      "casp",      "rmw",   "svc",
+                                  "mrs-tpidrro", "ldapur"};
     return names[static_cast<int>(op)];
 }
 
@@ -158,6 +159,20 @@ bool decode(uint32_t w, Insn& out) {
         ok = true;
     } else if ((w & 0xFEDFF800) == 0xD61F0800) {
         ok = decode_branch(w, o);
+    } else if ((w & 0xFFFFFFE0) == 0xD53BD060) {  // MRS Xt, TPIDRRO_EL0 (op0=3 op1=3 CRn=13 CRm=0 op2=3)
+        o.op = Op::Mrs;
+        o.rd = bits(w, 4, 0);
+        ok = true;
+    } else if ((w & 0x3F200C00) == 0x19000000 && bits(w, 23, 22) != 0 &&
+               !(bits(w, 31, 30) == 3 && bits(w, 23, 22) != 1) && !(bits(w, 31, 30) == 2 && bits(w, 23, 22) == 3)) {
+        o.op = Op::Ldapur;  // size 011001 opc 0 imm9 00 Rn Rt, opc != 00 (00 is STLUR)
+        o.size = bits(w, 31, 30);
+        o.sext = bits(w, 23, 22) == 1 ? 0 : bits(w, 23, 22) == 2 ? 1 : 2;
+        const int32_t i9 = int32_t(bits(w, 20, 12));
+        o.imm = i9 >= 256 ? i9 - 512 : i9;
+        o.rn = bits(w, 9, 5);
+        o.rd = bits(w, 4, 0);
+        ok = true;
     } else if ((w & 0xFF200400) == 0xF8200400) {
         ok = decode_ldraa(w, o);
     } else {
@@ -197,10 +212,18 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
         const uint32_t w = *p;
         Insn in;
         if (!decode(w, in)) {
-            if (is_known_unsupported(w)) ++counts.unsupported_seen;
+            if (is_known_unsupported(w) && policy.ldapr) {
+                // LDAPR{,B,H} -> LDAR{,B,H}: same size/Rn/Rt fields, acquire RCsc instead of RCpc.
+                // LDAR encodings: size 001000 1 1 0 11111 1 11111 Rn Rt (0x08DFFC00 | size<<30).
+                *p = 0x08DFFC00u | (w & 0xC0000000u) | (w & 0x3FFu);
+                ++counts.ldapr_rewritten;
+            } else if (is_known_unsupported(w)) {
+                ++counts.unsupported_seen;
+            }
             continue;
         }
         const bool want = in.op == Op::Svc ? policy.svc
+                          : in.op == Op::Mrs || in.op == Op::Ldapur ? policy.sysreg
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
                                                                                        : policy.pac;
         if (!want) continue;

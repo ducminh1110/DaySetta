@@ -336,7 +336,9 @@ bool CacheMap::lower_page(uint64_t addr, const LowerPolicy& pol, std::string* er
         const uint64_t b = std::max(it->begin, page), e = std::min(it->end, page + kHostPage);
         if (b < e) parts.emplace_back((b + 3) & ~uint64_t(3), e & ~uint64_t(3));
     }
-    if (parts.empty()) return fail(err, "page overlaps no code section of any image");
+    // Executable cache pages outside every image __TEXT section hold linker-generated branch
+    // islands/stubs (cache header branchPools): they are code too, lower the whole page.
+    if (parts.empty()) parts.emplace_back(page, page + kHostPage);
     if (mprotect(reinterpret_cast<void*>(page), kHostPage, PROT_READ | PROT_WRITE) != 0)
         return fail(err, "mprotect RW failed");
     LowerCounts c;
@@ -357,6 +359,7 @@ bool CacheMap::lower_page(uint64_t addr, const LowerPolicy& pol, std::string* er
     ++stats_.pages_lowered;
     stats_.lowered.words += c.words;
     stats_.lowered.unsupported_seen += c.unsupported_seen;
+    stats_.lowered.ldapr_rewritten += c.ldapr_rewritten;
     for (int i = 0; i < static_cast<int>(Op::kCount); ++i) stats_.lowered.patched[i] += c.patched[i];
     return true;
 }

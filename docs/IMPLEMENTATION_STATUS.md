@@ -56,6 +56,7 @@ load, soak, thread determinism and loader fixtures that do not exist yet.
 | Headless output | `IMPLEMENTED` | `src/render/output.cpp` | PPM/PAM/BGRA test passes |
 | Wayland / X11 / Vulkan | `PLANNED` | ADR-0004 | Development headers absent; not buildable on this host |
 | `ds-exec` + `ds-exec-probe` (R2) | `PARTIAL` | `src/exec/` (software PAC, LSE/PAC/svc BRK lowering, trap engine, split-cache map + slide v5, export-trie lookup), `tools/ds-exec-probe/main.cpp` | 11 `exec_*` cases incl. 4-thread LDADD contention; run in [r2-probe.txt](../artifacts/exec/r2-probe.txt) |
+| `ds-run` + `src/darwin/` (R3) | `PARTIAL` | `tools/ds-run/main.cpp`, `src/darwin/` (Mach-O arm64e loader, Darwin initial stack, commpage, shared-region dynamic-config page, BSD/Mach trap layer with DS_TRACE, ABI translation), `src/exec` extended (`mrs tpidrro_el0`, LDAPUR traps, LDAPR to LDAR rewrite) | 12 `darwin_*` cases; echo not reached: [r3-echo.txt](../artifacts/exec/r3-echo.txt), requirements record [r3-dyld27-requirements.md](../artifacts/exec/r3-dyld27-requirements.md) |
 | macOS 27 MIG scan | **DONE (WP1b, static)** | `tools/macos27/scan_mig.py`, `artifacts/macos-27/mig-routines.json` | 9 subsystems, 744 routines; see WP1b section |
 
 The 22 cases are `broker_proto_roundtrip`, `broker_proto_malformed`,
@@ -149,3 +150,17 @@ ServicesRelocated 29/29, ServerRelocated 10/10, CGXHMD 5/5, three start-1 subsys
 (not attributable to CGYSpinControl/CGYCaptureReply/CGYEventTap, names "?"). Names are
 `inferred-from-26.6` by (start, id) only: 724 named, 20 "?". Report: `artifacts/macos-27/MIG_27_REPORT.md`.
 No macOS 27 compatibility is claimed.
+
+## R3: genuine echo under genuine 27 dyld (`ds-run`)
+
+`OBSERVED` (2026-11-06, `DS_TRACE=1 ./build/ds-run /home/ubuntu/macos-re/store-27/root/bin/echo hello from macOS 27`):
+the genuine 27 `/usr/lib/dyld` (arm64e slice) is loaded by ds-run, runs `__dyld_start`, restarts into the dyld in the
+mapped cache, finds the cache through `shared_region_check_np` + the dynamic-config page + `fsgetpath`, parses the
+main executable and starts libSystem initialization. Echo does NOT print: exit status 133 (SIGTRAP) from a genuine
+Apple `brk #0xb001` in `libsystem_platform.dylib+0x3d40` right after the first unimplemented
+`_kernelrpc_mach_vm_map_trap` in `libsystem_kernel`. No `write` by Apple code was reached. The Darwin layer is
+deliberately limited to what the trace demanded (the owner chose Darling aarch64 as the Darwin runtime); everything
+the genuine dyld/libSystem asked for is recorded in [r3-dyld27-requirements.md](../artifacts/exec/r3-dyld27-requirements.md).
+Lowering findings: 12 LDAPR words rewritten to LDAR in dyld, 37 `mrs tpidrro_el0` trapped, 167 svc, no LDAPUR seen.
+Syscalls implemented 40 BSD names + 10 Mach traps (+ machdep 2/3, fast traps -3/-4); stubbed on purpose:
+`__mac_syscall`, `workq_kernreturn`, `fcntl(F_CHECK_LV)`. No macOS 27 compatibility is claimed.
