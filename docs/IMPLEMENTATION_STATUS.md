@@ -14,7 +14,7 @@ All commands ran in `/home/ubuntu/daysetta`. Artifacts: `build/Testing/Temporary
 | Configure | `cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo` | exit 0 | `VERIFIED` |
 | Build | `cmake --build build -j8` | exit 0; `-Wall -Wextra -Wpedantic -Werror` clean | `VERIFIED` |
 | CTest | `ctest --test-dir build --output-on-failure` | 1/1 target passed, 0.39 s | `VERIFIED` |
-| Direct suite | `./build/daysetta_tests` | **23/23 cases passed** (5 consecutive runs, all pass) | `VERIFIED` |
+| Direct suite | `./build/daysetta_tests` | **34/34 cases passed** (23 earlier cases + 11 `exec_*`) | `VERIFIED` |
 | Docs | `python3 ci/check_docs.py` | 0 errors, 24 Markdown files, 58 path refs | `VERIFIED` |
 | Local CI | `bash ci/run.sh` | **CI PASSED** | `VERIFIED` |
 
@@ -55,6 +55,7 @@ load, soak, thread determinism and loader fixtures that do not exist yet.
 | `daysetta-ctl` | `IMPLEMENTED` | `src/ctl/main.cpp` | No automated CLI test; commands built |
 | Headless output | `IMPLEMENTED` | `src/render/output.cpp` | PPM/PAM/BGRA test passes |
 | Wayland / X11 / Vulkan | `PLANNED` | ADR-0004 | Development headers absent; not buildable on this host |
+| `ds-exec` + `ds-exec-probe` (R2) | `PARTIAL` | `src/exec/` (software PAC, LSE/PAC/svc BRK lowering, trap engine, split-cache map + slide v5, export-trie lookup), `tools/ds-exec-probe/main.cpp` | 11 `exec_*` cases incl. 4-thread LDADD contention; run in [r2-probe.txt](../artifacts/exec/r2-probe.txt) |
 | macOS 27 MIG scan | **DONE (WP1b, static)** | `tools/macos27/scan_mig.py`, `artifacts/macos-27/mig-routines.json` | 9 subsystems, 744 routines; see WP1b section |
 
 The 22 cases are `broker_proto_roundtrip`, `broker_proto_malformed`,
@@ -88,7 +89,7 @@ review.
 | 26.6 protocol baseline | 738 MIG routines, 9 subsystems | `VERIFIED` |
 | 27 MIG ids | Scanned: 9 subsystems, 744 routines (addresses; 724 names inferred from 26.6) | `OBSERVED` (WP1b) |
 | 27 ObjC names | `__objc_classname`/`__objc_methname` size 0; pointer salt partially decoded (D-20/D-21) | `UNKNOWN` |
-| 27 runtime | No loader, ObjC runtime or arm64e execution probe; host lacks `pauth` | `UNKNOWN` |
+| 27 runtime | No loader or ObjC runtime. R2 (`VERIFIED`, [r2-probe.txt](../artifacts/exec/r2-probe.txt)): genuine arm64e cache code runs on this host (no PAC, no LSE) for `_strlen`, `_memcmp`, `_strtol_l`, `_adler32`, `_crc32`; results equal host references; 6 traps (pac-sign 3, pac-auth 1, ret-auth 2), 5 pages lowered lazily. PAC is a software SipHash-2-4 MAC, not QARMA, VA 48 bits (macOS VA size `UNKNOWN`); FEAT_LRCPC `LDAPR` words exist in Apple code and are not lowered (SIGILL reported, `OBSERVED` 1 in the 5 lowered pages, 40 in libc++ `__text`); plain `_strtol` needs Darwin TSD (`tpidrro_el0`); no dyld, TLS, stubs-to-other-images or syscalls tested | `PARTIAL` |
 
 ## 6. Not verified
 
