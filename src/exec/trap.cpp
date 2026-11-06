@@ -9,11 +9,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <mutex>
 
 namespace ds::exec {
 
 namespace {
 
+#if defined(__aarch64__)
 // ---- LL/SC primitives -------------------------------------------------------------------
 // One compare-and-swap loop per (size, acquire, release): LDX/LDAX + STX/STLX, CLREX on
 // mismatch.  Returns the value observed in memory (== expected on success).  The RMW
@@ -79,6 +81,34 @@ DS_CASP(casp_00, "ldxp", "stxp")
 DS_CASP(casp_10, "ldaxp", "stxp")
 DS_CASP(casp_01, "ldxp", "stlxp")
 DS_CASP(casp_11, "ldaxp", "stlxp")
+
+#else  // !__aarch64__: portable fallback (x86_64 etc.) so the emulation semantics stay testable off-target.
+// Same contract as the LL/SC versions: returns the value observed in memory.  CASP uses a mutex (no 128-bit
+// atomic without cx16/libatomic); it is atomic only against other CASP emulation, which is all tests need.
+#define DS_CAS(NAME, T)                                                                    \
+    inline uint64_t NAME(void* p, uint64_t exp, uint64_t nv) {                             \
+        T e = T(exp);                                                                      \
+        __atomic_compare_exchange_n(static_cast<T*>(p), &e, T(nv), false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); \
+        return e;                                                                          \
+    }
+DS_CAS(cas8_00, uint8_t) DS_CAS(cas8_10, uint8_t) DS_CAS(cas8_01, uint8_t) DS_CAS(cas8_11, uint8_t)
+DS_CAS(cas16_00, uint16_t) DS_CAS(cas16_10, uint16_t) DS_CAS(cas16_01, uint16_t) DS_CAS(cas16_11, uint16_t)
+DS_CAS(cas32_00, uint32_t) DS_CAS(cas32_10, uint32_t) DS_CAS(cas32_01, uint32_t) DS_CAS(cas32_11, uint32_t)
+DS_CAS(cas64_00, uint64_t) DS_CAS(cas64_10, uint64_t) DS_CAS(cas64_01, uint64_t) DS_CAS(cas64_11, uint64_t)
+
+inline void casp_any(void* p, uint64_t e0, uint64_t e1, uint64_t n0, uint64_t n1, uint64_t* o0, uint64_t* o1) {
+    static std::mutex m;
+    std::lock_guard<std::mutex> g(m);
+    auto* q = static_cast<uint64_t*>(p);
+    *o0 = q[0];
+    *o1 = q[1];
+    if (*o0 == e0 && *o1 == e1) { q[0] = n0; q[1] = n1; }
+}
+inline void casp_00(void* p, uint64_t a, uint64_t b, uint64_t c, uint64_t d, uint64_t* x, uint64_t* y) { casp_any(p, a, b, c, d, x, y); }
+inline void casp_10(void* p, uint64_t a, uint64_t b, uint64_t c, uint64_t d, uint64_t* x, uint64_t* y) { casp_any(p, a, b, c, d, x, y); }
+inline void casp_01(void* p, uint64_t a, uint64_t b, uint64_t c, uint64_t d, uint64_t* x, uint64_t* y) { casp_any(p, a, b, c, d, x, y); }
+inline void casp_11(void* p, uint64_t a, uint64_t b, uint64_t c, uint64_t d, uint64_t* x, uint64_t* y) { casp_any(p, a, b, c, d, x, y); }
+#endif
 
 using CasFn = uint64_t (*)(void*, uint64_t, uint64_t);
 CasFn pick_cas(unsigned size, bool acq, bool rel) {
@@ -324,6 +354,7 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
     return out;
 }
 
+#if defined(__aarch64__)
 // ---- signal handlers --------------------------------------------------------------------
 namespace {
 
@@ -559,5 +590,12 @@ bool install_trap_handlers(TrapRuntime* rt) {
     }
     return true;
 }
+
+#else  // !__aarch64__: guest traps need aarch64 ucontext; ds-exec only decodes/lowers/emulates (no live execution).
+bool handle_sigtrap(void*, uint64_t) { return false; }
+bool handle_sigsegv(void*, void*) { return false; }
+void thread_init() {}
+bool install_trap_handlers(TrapRuntime*) { return false; }
+#endif
 
 }  // namespace ds::exec

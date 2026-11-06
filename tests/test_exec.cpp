@@ -621,6 +621,10 @@ TrapRuntime& live_runtime() {
 }  // namespace
 
 DS_TEST(exec_live_lowered_code_traps) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_live_lowered_code_traps: needs an aarch64 host\n");
+    return;
+#endif
     TrapRuntime& rt = live_runtime();
     {
         ExecBuf b;
@@ -663,6 +667,10 @@ DS_TEST(exec_live_lowered_code_traps) {
 }
 
 DS_TEST(exec_ldadd_four_thread_contention) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_ldadd_four_thread_contention: needs an aarch64 host\n");
+    return;
+#endif
     live_runtime();
     ExecBuf b;
     auto f = b.load<uint64_t (*)(uint64_t*, uint64_t)>({0xf8e10002 /* ldaddal x1,x2,[x0] */, 0xaa0203e0, 0xd65f03c0});
@@ -697,6 +705,10 @@ DS_TEST(exec_trap_table_rejects_foreign_brk) {
 }
 
 DS_TEST(exec_probe_genuine_apple_functions) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_probe_genuine_apple_functions: needs an aarch64 host\n");
+    return;
+#endif
     const char* cache = "/home/ubuntu/macos-re/cache-arm64e/dyld_shared_cache_arm64e";
     struct stat st;
     if (stat(cache, &st) != 0) {

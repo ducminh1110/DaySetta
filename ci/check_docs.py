@@ -68,7 +68,7 @@ def skipped(path: Path) -> bool:
     if not parts:
         return False
     first = parts[0]
-    return first == ".git" or first == "build" or first.startswith("build-")
+    return first in (".git", "build", "recovery") or first.startswith("build-")  # recovery/: host-loss bundles, not project docs
 
 
 def markdown_files() -> list[Path]:
