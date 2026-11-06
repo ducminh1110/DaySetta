@@ -1,0 +1,11 @@
+PASS bootstrap look up com.apple.windowserver.active
+PASS 29000 GetCoreGraphicsServerVersion 600.0
+PASS 29010 GetSessionPort
+PASS 32000 NewConnectionPort
+PASS 30263 CreateWindow -> window id
+window id 0x1f6 tag 0x924a3
+PASS AttachCanvas reply
+PASS map canvas memory (host file fallback, ESC-G1-1)
+PASS CanvasFlushed sent
+PASS 30311 WindowIsOrderedIn replied
+ALL PASSED: 0 failure(s)
