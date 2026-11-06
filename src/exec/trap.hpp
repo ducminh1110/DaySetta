@@ -73,10 +73,16 @@ struct TrapRuntime {
     void (*svc)(CpuState& cpu, uint32_t imm, void* ctx) = nullptr;
     // Value of the calling thread's emulated TPIDRRO_EL0; null reads 0.
     uint64_t (*tsd)(void* ctx) = nullptr;
+    // Called after every successfully emulated trap (stats dumping); may be null.
+    void (*after_trap)(void* ctx) = nullptr;
 };
 
 // Install SIGTRAP/SIGILL/SIGSEGV handlers (SA_SIGINFO|SA_ONSTACK) for the process.
 bool install_trap_handlers(TrapRuntime* rt);
+// For runtimes that own the signal handlers (Darling's sigexc): emulate the lowered instruction
+// at the SIGTRAP context `uc` (a ucontext_t*).  False = not a lowered instruction (the BRK is the
+// guest's own; nothing changed, nothing printed).  Requires install_trap_handlers' TrapRuntime.
+bool handle_sigtrap(void* uc);
 // Give the calling thread an alternate signal stack (the installing thread gets one already).
 void thread_init();
 
