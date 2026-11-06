@@ -1,0 +1,84 @@
+{
+ "slide_info_versions": {
+  "v5": 14
+ },
+ "skylight_has_LC_DYLD_CHAINED_FIXUPS": false,
+ "skylight_load_commands": 77,
+ "cache_base": "0x180000000",
+ "got_slots_total": 3081,
+ "got_slots_zero_unbound": 2940,
+ "got_slots": 141,
+ "got_decoded": 141,
+ "got_target_in_mapping": 141,
+ "got_targets_equal_exported_symbol": 122,
+ "distinct_exported_symbol_targets": 122,
+ "objc_classlist": {
+  "entries": 303,
+  "decoded_by_slide_info": 303,
+  "equal_D21_formula": 303
+ },
+ "samples": [
+  {
+   "slot": "0x1e07a7010",
+   "raw": "0x100000677ba0a8",
+   "decoded": "0x1e77ba0a8",
+   "auth": false
+  },
+  {
+   "slot": "0x1e07a7018",
+   "raw": "0x100000677b9680",
+   "decoded": "0x1e77b9680",
+   "auth": false
+  },
+  {
+   "slot": "0x1e07a7020",
+   "raw": "0x100000677bb060",
+   "decoded": "0x1e77bb060",
+   "auth": false
+  },
+  {
+   "slot": "0x1e07a7028",
+   "raw": "0x100000677baff0",
+   "decoded": "0x1e77baff0",
+   "auth": false
+  },
+  {
+   "slot": "0x1e07a7030",
+   "raw": "0x100000677bb5d0",
+   "decoded": "0x1e77bb5d0",
+   "auth": false
+  },
+  {
+   "slot": "0x1e07a7038",
+   "raw": "0x100000677baf80",
+   "decoded": "0x1e77baf80",
+   "auth": false
+  },
+  {
+   "slot": "0x1e07a7040",
+   "raw": "0x100000677b9608",
+   "decoded": "0x1e77b9608",
+   "auth": false
+  },
+  {
+   "slot": "0x1e07a7048",
+   "raw": "0x100000677bb7b0",
+   "decoded": "0x1e77bb7b0",
+   "auth": false
+  },
+  {
+   "slot": "0x1e07a7050",
+   "raw": "0x100000677b5e90",
+   "decoded": "0x1e77b5e90",
+   "auth": false
+  },
+  {
+   "slot": "0x1e07a7058",
+   "raw": "0x100000677b5e40",
+   "decoded": "0x1e77b5e40",
+   "auth": false
+  }
+ ],
+ "evidence": "OBSERVED: counts from /home/ubuntu/macos-re/cache-arm64e (26A434); not a macOS 27 compatibility claim",
+ "failures": []
+}
