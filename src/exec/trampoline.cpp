@@ -467,9 +467,11 @@ bool trampoline_wants(const Insn& in) {
         case Op::PacSign: case Op::PacAuth: case Op::PacGa: case Op::BrAuth: case Op::RetAuth: case Op::LdrAuth:
         case Op::Cas: case Op::Casp: case Op::Rmw: case Op::Ldapur: case Op::Cpa: case Op::Dot:
             // FP16 inline sequences disabled until they match the trap path (see test);
-            // Fp16 words lower to BRK and are handled exactly by emulate().
+            // Fp16 words lower to BRK and are handled exactly by emulate(). Same for
+            // Op::Fp16V (vector forms): the trap path computes per-lane values.
             return true;
         case Op::Fp16:
+        case Op::Fp16V:
             return false;
         case Op::Mrs:  // TSD base from the thread-local cache (see trampoline_set_mrs_tls); MrsTpidr is rewritten in place by lower_range; Svc keeps BRK
             return g_mrs_tls >= 0 && in.rd != 18 && in.rd != 31;

@@ -33,6 +33,7 @@ enum class Op : uint8_t {
     MrsTpidr,  // mrs Xt, tpidr_el0: Darwin keeps a CPU/cluster hint there (libmalloc xzone index); the Linux host value is a TLS pointer, so emulate as 0
     Dot,       // FEAT_DotProd UDOT/SDOT (vector and by-element): expanded to ARMv8.0 widening multiply + pairwise adds
     Fp16,      // FP16 (FEAT_FP16) scalar ops: fmov/fcvt/fadd/… on H regs. Host is ARMv8.0 (no FP16), so lowered
+    Fp16V,     // FP16 (FEAT_FP16) vector H ops (.4h/.8h): per-lane widen-compute-narrow via the trap path
     kCount
 };
 
@@ -54,6 +55,15 @@ enum class Fp16Kind : uint8_t {
     Fcmp, Fcmp0, Fcsel, Fccmp,             // Fcmp: rm = compare reg (mul = signalling)
     Fminnm, Fmaxnm, Fabs, Fneg,
     Scvtf, Ucvtf,                           // rn = general register
+    // Vector .4h/.8h
+    FnegV, FabsV,
+    FaddV, FsubV, FmulV, FdivV, FmaxV, FminV, FmaxnmV, FminnmV,
+    FmlaV, FmlsV,
+    FcmeqV, FcmgeV, FcmgtV, Fcmeq0V, Fcmge0V, Fcmgt0V,
+    ScvtfV, UcvtfV, FcvtzsV, FcvtzuV, FcvtnuV,
+    FrintiV, FrmV, MoviV, DupV,
+    FaddpV, FmaxpV, FminpV,
+    FmulIdxV, FmlaIdxV, FmlsIdxV,
 };
 
 struct Insn {

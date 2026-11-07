@@ -137,6 +137,93 @@ bool decode_ldraa(uint32_t w, Insn& o) {
     return true;
 }
 
+// FP16 (FEAT_FP16) vector ops on Vd.<4h|8h>: per-lane widen-compute-narrow emulation.
+// Patterns (mask, value) from llvm-mc-assembled operand grids (ground truth); operands
+// use the standard SIMD layout (rm=[20:16], rn=[9:5], rd=[4:0]) except indexed forms.
+// Trap path only (trampoline_wants false for Op::Fp16V).
+bool decode_fp16v(uint32_t w, Insn& o) {
+    struct VP { uint32_t mask, value; Fp16Kind hk; };
+    static const VP pats[] = {
+        {0xFFE0FE80u, 0x0E401400u, Fp16Kind::FaddV},  // fadd.4h swept
+        {0xFFE0FE80u, 0x4E401400u, Fp16Kind::FaddV},  // fadd.8h swept
+        {0xFFE0FE80u, 0x0EC01400u, Fp16Kind::FsubV},  // fsub.4h swept
+        {0xFFE0FE80u, 0x4EC01400u, Fp16Kind::FsubV},  // fsub.8h swept
+        {0xFFE0FE80u, 0x2E401C00u, Fp16Kind::FmulV},  // fmul.4h swept
+        {0xFFE0FE80u, 0x6E401C00u, Fp16Kind::FmulV},  // fmul.8h swept
+        {0xFFE0FE80u, 0x2E403C00u, Fp16Kind::FdivV},  // fdiv.4h swept
+        {0xFFE0FE80u, 0x6E403C00u, Fp16Kind::FdivV},  // fdiv.8h swept
+        {0xFFE0FE80u, 0x0E403400u, Fp16Kind::FmaxV},  // fmax.4h swept
+        {0xFFE0FE80u, 0x4E403400u, Fp16Kind::FmaxV},  // fmax.8h swept
+        {0xFFE0FE80u, 0x0EC03400u, Fp16Kind::FminV},  // fmin.4h swept
+        {0xFFE0FE80u, 0x4EC03400u, Fp16Kind::FminV},  // fmin.8h swept
+        {0xFFE0FE80u, 0x0E400400u, Fp16Kind::FmaxnmV},  // fmaxnm.4h swept
+        {0xFFE0FE80u, 0x4E400400u, Fp16Kind::FmaxnmV},  // fmaxnm.8h swept
+        {0xFFE0FE80u, 0x0EC00400u, Fp16Kind::FminnmV},  // fminnm.4h swept
+        {0xFFE0FE80u, 0x4EC00400u, Fp16Kind::FminnmV},  // fminnm.8h swept
+        {0xFFE0FE80u, 0x0E400C00u, Fp16Kind::FmlaV},  // fmla.4h swept
+        {0xFFE0FE80u, 0x4E400C00u, Fp16Kind::FmlaV},  // fmla.8h swept
+        {0xFFE0FE80u, 0x0EC00C00u, Fp16Kind::FmlsV},  // fmls.4h swept
+        {0xFFE0FE80u, 0x4EC00C00u, Fp16Kind::FmlsV},  // fmls.8h swept
+        {0xFFE0FE80u, 0x0E402400u, Fp16Kind::FcmeqV},  // fcmeq.4h swept
+        {0xFFE0FE80u, 0x4E402400u, Fp16Kind::FcmeqV},  // fcmeq.8h swept
+        {0xFFE0FE80u, 0x2E402400u, Fp16Kind::FcmgeV},  // fcmge.4h swept
+        {0xFFE0FE80u, 0x6E402400u, Fp16Kind::FcmgeV},  // fcmge.8h swept
+        {0xFFE0FE80u, 0x2EC02400u, Fp16Kind::FcmgtV},  // fcmgt.4h swept
+        {0xFFE0FE80u, 0x6EC02400u, Fp16Kind::FcmgtV},  // fcmgt.8h swept
+        {0xFFFFFC00u, 0x0EF8D800u, Fp16Kind::Fcmeq0V},  // fcmeq0.4h swept
+        {0xFFFFFC00u, 0x4EF8D800u, Fp16Kind::Fcmeq0V},  // fcmeq0.8h swept
+        {0xFFFFFC00u, 0x2EF8C800u, Fp16Kind::Fcmge0V},  // fcmge0.4h swept
+        {0xFFFFFC00u, 0x6EF8C800u, Fp16Kind::Fcmge0V},  // fcmge0.8h swept
+        {0xFFFFFC00u, 0x0EF8C800u, Fp16Kind::Fcmgt0V},  // fcmgt0.4h swept
+        {0xFFFFFC00u, 0x4EF8C800u, Fp16Kind::Fcmgt0V},  // fcmgt0.8h swept
+        {0xFFFFFD40u, 0x2EF8F800u, Fp16Kind::FnegV},  // fneg.4h swept
+        {0xFFFFFD40u, 0x6EF8F800u, Fp16Kind::FnegV},  // fneg.8h swept
+        {0xFFFFFD40u, 0x0EF8F800u, Fp16Kind::FabsV},  // fabs.4h swept
+        {0xFFFFFD40u, 0x4EF8F800u, Fp16Kind::FabsV},  // fabs.8h swept
+        {0xFFFFFD40u, 0x0EF9B800u, Fp16Kind::FcvtzsV},  // fcvtzs.4h swept
+        {0xFFFFFD40u, 0x4EF9B800u, Fp16Kind::FcvtzsV},  // fcvtzs.8h swept
+        {0xFFFFFD40u, 0x2EF9B800u, Fp16Kind::FcvtzuV},  // fcvtzu.4h swept
+        {0xFFFFFD40u, 0x6EF9B800u, Fp16Kind::FcvtzuV},  // fcvtzu.8h swept
+        {0xFFFFFD40u, 0x0E79D800u, Fp16Kind::ScvtfV},  // scvtf.4h swept
+        {0xFFFFFD40u, 0x4E79D800u, Fp16Kind::ScvtfV},  // scvtf.8h swept
+        {0xFFFFFD40u, 0x2E79D800u, Fp16Kind::UcvtfV},  // ucvtf.4h swept
+        {0xFFFFFD40u, 0x6E79D800u, Fp16Kind::UcvtfV},  // ucvtf.8h swept
+        {0xFFFFFD40u, 0x2EF99800u, Fp16Kind::FrintiV},  // frinti.4h swept
+        {0xFFFFFD40u, 0x6EF99800u, Fp16Kind::FrintiV},  // frinti.8h swept
+        {0xFFFFFD40u, 0x2E79A800u, Fp16Kind::FcvtnuV},  // fcvtnu.4h swept
+        {0xFFFFFD40u, 0x6E79A800u, Fp16Kind::FcvtnuV},  // fcvtnu.8h swept
+        {0xFFE0FD40u, 0x2E401400u, Fp16Kind::FaddpV},  // faddp.4h swept
+        {0xFFE0FD40u, 0x6E401400u, Fp16Kind::FaddpV},  // faddp.8h swept
+        {0xFFE0FD40u, 0x2E403400u, Fp16Kind::FmaxpV},  // fmaxp.4h swept
+        {0xFFE0FD40u, 0x6E403400u, Fp16Kind::FmaxpV},  // fmaxp.8h swept
+        {0xFFE0FD40u, 0x2EC03400u, Fp16Kind::FminpV},  // fminp.4h swept
+        {0xFFE0FD40u, 0x6EC03400u, Fp16Kind::FminpV},  // fminp.8h swept
+        {0xFFC0F700u, 0x0F009000u, Fp16Kind::FmulIdxV},  // fmulby.4h swept
+        {0xFFC0F700u, 0x4F009000u, Fp16Kind::FmulIdxV},  // fmulby.8h swept
+        {0xFFC0F700u, 0x0F001000u, Fp16Kind::FmlaIdxV},  // fmlaby.4h swept
+        {0xFFC0F700u, 0x4F001000u, Fp16Kind::FmlaIdxV},  // fmlaby.8h swept
+        {0xFFC0F700u, 0x0F005000u, Fp16Kind::FmlsIdxV},  // fmlsby.4h swept
+        {0xFFC0F700u, 0x4F005000u, Fp16Kind::FmlsIdxV},  // fmlsby.8h swept
+        {0xFFE3FF00u, 0x0E020400u, Fp16Kind::DupV},  // dup.4h swept
+        {0xFFE3FF00u, 0x4E020400u, Fp16Kind::DupV},  // dup.8h swept
+    };
+    for (const auto& p : pats) {
+        if ((w & p.mask) != p.value) continue;
+        o.op = Op::Fp16V;
+        o.hk = p.hk;
+        o.rd = bits(w, 4, 0);
+        o.rn = bits(w, 9, 5);
+        o.rm = bits(w, 20, 16);
+        o.q = !!(w >> 30) & 1;                 // .8h forms have bit30 set
+        // by-element index (only for the indexed*/dup rows): low bits of Rm (20, 21) and size-bit 11
+        o.lane = (p.hk == Fp16Kind::FmulIdxV || p.hk == Fp16Kind::FmlaIdxV || p.hk == Fp16Kind::FmlsIdxV || p.hk == Fp16Kind::DupV)
+            ? int8_t(bits(w, 11, 11) * 4 + bits(w, 21, 21) * 2 + bits(w, 20, 20))
+            : int8_t(-1);
+        return true;
+    }
+    return false;
+}
+
 // FP16 (FEAT_FP16) scalar ops on H registers.  The host is ARMv8.0 (no FP16 hardware), so
 // these are lowered to BRK slots or inline ARMv8.0 sequences built from FCVT between half
 // and single/double (ARMv8.0 baseline) plus single/double arithmetic.  Register operand
@@ -148,7 +235,7 @@ bool decode_ldraa(uint32_t w, Insn& o) {
 bool decode_fp16(uint32_t w, Insn& o) {
     struct Pat { uint32_t mask, value; Fp16Kind hk; };
     static const Pat pats[] = {
-        {0xFFFFFFE0, 0x1EEE1000, Fp16Kind::FmovImm},                  // fmov hd, #imm8
+        {0xFFE0FC00, 0x1EE01000, Fp16Kind::FmovImm},
         {0xFFFFFC00, 0x1EE04000, Fp16Kind::FmovRegH},                 // fmov hd, hn
         {0xFFFFFC00, 0x1EE70000, Fp16Kind::FmovWtoH},                 // fmov hd, wn
         {0xFFFFFC00, 0x1EE60000, Fp16Kind::FmovHtoW},                 // fmov wd, hn
@@ -303,6 +390,8 @@ bool decode(uint32_t w, Insn& out) {
         ok = decode_ldraa(w, o);
     } else if (decode_fp16(w, o)) {
         ok = true;
+    } else if (decode_fp16v(w, o)) {
+        ok = true;
     } else {
         ok = decode_lse(w, o);
     }
@@ -365,7 +454,7 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
         const bool want = in.op == Op::Svc ? policy.svc
                           : in.op == Op::Mrs || in.op == Op::MrsTpidr || in.op == Op::Ldapur ? policy.sysreg
                           : in.op == Op::Cpa ? policy.pac
-                          : in.op == Op::Dot || in.op == Op::Fp16 ? policy.simd
+                          : in.op == Op::Dot || in.op == Op::Fp16 || in.op == Op::Fp16V ? policy.simd
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
                           : policy.pac;
         if (!want) continue;
