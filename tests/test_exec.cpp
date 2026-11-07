@@ -911,3 +911,40 @@ DS_TEST(exec_probe_genuine_apple_functions) {
     if (rc != 0 || out.find("MISMATCH") != std::string::npos || out.find("RESULT: 9 match, 0 mismatch") == std::string::npos)
         throw ds::test::Failure("ds-exec-probe failed (status " + std::to_string(rc) + "):\n" + out);
 }
+
+DS_TEST(exec_remap_restore_original) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_remap_restore_original: needs an aarch64 host\n");
+    return;
+#endif
+    live_runtime();
+    // pacibsp; mov x0, #0; autibsp; ret
+    const std::vector<uint32_t> orig = {0xd503237f, 0xd2800000, 0xd50323ff, 0xd65f03c0};
+    auto check = [&](bool trampolines) {
+        ExecBuf src;
+        std::memcpy(src.mem, orig.data(), orig.size() * 4);
+        LowerPolicy pol;
+        pol.trampolines = trampolines;
+        LowerCounts c;
+        std::string err;
+        DS_CHECK(lower_range(src.mem, src.mem + orig.size(), pol, c, &err));
+        // lowering must have changed something (a BRK or a `b stub`), else the restore is vacuous
+        bool changed = false;
+        for (size_t i = 0; i < orig.size(); ++i) changed = changed || src.mem[i] != orig[i];
+        DS_CHECK(changed);
+        // darlingserver copies the already-lowered guest bytes into the vm_remap destination
+        ExecBuf dst;
+        std::memcpy(dst.mem, src.mem, orig.size() * 4);
+        flush_icache(dst.mem, dst.mem + orig.size());
+        const size_t restored = restore_original(dst.mem, src.mem, orig.size());
+        DS_CHECK(restored >= 1);
+        for (size_t i = 0; i < orig.size(); ++i) DS_CHECK_EQ(dst.mem[i], orig[i]);
+        // the restored copy is lowered afresh at its own address and runs
+        LowerCounts c2;
+        DS_CHECK(lower_range(dst.mem, dst.mem + orig.size(), pol, c2, &err));
+        flush_icache(dst.mem, dst.mem + orig.size());
+        DS_CHECK_EQ(reinterpret_cast<long (*)()>(dst.mem)(), 0l);
+    };
+    check(false);  // BRK trap-table entries
+    check(true);   // trampoline sites (`b stub`)
+}

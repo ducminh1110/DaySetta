@@ -8,6 +8,7 @@
 #include <cstring>
 #include <deque>
 #include <mutex>
+#include <unordered_map>
 #include <vector>
 
 namespace ds::exec {
@@ -28,6 +29,7 @@ const Pac* g_pac = nullptr;
 std::mutex g_mu;
 std::vector<Chunk> g_chunks;
 std::deque<SiteInfo> g_sites;
+std::unordered_map<uint64_t, const SiteInfo*> g_site_by_pc;  // guarded by g_mu; deque entries are node-stable
 TrampHandler g_handler = nullptr;
 TrampStats g_stats;
 long g_mrs_tls = -1;
@@ -363,6 +365,8 @@ uint32_t trampoline_make(uint32_t* site, uint32_t word, const Insn& in, uint64_t
         stub[3] = 0xD503201Fu;
         __builtin___clear_cache(reinterpret_cast<char*>(stub), reinterpret_cast<char*>(stub) + 16);
         ++g_stats.sites;
+        g_sites.push_back(SiteInfo{in, pc, word});
+        g_site_by_pc[pc] = &g_sites.back();
         const int64_t to_stub = (int64_t(reinterpret_cast<uint64_t>(stub)) - int64_t(pc)) / 4;
         return 0x14000000u | (uint32_t(to_stub) & 0x03FFFFFFu);
     }
@@ -375,10 +379,13 @@ uint32_t trampoline_make(uint32_t* site, uint32_t word, const Insn& in, uint64_t
         __builtin___clear_cache(reinterpret_cast<char*>(istub), reinterpret_cast<char*>(istub) + code.size() * 4);
         ++g_stats.sites;
         ++g_stats.inlined;
+        g_sites.push_back(SiteInfo{in, pc, word});
+        g_site_by_pc[pc] = &g_sites.back();
         const int64_t to_i = (int64_t(reinterpret_cast<uint64_t>(istub)) - int64_t(pc)) / 4;
         return 0x14000000u | (uint32_t(to_i) & 0x03FFFFFFu);
     }
     g_sites.push_back(SiteInfo{in, pc, word});
+    g_site_by_pc[pc] = &g_sites.back();
     const SiteInfo* si = &g_sites.back();
     uint32_t* stub = reinterpret_cast<uint32_t*>(ch->base + ch->used);
     ch->used += 16;
@@ -414,6 +421,12 @@ uint32_t trampoline_make(uint32_t* site, uint32_t word, const Insn& in, uint64_t
 TrampStats trampoline_stats() {
     std::lock_guard<std::mutex> lk(g_mu);
     return g_stats;
+}
+
+const SiteInfo* trampoline_lookup(uint64_t pc) {
+    std::lock_guard<std::mutex> lk(g_mu);
+    auto it = g_site_by_pc.find(pc);
+    return it == g_site_by_pc.end() ? nullptr : it->second;
 }
 
 uint32_t encode_and_imm64(unsigned rd, uint64_t mask) {

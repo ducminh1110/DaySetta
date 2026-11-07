@@ -5,6 +5,10 @@
 // island's common block, which saves x0-x30 + NZCV below the guest's red zone, calls ds_tramp_c(frame, site) on the guest
 // stack, restores everything and continues at frame[NEXT] (site+4, or the branch target) through x18.  Explicit emulation
 // is unchanged: ds_tramp_c runs the same emulate() as the SIGTRAP path.
+//
+// A `b stub` word is PC-relative: it is only valid at its own site.  Copying lowered bytes to
+// another address (vm_remap with copy) therefore yields a branch that lands nowhere.  Sites are
+// recorded so a copy can have its original words restored (see restore_original in lowering.hpp).
 #pragma once
 
 #include <cstddef>
@@ -20,6 +24,11 @@ struct SiteInfo {
     uint64_t pc;
     uint32_t word;
 };
+
+// Recorded site whose original word is `word` at `pc`, or null when `pc` was not lowered
+// through a trampoline.  Restores vm_remap copies of lowered bytes: the destination holds a
+// stale PC-relative `b stub`, so it must be rewritten to the original word before it runs.
+const SiteInfo* trampoline_lookup(uint64_t pc);
 
 // Frame written by the common block (offsets in 8-byte slots): x0..x30 = 0..30, NZCV = 31, guest SP = 32, NEXT = 33.
 constexpr int kFrameX = 0, kFrameNzcv = 31, kFrameSp = 32, kFrameNext = 33;

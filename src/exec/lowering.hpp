@@ -129,4 +129,13 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
                  std::string* err);
 void flush_icache(void* begin, void* end);
 
+// Copy-based lowering (vm_remap) copies live, already lowered bytes into the destination. That
+// copy holds BRK trap words keyed by the source PC and `b island` branches addressed from the
+// source PC, so it cannot run at the destination. This rewrites dst[i] back to the original
+// instruction wherever the source pc has a lowered entry (trap table or trampoline site), so the
+// copy holds original words again and can be lowered fresh at its own address. Unpatched words
+// already equal their originals and are left alone; inline in-place rewrites (strip AND, mov#0,
+// LDAPR->LDAR) are PC-independent and also left alone. Returns the number of restored sites.
+size_t restore_original(uint32_t* dst, const uint32_t* src_pc, size_t n);
+
 }  // namespace ds::exec
