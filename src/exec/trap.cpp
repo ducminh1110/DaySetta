@@ -605,6 +605,7 @@ bool handle_sigsegv(void* vuc, void* vsi) {
     auto* si = static_cast<siginfo_t*>(vsi);
     if (!g_rt) return false;
     const uint64_t pc = uc->uc_mcontext.pc;
+    if (g_rt->lazy_slide && si->si_code == SEGV_ACCERR && g_rt->lazy_slide(reinterpret_cast<uint64_t>(si->si_addr), g_rt->ctx)) return true;
     if (getenv("DS_EXEC_TRACE_STRIP") && !g_rt->pac->canonical(pc))
         say("ds-exec: segv tid=%d code=%d addr=0x%llx pc=0x%llx sp=0x%llx\n", (int)gettid(), si->si_code,
             (unsigned long long)reinterpret_cast<uint64_t>(si->si_addr), (unsigned long long)pc, (unsigned long long)uc->uc_mcontext.sp);
