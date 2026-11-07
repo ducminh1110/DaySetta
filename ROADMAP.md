@@ -194,6 +194,14 @@ component and exclusion.
 **Exit criteria.** 1.0 release candidate tagged; external review complete; the next
 protocol major has a written compatibility policy.
 
+## 8a. Third-party app install paths (owner order, 2026-11-08; after the desktop and the built-in macOS 27 apps run)
+
+Status: not started. The first deliverables of the third-party phase, before any per-app tuning:
+
+1. `.app` in a `.dmg`: mount disk images the way macOS does (DiskImageMounter, `hdiutil`, diskimages-helper; APFS and HFS+ images), then drag to /Applications in Finder.
+2. `.pkg`: Installer.app and the PackageKit stack (installd, system_installd, pre/postinstall scripts, receipts in /var/db/receipts).
+3. Then app-by-app work (Office, Chrome, VS Code, Discord, ...). Very special-purpose apps may be skipped.
+
 ## 9. North Star (not started)
 
 Status: `PLANNED`, no work done, no commitments, no claims. Vision in the user's words:
