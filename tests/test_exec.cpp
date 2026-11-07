@@ -221,6 +221,30 @@ DS_TEST(exec_pac_round_trip_and_poison) {
     DS_CHECK_EQ(Pac::blend(0x0000aaaa00001000ull, 0x1234), 0x1234aaaa00001000ull);
 }
 
+DS_TEST(exec_libkernel_function_ptr_auth_schema) {
+    // libsystem_kernel's _libkernel_functions fields are signed by Apple arm64e code with
+    // key IA and modifier = ptrauth_blend_discriminator(&field, string_discriminator("libkernel_functions_<f>")).
+    // The shim must authenticate them with the same schema through ds-exec (no blind strip).
+    const Pac& p = tpac();
+    const uint64_t field_addr = 0x0000aaaa20001040ull;       // &table->field (in cache)
+    const uint64_t target = 0x00000180887958ull;             // e.g. __pthread_exit_if_canceled
+    const uint16_t diversity = 0x41a1;  // __builtin_ptrauth_string_discriminator("libkernel_functions__pthread_exit_if_canceled") (clang arm64e)
+    const uint64_t mod = Pac::blend(field_addr, diversity);
+    const uint64_t signed_ptr = p.sign(PacKey::IA, target, mod);
+
+    DS_CHECK(p.strip(signed_ptr) == target);
+    const AuthResult ok = p.auth(PacKey::IA, signed_ptr, mod);
+    DS_CHECK(ok.ok);
+    DS_CHECK_EQ(ok.value, target);
+
+    // wrong discriminator fails (auth must not be bypassed by collusion)
+    const AuthResult bad = p.auth(PacKey::IA, signed_ptr, Pac::blend(field_addr, 0x41a2));
+    DS_CHECK(!bad.ok);
+    DS_CHECK(noncanon(bad.value));
+    // no field-blend also fails
+    DS_CHECK(!p.auth(PacKey::IA, signed_ptr, diversity).ok);
+}
+
 DS_TEST(exec_decode_matches_assembler_table) {
     int lowered = 0;
     for (const Enc& e : kEnc) {
