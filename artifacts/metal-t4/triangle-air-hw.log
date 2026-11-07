@@ -1,0 +1,6 @@
+Validation layer requested but not available. Ignoring...
+indium: using Vulkan device "Tesla T4" (VkPhysicalDeviceType 2) => HW
+vulkan device: Tesla T4 => HW (non-CPU Vulkan device)
+center px=71,70,114 bg px=25,25,38 => PASS
+wrote out/hw/metal-indium-triangle-AIR-HW-x86_64.png
+rc=0
