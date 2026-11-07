@@ -435,7 +435,7 @@ TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out, uint64_t tsd = 0) {
             say("ds-exec: PAC authentication failure at pc=0x%llx (%s) word=0x%08x: poisoned 0x%llx\n",
                 (unsigned long long)pc, where(pc).c_str(), e->word, (unsigned long long)o.fault_addr);
             if (getenv("MLDR_DSEXEC_REGS"))  // debug, off by default
-                say("ds-exec:   lr=0x%llx x0=0x%llx\n", (unsigned long long)cs.x[30], (unsigned long long)cs.x[0]);
+                say("ds-exec:   lr=0x%llx x0=0x%llx x1=0x%llx x6=0x%llx x8=0x%llx x16=0x%llx x17=0x%llx\n", (unsigned long long)cs.x[30], (unsigned long long)cs.x[0], (unsigned long long)cs.x[1], (unsigned long long)cs.x[6], (unsigned long long)cs.x[8], (unsigned long long)cs.x[16], (unsigned long long)cs.x[17]);
             if (getenv("MLDR_DSEXEC_BT")) {  // debug: frame-pointer walk
                 const uint64_t* fp = reinterpret_cast<const uint64_t*>(cs.x[29]);
                 for (int i = 0; i < 12 && fp && reinterpret_cast<uint64_t>(fp) > 0x10000; ++i) {
