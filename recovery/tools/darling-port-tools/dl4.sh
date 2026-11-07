@@ -1,6 +1,6 @@
 #!/bin/bash
 # dl4.sh build FILE...   recompile changed dyld sources, relink, install as /usr/lib/dyl4
-# dl4.sh run BIN ARGS... run a BaseSystem binary (path inside ~/basesystem) through dyl4 + the 26.6 cache
+# dl4.sh run BIN ARGS... run a macOS 27 binary (path inside ~/macos-re/store-27/root, or absolute) through dyl4 + the 27 cache (retargeted from 26.6 BaseSystem)
 R=/usr/local/libexec/darling
 # Restart the Darling container if its shellspawn is gone (e.g. after replacing system libraries).
 ensure_darling() {
@@ -12,12 +12,12 @@ ensure_darling() {
 
 case "$1" in
 build)
-	shift; cd ~/dyld-1378 && [ $# -gt 0 ] && bash $HOME/darling-port-tools/dyld_try.sh "$@" | head -3
-	bash $HOME/darling-port-tools/dyld_link.sh 2>&1 | grep link= && sudo -n cp ~/dyld-port/dyld $R/usr/lib/dyl4 ;;
+	shift; B=$HOME/dyld-1378/darling-compat/build-aarch64.sh
+	[ $# -gt 0 ] && bash $B compile "$@" | head -3
+	bash $B link 2>&1 | grep link= && sudo -n cp ~/dyld-port-a64e/dyld $R/usr/lib/dyl4.new && sudo -n mv -f $R/usr/lib/dyl4.new $R/usr/lib/dyl4 ;;
 run)
 	ensure_darling
-	shift; b=$1; shift; n=$(echo "$b" | tr / _)
-	python3 $HOME/darling-port-tools/use_dyl4.py ~/basesystem/$b ~/darltest/bs$n >/dev/null && chmod +x ~/darltest/bs$n
-	timeout -s KILL ${DL4_TIMEOUT:-60} darling shell env DYLD_SHARED_CACHE_DIR=/Volumes/SystemRoot/home/ubuntu/basesystem/System/Library/dyld/ DYLD_SHARED_REGION=private $DL4_ENV /Volumes/SystemRoot/home/ubuntu/darltest/bs$n "$@" > ~/darltest/last.log 2>&1 </dev/null
+	shift; b=$1; shift; case $b in /*) p=$b;; *) p=$HOME/macos-re/store-27/root/$b;; esac
+	timeout -s KILL ${DL4_TIMEOUT:-60} darling shell env DARLING_DYLINKER=/usr/lib/dyl4 DARLING_DS_CACHE=/home/ubuntu/macos-re/cache-arm64e/dyld_shared_cache_arm64e $DL4_ENV /Volumes/SystemRoot$p "$@" > ~/darltest/last.log 2>&1 </dev/null
 	echo "rc=$?"; head -${DL4_LINES:-40} ~/darltest/last.log ;;
 esac

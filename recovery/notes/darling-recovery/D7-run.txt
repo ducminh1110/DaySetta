@@ -1,0 +1,28 @@
+# D7 run transcript 2026-11-07 (unified build + D7 fixes; aarch64 ARMv8.0 host, no PAC/LSE)
+# Apple images: only from the macOS 27 cache (/home/ubuntu/macos-re/cache-arm64e, 27.0.1 IPSW) and store (/home/ubuntu/macos-re/store-27).
+# Darling images the guest maps (checked via /proc/<pid>/maps of a running plutil): 
+#   /usr/lib/dyl4 (dyld-1378 port = the dynamic linker),  /usr/lib/system/libsystem_kernel.dylib (kernel-boundary shim),  mldr (Linux loader).
+#   Nothing else is mapped from outside the cache/store. libdispatch, libsystem_info, libsystem_configuration, libobjc, CF, Foundation, libxpc,
+#   libSystem pieces all come from the 27 cache (dyl4: isAlwaysOverridablePath()=false, kernel-layer list = libsystem_kernel only).
+#   Darling daemons in the container (not in guest 27 processes): launchd, shellspawn, memberd, opendirectoryd (no Apple 27 equivalent running yet).
+#   Retired from the load path: D5 Darling arm64e libdispatch (~/dispatch-a64e), my arm64e build of libdispatch-apple (macos26 override, 26.6): both unused.
+# 1. ESC-D6-1 (CF+0x11c488 brk #0xc473): not reproducible with Apple's libdispatch; it came with the Darling libdispatch on the load path.
+#    Slot 0x1e63d76f0 (the real address; D6 peeked 0x1e63d66f0 by mistake) is CF __DATA_DIRTY, = 0 at the crash (CF init had not run).
+# 2. The 3 PAC failures at pc=0x505007870 were in the disk-loaded Darling libdispatch; gone (log empty) with the cache libdispatch.
+# 3. New real bug fixed: dyl4 LibSystemHelpers vtable: 27 libdyld inserts callInitializer (slot 25, blraaz x6) before os_unfair_recursive_lock_trylock;
+#    dyl4's couldDlopenLock hit callInitializer -> PAC failure + SIGSEGV pc=0. Added the slot (libdyld/LibSystemHelpers.h, #if DARLING).
+# 4. ds-exec: BRK imm is 16 bits -> "trap side table full (65536 entries)" in plutil -p. TrapTable overflow entries now use index 0xFFFF and are found by pc
+#    (new unit test exec_trap_table_overflow_is_found_by_pc; daysetta_tests 49/49).
+$ echo.s1 hi                      -> rc=0  00000000: 6869 0a   hi.
+$ plutil.s1 -help (27 store, arm64e 0x80000002) -> rc=0, full help text, 67 s (dyl4 JIT-loads Foundation deps; every lowered blraa traps)
+$ plutil.s1 -p t.plist            -> prints "{" then crashes in Apple libdispatch: "BUG IN LIBDISPATCH: Missing Kevent WORKQ support" (ESC-D7-1.md)
+$ probe (dlopen AppKit, NSApplicationLoad) -> same libdispatch crash, ESC-D7-1.md
+# Regression after D7 changes: echo.s2/echo-fat/echo.s1 hi, uname, bash, /bin/echo: see below
+$ darling shell echo.s2 hi
+00000000: 6869 0a                                  hi.
+$ darling shell echo-fat hi
+00000000: 6869 0a                                  hi.
+Darwin labexp 26.2.0 Darwin Kernel Version 26.2.0 arm64
+42
+hello
+49/49 tests passed
