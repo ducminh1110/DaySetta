@@ -202,6 +202,11 @@ Status: not started. The first deliverables of the third-party phase, before any
 2. `.pkg`: Installer.app and the PackageKit stack (installd, system_installd, pre/postinstall scripts, receipts in /var/db/receipts).
 3. Then app-by-app work (Office, Chrome, VS Code, Discord, ...). Very special-purpose apps may be skipped.
 
+## 8b. Final humanize pass (owner order, 2026-11-08; when the app is close to done)
+
+One full cleanup pass over every repo we own (~/daysetta, our Darling commits, dyl4, the windowserver), behaviour-preserving and test-gated:
+`/deslop repo` (clean-code-skill) slice by slice, a code-humanizer scan with fixes, and `desloppify scan` + `next` per project until the strict score stops improving. During development every agent already writes under the mandatory clean-code + code-humanizer Guard rules (~/.config/opencode/AGENTS.md).
+
 ## 9. North Star (not started)
 
 Status: `PLANNED`, no work done, no commitments, no claims. Vision in the user's words:
