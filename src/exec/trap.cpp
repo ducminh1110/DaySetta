@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "trap.hpp"
 
 #include <signal.h>
@@ -168,6 +169,27 @@ uint64_t pointer_check(const CpuState& c, uint64_t result, uint64_t base, bool c
 
 }  // namespace
 
+namespace {
+struct PlainRange { std::atomic<uint64_t> start{0}, end{0}; };
+constexpr int kPlainMax = 64;
+PlainRange g_plain[kPlainMax];
+std::atomic<int> g_plain_n{0};
+}  // namespace
+
+void plain_range_add(uint64_t start, uint64_t size) {
+    const int i = g_plain_n.fetch_add(1);
+    if (i >= kPlainMax) { g_plain_n.store(kPlainMax); return; }
+    g_plain[i].start.store(start);
+    g_plain[i].end.store(start + size);
+}
+
+bool plain_range_contains(uint64_t a) {
+    const int n = std::min(g_plain_n.load(), kPlainMax);
+    for (int i = 0; i < n; ++i)
+        if (a >= g_plain[i].start.load() && a < g_plain[i].end.load()) return true;
+    return false;
+}
+
 EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats) {
     EmuOutcome out;
     stats.by_op[static_cast<int>(in.op)].fetch_add(1, std::memory_order_relaxed);
@@ -196,6 +218,13 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
                 if (spin && n.fetch_add(1, std::memory_order_relaxed) % 200000 == 199999)
                     fprintf(stderr, "ds-exec: br-auth spin sample at pc=0x%llx -> 0x%llx lr=0x%llx\n", (unsigned long long)c.pc,
                             (unsigned long long)r.value, (unsigned long long)c.x[30]);
+            }
+            if (!r.ok) {
+                const uint64_t raw = c.get(in.rn), bare = pac.strip(raw);
+                if (raw == bare && plain_range_contains(bare)) {  // cross-ABI rule: unsigned pointer into a plain-arm64 image
+                    c.pc = bare;
+                    return out;
+                }
             }
             c.pc = r.value;
             if (!r.ok) {
