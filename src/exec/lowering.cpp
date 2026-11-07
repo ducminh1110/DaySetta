@@ -136,7 +136,80 @@ bool decode_ldraa(uint32_t w, Insn& o) {
     o.rd = bits(w, 4, 0);
     return true;
 }
-}  // namespace
+
+// FP16 (FEAT_FP16) scalar ops on H registers.  The host is ARMv8.0 (no FP16 hardware), so
+// these are lowered to BRK slots or inline ARMv8.0 sequences built from FCVT between half
+// and single/double (ARMv8.0 baseline) plus single/double arithmetic.  Register operand
+// fields are always the SIMD layout (rm=[20:16], rn=[9:5], rd=[4:0]).  Mask/value pairs
+// below were derived by assembling operand grids with llvm-mc (-mattr=+fullfp16) and
+// diffing the operand fields across the grid; they are cross-checked by the
+// exec_fp16_decode test (assemble-vs-decode over random operands).  Op kinds go in
+// Insn::hk (Fp16Kind).
+bool decode_fp16(uint32_t w, Insn& o) {
+    struct Pat { uint32_t mask, value; Fp16Kind hk; };
+    static const Pat pats[] = {
+        {0xFFFFFFE0, 0x1EEE1000, Fp16Kind::FmovImm},                  // fmov hd, #imm8
+        {0xFFFFFC00, 0x1EE04000, Fp16Kind::FmovRegH},                 // fmov hd, hn
+        {0xFFFFFC00, 0x1EE70000, Fp16Kind::FmovWtoH},                 // fmov hd, wn
+        {0xFFFFFC00, 0x1EE60000, Fp16Kind::FmovHtoW},                 // fmov wd, hn
+        {0xFFBFFC00, 0x1E23C000, Fp16Kind::FcvtToH},                  // fcvt hd, sn
+        {0xFFBFFC00, 0x1E63C000, Fp16Kind::FcvtToH},                  // fcvt hd, dn
+        {0xFFFF7C00, 0x1EE24000, Fp16Kind::FcvtFromH},                // fcvt sn, hn
+        {0xFFFF7C00, 0x1EE2C000, Fp16Kind::FcvtFromH},                // fcvt dn, hn
+        {0xFFE0FC00, 0x1EE02800, Fp16Kind::Fadd},
+        {0xFFE0FC00, 0x1EE03800, Fp16Kind::Fsub},
+        {0xFFE0FC00, 0x1EE00800, Fp16Kind::Fmul},
+        {0xFFE0FC00, 0x1EE01800, Fp16Kind::Fdiv},
+        {0xFFE08000, 0x1FC00000, Fp16Kind::Fmadd},
+        {0xFFE08000, 0x1FC08000, Fp16Kind::Fmsub},
+        {0xFFE08000, 0x1FE00000, Fp16Kind::Fnmadd},
+        {0xFFE08000, 0x1FE08000, Fp16Kind::Fnmsub},
+        {0xFFE00C00, 0x1EE00C00, Fp16Kind::Fcsel},
+        {0xFFE00C00, 0x1EE00400, Fp16Kind::Fccmp},
+        {0xFFFFFC00, 0x5E79D800, Fp16Kind::Scvtf},
+        {0xFFFFFC00, 0x7E79D800, Fp16Kind::Ucvtf},
+        {0xFFFFFC00, 0x1EE0C000, Fp16Kind::Fabs},
+        {0xFFFFFC00, 0x1EE14000, Fp16Kind::Fneg},
+        {0xFFE0FC00, 0x1EE06800, Fp16Kind::Fmaxnm},
+        {0xFFE0FC00, 0x1EE07800, Fp16Kind::Fminnm},
+    };
+    for (const auto& p : pats) {
+        if ((w & p.mask) != p.value) continue;
+        o.op = Op::Fp16;
+        o.hk = p.hk;
+        o.rd = bits(w, 4, 0);
+        o.rn = bits(w, 9, 5);
+        o.rm = bits(w, 20, 16);
+        switch (p.hk) {
+            case Fp16Kind::FmovImm: o.imm = int32_t(bits(w, 20, 13)); break;
+            case Fp16Kind::FcvtToH:
+            case Fp16Kind::FcvtFromH: o.size = bits(w, 23, 23) ? 1 : 2; break;  // 2=S, 1=D
+            case Fp16Kind::Fmadd:
+            case Fp16Kind::Fmsub:
+            case Fp16Kind::Fnmadd:
+            case Fp16Kind::Fnmsub: o.rs = bits(w, 14, 10); o.sub = bits(w, 15, 15); break;
+            case Fp16Kind::Fcsel: o.imm = int32_t(bits(w, 15, 12)); break;
+            case Fp16Kind::Fccmp: o.imm = int32_t(bits(w, 15, 12)); o.rs = bits(w, 3, 0); break;
+            case Fp16Kind::Fcmp:
+            case Fp16Kind::Fcmp0: o.mul = bits(w, 4, 4); break;  // signalling bit
+            default: break;
+        }
+        return true;
+    }
+    // FCMP/FCMPE (scalar, register and #0.0): reg = 0x1EE02000, #0.0 = 0x1EE02008
+    // (bit 3 differentiates; e-bit is bit 4; zero-form also has rm == 0).
+    if ((w & 0xFFE0FC00) == 0x1EE02000) {
+        o.op = Op::Fp16;
+        o.rd = bits(w, 4, 0);
+        o.rn = bits(w, 9, 5);
+        o.rm = bits(w, 20, 16);
+        o.mul = bits(w, 4, 4);
+        o.hk = bits(w, 3, 3) ? Fp16Kind::Fcmp0 : Fp16Kind::Fcmp;
+        return true;
+    }
+    return false;
+}
+}
 
 bool decode(uint32_t w, Insn& out) {
     Insn o;
@@ -228,6 +301,8 @@ bool decode(uint32_t w, Insn& out) {
         ok = true;
     } else if ((w & 0xFF200400) == 0xF8200400) {
         ok = decode_ldraa(w, o);
+    } else if (decode_fp16(w, o)) {
+        ok = true;
     } else {
         ok = decode_lse(w, o);
     }
@@ -290,9 +365,9 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
         const bool want = in.op == Op::Svc ? policy.svc
                           : in.op == Op::Mrs || in.op == Op::MrsTpidr || in.op == Op::Ldapur ? policy.sysreg
                           : in.op == Op::Cpa ? policy.pac
-                          : in.op == Op::Dot ? policy.simd
+                          : in.op == Op::Dot || in.op == Op::Fp16 ? policy.simd
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
-                                                                                       : policy.pac;
+                          : policy.pac;
         if (!want) continue;
         if (in.op == Op::PacStrip && policy.strip_mask) {
             const uint32_t w2 = encode_and_imm64(in.rd, policy.strip_mask);
