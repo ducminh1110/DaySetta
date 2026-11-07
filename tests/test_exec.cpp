@@ -388,6 +388,29 @@ DS_TEST(exec_emulate_combined_auth_branches) {
     DS_CHECK_EQ(cs.pc, 0x400000ull);  // access faults at the instruction
 }
 
+DS_TEST(exec_cross_abi_unsigned_pointer_into_plain_range) {
+    // arm64e code calling the plain-arm64 Darling shim through an unsigned pointer (libpthread pthread_once(fn) etc.)
+    const uint64_t plain = 0x0000bbbb00010000ull, other = 0x0000bbbb00090000ull;
+    plain_range_add(plain, 0x1000);
+    CpuState cs = fresh();
+    cs.x[12] = plain + 0x44;  // unsigned, inside the plain range: accepted
+    EmuOutcome o = run(0xd63f099f, cs);  // blraaz x12
+    DS_CHECK(o.status == Emu::Ok);
+    DS_CHECK_EQ(cs.pc, plain + 0x44);
+    cs = fresh();
+    cs.x[12] = other;  // unsigned, outside every plain range: still a fault
+    o = run(0xd63f099f, cs);
+    DS_CHECK(o.status == Emu::AuthFault);
+    cs = fresh();
+    cs.x[12] = tpac().sign(PacKey::IB, plain + 0x44, 0);  // signed with the wrong key: still a fault
+    o = run(0xd63f099f, cs);
+    DS_CHECK(o.status == Emu::AuthFault);
+    cs = fresh();
+    cs.x[12] = tpac().sign(PacKey::IA, plain + 0x44, 0);  // correctly signed: Ok as before
+    o = run(0xd63f099f, cs);
+    DS_CHECK(o.status == Emu::Ok && cs.pc == plain + 0x44);
+}
+
 DS_TEST(exec_emulate_pauth_lr) {
     // encodings from llvm-mc --mattr=+pauth-lr; label 0x288 bytes back (echo slice: pacibsppc at 0x4f0, retabsppc at 0x778)
     const uint32_t retabsppc = 0x5520145f;
