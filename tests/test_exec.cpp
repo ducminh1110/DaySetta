@@ -18,6 +18,7 @@
 #include "exec/lowering.hpp"
 #include "exec/pac.hpp"
 #include "exec/trap.hpp"
+#include "exec/trampoline.hpp"
 #include "test.hpp"
 
 using namespace ds::exec;
@@ -730,6 +731,24 @@ DS_TEST(exec_trampolines_match_trap_path) {
     flush_icache(callee.mem, callee.mem + 2);
     const uint64_t signed_callee = tpac().sign(PacKey::IA, reinterpret_cast<uint64_t>(callee.mem), 0);
     both({0xa9bf7bfd, 0xd63f081f, 0xa8c17bfd, 0xd65f03c0}, [&](auto f) { return f(signed_callee, 0, 0); }, "blraaz", true);
+    // authentication failure falls back to the exact emulation (poisoned result identical to the trap path)
+    both({0xdac133e0, 0xd65f03c0}, [&](auto f) { return f(tpac().sign(PacKey::IA, p, 0) ^ (1ull << 50), 0, 0); }, "autiza fail", true);
+    both({0xdac11020, 0xd65f03c0}, [&](auto f) { return f(tpac().sign(PacKey::IA, p, 5), 6, 0); }, "autia x0,x1 wrong modifier", true);
+    // modifier register forms: pacda/autda x0, x1
+    both({0xdac10c20, 0xdac11c20, 0xd65f03c0}, [&](auto f) { return f(p, 0x77, 0); }, "pacdb/autdb x0,x1", true);
+    DS_CHECK(trampoline_stats().inlined > 0);
+    // LSE atomics inline: casalb, ldsetal x, swpal w, ldclral h, ldeoral x (value in w0/x0 after, memory checked)
+    // casalb w1,w2,[x0]; mov w0,w1 (hit and miss), casal x1,x2,[x0]
+    both({0x08e1fc02, 0x2a0103e0, 0xd65f03c0}, [&](auto f) { static uint8_t v; v = 5; unsigned long r = f(reinterpret_cast<unsigned long>(&v), 5, 9); r = r * 1000 + v; r = r * 1000 + f(reinterpret_cast<unsigned long>(&v), 5, 1) ; return r * 1000 + v; }, "casalb", true);
+    both({0xc8e1fc02, 0xaa0103e0, 0xd65f03c0}, [&](auto f) { static uint64_t v; v = 0x1122334455ull; unsigned long r = f(reinterpret_cast<unsigned long>(&v), 0x1122334455ull, 7); return r ^ v; }, "casal x", true);
+    // ldsetal x1,x2,[x0]; mov x0,x2; ret
+    both({0xf8e13002, 0xaa0203e0, 0xd65f03c0}, [&](auto f) { static uint64_t v; v = 0x0f; unsigned long r = f(reinterpret_cast<unsigned long>(&v), 0xf0, 0); return r * 1000 + v; }, "ldsetal", true);
+    // swpal w1,w2,[x0]; mov w0,w2; ret
+    both({0xb8e18002, 0x2a0203e0, 0xd65f03c0}, [&](auto f) { static uint32_t v; v = 7; unsigned long r = f(reinterpret_cast<unsigned long>(&v), 99, 0); return r * 1000 + v; }, "swpal", true);
+    // ldclral x1,x2,[x0]
+    both({0xf8e11002, 0xaa0203e0, 0xd65f03c0}, [&](auto f) { static uint64_t v; v = 0xff; unsigned long r = f(reinterpret_cast<unsigned long>(&v), 0x0f, 0); return r * 1000 + v; }, "ldclral", true);
+    // ldeoral w1,w2,[x0]
+    both({0xb8e12002, 0x2a0203e0, 0xd65f03c0}, [&](auto f) { static uint32_t v; v = 0xaa; unsigned long r = f(reinterpret_cast<unsigned long>(&v), 0xff, 0); return r * 1000 + v; }, "ldeoral", true);
     // vector registers survive the host handler: fmov d0,x0; paciza x1; fmov x0,d0; ret
     both({0x9e670000, 0xdac123e1, 0x9e660000, 0xd65f03c0}, [&](auto f) { return f(0x1122334455667788ul, p, 0); }, "vector regs", true);
     // cas w1,w2,[x0]; mov w0,w1; ret
