@@ -209,8 +209,51 @@ bool CacheMap::apply_slide_pages(const std::vector<uint8_t>& buf, uint64_t map_a
     return true;
 }
 
+// Fault-time slide of the 16 KB page containing `addr` in a lazily slid mapping.  True when the page is (now) usable.
+bool CacheMap::lazy_slide(uint64_t addr) {
+    auto it = std::upper_bound(lazy_.begin(), lazy_.end(), addr, [](uint64_t a, const LazyMap& m) { return a < m.addr; });
+    if (it == lazy_.begin()) return false;
+    --it;
+    if (addr >= it->addr + it->size) return false;
+    const uint32_t pg = uint32_t((addr - it->addr) / it->page_size);
+    if (pg >= it->pages) return false;
+    if (it->done[pg].load(std::memory_order_acquire)) return true;
+    std::lock_guard<std::mutex> lk(lazy_mu_);
+    if (it->done[pg].load(std::memory_order_acquire)) return true;
+    void* page = reinterpret_cast<void*>(it->addr + uint64_t(pg) * it->page_size);
+    if (mprotect(page, it->page_size, PROT_READ | PROT_WRITE) != 0) return false;
+    std::string err;
+    uint64_t ns = 0, nr = 0;
+    if (!apply_slide_pages(it->buf, it->addr, *pac_, pg, pg + 1, &err, &ns, &nr)) {
+        std::fprintf(stderr, "ds-exec: lazy slide failed: %s\n", err.c_str());
+        return false;
+    }
+    stats_.signed_ptrs += ns;
+    stats_.rebased += nr;
+    if (mprotect(page, it->page_size, it->final_prot) != 0) return false;
+    it->done[pg].store(1, std::memory_order_release);
+    ++lazy_slid_;
+    return true;
+}
+
 // Slide every pending mapping, spread over the host's cores (the cache has ~30M pointers; each page is independent).
 bool CacheMap::slide_pending(std::vector<PendingSlide>& pending, const Pac& pac, std::string* err) {
+    // Lazy mappings stay PROT_NONE: a first touch faults into lazy_slide(), which slides just that 16 KB page (cold start and
+    // short commands never pay for the ~30M pointers of the whole cache).
+    pac_ = &pac;
+    for (size_t i = pending.size(); i-- > 0;)
+        if (pending[i].lazy) {
+            LazyMap lm;
+            lm.addr = pending[i].addr; lm.size = pending[i].size; lm.final_prot = pending[i].final_prot; lm.pages = pending[i].pages;
+            lm.buf = std::move(pending[i].buf);
+            SlideInfo5 si;
+            std::memcpy(&si, lm.buf.data(), sizeof si);
+            lm.page_size = si.page_size;
+            lm.done.reset(new std::atomic<uint8_t>[lm.pages]());
+            lazy_.push_back(std::move(lm));
+            pending.erase(pending.begin() + i);
+        }
+    std::sort(lazy_.begin(), lazy_.end(), [](const LazyMap& a, const LazyMap& b) { return a.addr < b.addr; });
     struct Task { size_t idx; uint32_t pg0, pg1; };
     std::vector<Task> tasks;
     constexpr uint32_t kChunkPages = 512;
@@ -297,7 +340,10 @@ bool CacheMap::map(const std::string& main_path, const Pac& pac, std::string* er
             const bool slid = m.slideInfoFileSize != 0;
             const int final_prot = exec ? PROT_READ : to_prot(m.initProt);  // exec pages stay unmapped-for-exec until lowered
             void* want = reinterpret_cast<void*>(m.address);
-            void* got = mmap(want, m.size, slid ? (PROT_READ | PROT_WRITE) : final_prot,
+            // Lazy sliding is opt-in (DS_EXEC_LAZY_SLIDE=1): the guest's own mprotect() of cache data (dyld makes DATA_CONST writable) would make
+            // PROT_NONE pages readable without a fault, handing out unslid pointers.  Needs a guest-mprotect hook before it can be default.
+            const bool lazy = slid && std::getenv("DS_EXEC_LAZY_SLIDE");
+            void* got = mmap(want, m.size, slid ? (lazy ? PROT_NONE : (PROT_READ | PROT_WRITE)) : final_prot,
                              MAP_PRIVATE | MAP_FIXED_NOREPLACE, fd, off_t(m.fileOffset));
             if (got == MAP_FAILED || got != want) {
                 if (got != MAP_FAILED) munmap(got, m.size);
@@ -316,6 +362,7 @@ bool CacheMap::map(const std::string& main_path, const Pac& pac, std::string* er
                 ps.addr = m.address;
                 ps.size = m.size;
                 ps.final_prot = final_prot;
+                ps.lazy = lazy;
                 ps.buf.resize(m.slideInfoFileSize);
                 if (pread(fd, ps.buf.data(), ps.buf.size(), off_t(m.slideInfoFileOffset)) != ssize_t(ps.buf.size())) {
                     close(fd);
