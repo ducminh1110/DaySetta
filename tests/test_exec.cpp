@@ -3,6 +3,7 @@
 // Encodings in kEnc were produced by `clang --target=aarch64-linux-gnu -march=armv8.5-a+pauth+lse`
 // + `llvm-objdump -d` (class VERIFIED, not hand-derived).  Darwin ENOSYS = 78:
 // /home/ubuntu/darling/src/external/xnu/bsd/sys/errno.h:211.
+#include <memory>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
@@ -701,7 +702,20 @@ DS_TEST(exec_trap_table_rejects_foreign_brk) {
     DS_CHECK(idx >= 0);
     DS_CHECK(trap_table().find(uint32_t(idx), pc) != nullptr);
     DS_CHECK(trap_table().find(uint32_t(idx), pc + 4) == nullptr);
-    DS_CHECK(trap_table().find(0xFFFF, pc) == nullptr);
+    DS_CHECK(trap_table().find(0xFFFE, pc) == nullptr);
+}
+
+DS_TEST(exec_trap_table_overflow_is_found_by_pc) {
+    // BRK has 16 bits: past kMax entries the reserved index 0xFFFF is used and the entry is found by pc
+    auto t = std::make_unique<TrapTable>();
+    for (uint32_t i = 0; i < TrapTable::kMax; ++i) DS_CHECK(t->add(0x1000 + 4ull * i, 0x10000000u + i) == int64_t(i));
+    const int64_t a = t->add(0x900000, 0xd71f0830u), b = t->add(0x900004, 0xd63f0830u);
+    DS_CHECK(a == TrapTable::kOverflowIdx && b == TrapTable::kOverflowIdx);
+    const TrapEntry* ea = t->find(0xFFFF, 0x900000);
+    const TrapEntry* eb = t->find(0xFFFF, 0x900004);
+    DS_CHECK(ea && ea->word == 0xd71f0830u && eb && eb->word == 0xd63f0830u);
+    DS_CHECK(t->find(0xFFFF, 0x900008) == nullptr);
+    DS_CHECK(t->find(7, 0x1000 + 4 * 7) != nullptr);
 }
 
 DS_TEST(exec_probe_genuine_apple_functions) {
