@@ -49,6 +49,8 @@ struct TrapStats {
     std::atomic<uint64_t> by_op[static_cast<int>(Op::kCount)] = {};
     std::atomic<uint64_t> by_rmw[static_cast<int>(Rmw::kCount)] = {};
     std::atomic<uint64_t> auth_fail{0};
+    std::atomic<uint64_t> brk_traps{0};   // SIGTRAP round trips (the slow path)
+    std::atomic<uint64_t> tramp_calls{0}; // user-space trampoline executions (the fast path)
     std::atomic<uint64_t> lazy_pages{0};
     uint64_t total() const {
         uint64_t t = 0;

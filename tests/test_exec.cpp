@@ -620,11 +620,11 @@ struct ExecBuf {
     ~ExecBuf() { munmap(mem, 4096); }
     // copy words, lower them, flush; returns function pointer
     template <typename F>
-    F load(std::vector<uint32_t> words, LowerCounts* counts = nullptr) {
+    F load(std::vector<uint32_t> words, LowerCounts* counts = nullptr, const LowerPolicy& pol = LowerPolicy{}) {
         std::memcpy(mem, words.data(), words.size() * 4);
         LowerCounts c;
         std::string err;
-        if (!lower_range(mem, mem + words.size(), LowerPolicy{}, c, &err)) throw ds::test::Failure(err);
+        if (!lower_range(mem, mem + words.size(), pol, c, &err)) throw ds::test::Failure(err);
         flush_icache(mem, mem + words.size());
         if (counts) *counts = c;
         return reinterpret_cast<F>(mem);
@@ -688,6 +688,56 @@ DS_TEST(exec_live_lowered_code_traps) {
         DS_CHECK_EQ(f(&v, 5, 1), 9u);
         DS_CHECK_EQ(v, 9u);
     }
+}
+
+DS_TEST(exec_trampolines_match_trap_path) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_trampolines_match_trap_path: needs an aarch64 host\n");
+    return;
+#endif
+    live_runtime();
+    LowerPolicy fast;
+    fast.trampolines = true;
+    fast.strip_mask = ~tpac().field_mask();
+    const uint64_t p = 0x0000aaaa00007000ull;
+    auto both = [&](std::vector<uint32_t> words, auto call, const char* what, bool expect_branch) {
+        ExecBuf slow, quick;
+        LowerCounts cs, cq;
+        using F = unsigned long (*)(unsigned long, unsigned long, unsigned long);
+        F fs = slow.load<F>(words, &cs);
+        F fq = quick.load<F>(words, &cq, fast);
+        unsigned long a = call(fs), b = call(fq);
+        if (a != b) throw ds::test::Failure(std::string("trampoline result differs from trap path: ") + what);
+        if (expect_branch) {
+            bool any = false;
+            for (size_t i = 0; i < words.size(); ++i) any |= (quick.mem[i] >> 26) == 5u && quick.mem[i] != words[i];
+            DS_CHECK(any);
+            DS_CHECK(cq.trampolined + cq.inlined_strip > 0);
+        }
+    };
+    // paciza x0; autiza x0; ret  (round trip)
+    both({0xdac123e0, 0xdac133e0, 0xd65f03c0}, [&](auto f) { return f(p, 0, 0); }, "pac/aut", true);
+    // pacia x0, x1; ret  (signature depends on the modifier register)
+    both({0xdac10020, 0xd65f03c0}, [&](auto f) { return f(p, 0x1234, 0); }, "pacia x0,x1", true);
+    // paciza x0; xpaci x0; ret (inline strip)
+    both({0xdac123e0, 0xdac143e0, 0xd65f03c0}, [&](auto f) { return f(p, 0, 0); }, "xpaci", true);
+    // pacibsp; mov x0,#9; retab (sp modifier, return through the trampoline)
+    both({0xd503237f, 0xd2800120, 0xd65f0fff}, [&](auto f) { return f(0, 0, 0); }, "pacibsp/retab", true);
+    // blraaz x0 into a callee returning 77
+    ExecBuf callee;
+    callee.mem[0] = 0xd28009a0;  // mov x0,#77
+    callee.mem[1] = 0xd65f03c0;  // ret
+    flush_icache(callee.mem, callee.mem + 2);
+    const uint64_t signed_callee = tpac().sign(PacKey::IA, reinterpret_cast<uint64_t>(callee.mem), 0);
+    both({0xa9bf7bfd, 0xd63f081f, 0xa8c17bfd, 0xd65f03c0}, [&](auto f) { return f(signed_callee, 0, 0); }, "blraaz", true);
+    // vector registers survive the host handler: fmov d0,x0; paciza x1; fmov x0,d0; ret
+    both({0x9e670000, 0xdac123e1, 0x9e660000, 0xd65f03c0}, [&](auto f) { return f(0x1122334455667788ul, p, 0); }, "vector regs", true);
+    // cas w1,w2,[x0]; mov w0,w1; ret
+    both({0x88a17c02, 0x2a0103e0, 0xd65f03c0},
+         [&](auto f) { static uint32_t v; v = 5; unsigned long r = f(reinterpret_cast<unsigned long>(&v), 5, 9); return r * 100 + v; }, "cas", true);
+    // ldaddal x1,x2,[x0]; mov x0,x2; ret
+    both({0xf8e10002, 0xaa0203e0, 0xd65f03c0},
+         [&](auto f) { static uint64_t v; v = 40; unsigned long r = f(reinterpret_cast<unsigned long>(&v), 2, 0); return r * 1000 + v; }, "ldaddal", true);
 }
 
 DS_TEST(exec_ldadd_four_thread_contention) {

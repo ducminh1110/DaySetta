@@ -84,6 +84,10 @@ private:
     void index_images();
 
     uint64_t base_ = 0;
+    struct PendingSlide { uint64_t addr = 0, size = 0; int final_prot = 0; uint32_t pages = 0; std::vector<uint8_t> buf; };
+    bool apply_slide_pages(const std::vector<uint8_t>& buf, uint64_t map_addr, const Pac& pac, uint32_t pg0, uint32_t pg1, std::string* err,
+                           uint64_t* signed_out, uint64_t* rebased_out);
+    bool slide_pending(std::vector<PendingSlide>& pending, const Pac& pac, std::string* err);
     std::vector<Mapping> maps_;
     std::vector<Img> images_;                       // sorted by address
     std::vector<CodeRange> code_;                   // sorted, merged

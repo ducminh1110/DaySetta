@@ -1,5 +1,6 @@
 #include <unordered_map>
 #include "lowering.hpp"
+#include "trampoline.hpp"
 
 namespace ds::exec {
 
@@ -281,6 +282,30 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
                                                                                        : policy.pac;
         if (!want) continue;
+        if (in.op == Op::PacStrip && policy.strip_mask) {
+            const uint32_t w2 = encode_and_imm64(in.rd, policy.strip_mask);
+            if (w2) {
+                *p = w2;
+                ++counts.patched[static_cast<int>(in.op)];
+                ++counts.inlined_strip;
+                continue;
+            }
+        }
+        if (in.op == Op::MrsTpidr && policy.trampolines && in.rd != 31) {  // Darwin's cluster hint reads 0 here: mov xd, #0 in place
+            *p = 0xD2800000u | in.rd;
+            ++counts.patched[static_cast<int>(in.op)];
+            ++counts.inlined_strip;
+            continue;
+        }
+        if (policy.trampolines && trampoline_wants(in)) {
+            const uint32_t b = trampoline_make(p, w, in, policy.island_skip);
+            if (b) {
+                *p = b;
+                ++counts.patched[static_cast<int>(in.op)];
+                ++counts.trampolined;
+                continue;
+            }
+        }
         const int64_t idx = trap_table().add(reinterpret_cast<uint64_t>(p), w);
         if (idx < 0) {
             if (err) *err = "ds-exec: trap side table full (65536 distinct words)";
