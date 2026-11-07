@@ -1,0 +1,37 @@
+# bench 2026-11-07T02:31:06+00:00 host=aarch64 cpus=8
+# commit daysetta=9091207 darling=e76138303 dyld=84a21b8
+## cold (container restarted, page cache dropped)
+cold 27 echo                       wall=  0.00s rc=0
+    ds-exec: cache map+slide 14.472 s (signed=11531881 rebased=18920839)
+    ds-exec: emulated: trampoline=82 sigtrap=0 | stubs=18038 islands=7 no_island=0 | auth_fail=0 lazy_pages=236
+## warm
+27 echo #1                         wall=  0.00s rc=0
+    ds-exec: cache map+slide 0.183 s (signed=11531881 rebased=18920839)
+    ds-exec: emulated: trampoline=82 sigtrap=0 | stubs=18038 islands=7 no_island=0 | auth_fail=0 lazy_pages=236
+27 echo #2                         wall=  0.00s rc=0
+    ds-exec: cache map+slide 0.180 s (signed=11531881 rebased=18920839)
+    ds-exec: emulated: trampoline=82 sigtrap=0 | stubs=18038 islands=7 no_island=0 | auth_fail=0 lazy_pages=236
+27 echo #3                         wall=  0.00s rc=0
+    ds-exec: cache map+slide 0.184 s (signed=11531881 rebased=18920839)
+    ds-exec: emulated: trampoline=82 sigtrap=0 | stubs=18038 islands=7 no_island=0 | auth_fail=0 lazy_pages=236
+27 plutil -help #1                 wall=  0.00s rc=0
+    ds-exec: cache map+slide 0.177 s (signed=11531881 rebased=18920839)
+    ds-exec: emulated: trampoline=5085 sigtrap=0 | stubs=53200 islands=9 no_island=0 | auth_fail=0 lazy_pages=744
+27 plutil -help #2                 wall=  0.00s rc=0
+    ds-exec: cache map+slide 0.180 s (signed=11531881 rebased=18920839)
+    ds-exec: emulated: trampoline=5085 sigtrap=0 | stubs=53200 islands=9 no_island=0 | auth_fail=0 lazy_pages=744
+27 plutil -help #3                 wall=  0.00s rc=0
+    ds-exec: cache map+slide 0.180 s (signed=11531881 rebased=18920839)
+    ds-exec: emulated: trampoline=5085 sigtrap=0 | stubs=53200 islands=9 no_island=0 | auth_fail=0 lazy_pages=744
+27 plutil -convert xml1 #1         wall=  0.00s rc=0
+    ds-exec: cache map+slide 0.180 s (signed=11531881 rebased=18920839)
+    ds-exec: emulated: trampoline=752 sigtrap=1 | stubs=58313 islands=11 no_island=256 | auth_fail=0 lazy_pages=881
+27 plutil -p (needs vouchers/cfprefsd) wall=  0.00s rc=133
+    ds-exec: cache map+slide 0.246 s (signed=11531881 rebased=18920839)
+micro: objc/CF/dispatch x1e6       wall=  0.00s rc=0
+    ds-exec: cache map+slide 0.179 s (signed=11531881 rebased=18920839)
+    ds-exec: emulated: trampoline=294 sigtrap=0 | stubs=41942 islands=9 no_island=0 | auth_fail=0 lazy_pages=571
+    | objc_msgSend x1000000: 0.024 s (24 ns/op)
+    | CFString length+retain+release x1000000: 0.244 s (244 ns/op) len=11000000
+    | CFStringAppend x100000: 0.037 s (374 ns/op) len=1100011
+    | dispatch_async x1000000: 1.307 s (1307 ns/op) done=1000000
