@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "trap.hpp"
+#include "trampoline.hpp"
 
 #include <signal.h>
 #include <sys/mman.h>
@@ -389,6 +390,7 @@ namespace {
 
 TrapRuntime* g_rt = nullptr;
 
+
 void say(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
 void say(const char* fmt, ...) {
     char buf[512];
@@ -445,6 +447,7 @@ TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out, uint64_t tsd = 0) {
     load_state(cs, uc);
     cs.tpidrro = g_rt->tsd ? g_rt->tsd(g_rt->ctx) : tsd;
     const uint64_t x0_in = cs.x[0], pstate_in = cs.pstate;
+    g_rt->stats.brk_traps.fetch_add(1, std::memory_order_relaxed);
     const EmuOutcome o = emulate(in, cs, *g_rt->pac, g_rt->stats);
     switch (o.status) {
         case Emu::Ok:
@@ -492,6 +495,47 @@ TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out, uint64_t tsd = 0) {
             die_default(SIGTRAP);
             return TrapRes::Done;
     }
+}
+
+// Trampoline entry (see trampoline.hpp): same emulation as the SIGTRAP path, on a frame built by the island's common block.
+void tramp_entry(uint64_t* f, const SiteInfo* si) {
+    CpuState cs;
+    for (int i = 0; i < 31; ++i) cs.x[i] = f[kFrameX + i];
+    cs.sp = f[kFrameSp];
+    cs.pc = si->pc;
+    cs.pstate = f[kFrameNzcv];
+    cs.tpidrro = ((si->in.op == Op::Mrs || si->in.op == Op::MrsTpidr) && g_rt->tsd) ? g_rt->tsd(g_rt->ctx) : 0;
+    g_rt->stats.tramp_calls.fetch_add(1, std::memory_order_relaxed);
+    const EmuOutcome o = emulate(si->in, cs, *g_rt->pac, g_rt->stats);
+    switch (o.status) {
+        case Emu::Ok:
+            break;
+        case Emu::AuthFault:
+            say("ds-exec: PAC authentication failure at pc=0x%llx (%s) word=0x%08x: poisoned 0x%llx\n",
+                (unsigned long long)si->pc, where(si->pc).c_str(), si->word, (unsigned long long)o.fault_addr);
+            if (getenv("MLDR_DSEXEC_REGS"))
+                say("ds-exec:   lr=0x%llx x0=0x%llx x1=0x%llx x6=0x%llx x8=0x%llx x16=0x%llx x17=0x%llx\n", (unsigned long long)cs.x[30],
+                    (unsigned long long)cs.x[0], (unsigned long long)cs.x[1], (unsigned long long)cs.x[6],
+                    (unsigned long long)cs.x[8], (unsigned long long)cs.x[16], (unsigned long long)cs.x[17]);
+            if (si->in.op == Op::LdrAuth) {  // access through the poisoned address faults like hardware
+                die_default(SIGSEGV);
+                raise(SIGSEGV);
+            }
+            break;  // branch to the poisoned pc: the fetch faults, reported by on_segv
+        case Emu::Misaligned:
+            say("ds-exec: misaligned atomic at pc=0x%llx (%s) word=0x%08x addr=0x%llx\n", (unsigned long long)si->pc,
+                where(si->pc).c_str(), si->word, (unsigned long long)o.fault_addr);
+            die_default(SIGBUS);
+            raise(SIGBUS);
+            break;
+        default:
+            say("ds-exec: cannot emulate word 0x%08x at pc=0x%llx\n", si->word, (unsigned long long)si->pc);
+            die_default(SIGTRAP);
+            raise(SIGTRAP);
+            break;
+    }
+    for (int i = 0; i < 31; ++i) f[kFrameX + i] = cs.x[i];
+    f[kFrameNext] = cs.pc;
 }
 
 void on_trap(int sig, siginfo_t*, void* vuc) {
@@ -606,6 +650,7 @@ void thread_init() {
 
 bool install_trap_handlers(TrapRuntime* rt) {
     g_rt = rt;
+    trampoline_set_handler(&tramp_entry);
     thread_init();
     struct { int sig; void (*fn)(int, siginfo_t*, void*); } hs[] = {
         {SIGTRAP, on_trap}, {SIGILL, on_ill}, {SIGSEGV, on_segv}};

@@ -1,3 +1,5 @@
+#include <thread>
+#include <atomic>
 #include "cache_map.hpp"
 
 #include <fcntl.h>
@@ -168,8 +170,17 @@ bool CacheMap::apply_slide(int fd, uint64_t map_addr, uint64_t map_size, uint64_
     if (si.page_size == 0 || sizeof si + 2ull * si.page_starts_count > slide_size ||
         uint64_t(si.page_starts_count) * si.page_size > map_size)
         return fail(err, "slide info v5 header inconsistent with mapping");
+    return apply_slide_pages(buf, map_addr, pac, 0, si.page_starts_count, err, nullptr, nullptr);
+}
+
+// Slide pages [pg0, pg1) of a mapping whose slide info is `buf` (header already validated).  Thread-safe: pages are disjoint.
+bool CacheMap::apply_slide_pages(const std::vector<uint8_t>& buf, uint64_t map_addr, const Pac& pac, uint32_t pg0, uint32_t pg1,
+                                 std::string* err, uint64_t* signed_out, uint64_t* rebased_out) {
+    SlideInfo5 si;
+    std::memcpy(&si, buf.data(), sizeof si);
     const uint16_t* starts = reinterpret_cast<const uint16_t*>(buf.data() + sizeof si);
-    for (uint32_t pg = 0; pg < si.page_starts_count; ++pg) {
+    uint64_t nsigned = 0, nrebased = 0;
+    for (uint32_t pg = pg0; pg < pg1; ++pg) {
         uint64_t off = starts[pg];
         if (off == kPageNoRebase) continue;
         const uint64_t page_addr = map_addr + uint64_t(pg) * si.page_size;
@@ -184,15 +195,59 @@ bool CacheMap::apply_slide(int fd, uint64_t map_addr, uint64_t map_size, uint64_
                 const bool addr_div = (raw >> 50) & 1, key_data = (raw >> 51) & 1;
                 const uint64_t mod = addr_div ? Pac::blend(page_addr + off, div) : div;
                 *loc = pac.sign(key_data ? PacKey::DA : PacKey::IA, target, mod);
-                ++stats_.signed_ptrs;
+                ++nsigned;
             } else {
                 *loc = target | (((raw >> 34) & 0xFF) << 56);
-                ++stats_.rebased;
+                ++nrebased;
             }
             if (next == 0) break;
             off += next;
         }
     }
+    if (signed_out) *signed_out += nsigned; else stats_.signed_ptrs += nsigned;
+    if (rebased_out) *rebased_out += nrebased; else stats_.rebased += nrebased;
+    return true;
+}
+
+// Slide every pending mapping, spread over the host's cores (the cache has ~30M pointers; each page is independent).
+bool CacheMap::slide_pending(std::vector<PendingSlide>& pending, const Pac& pac, std::string* err) {
+    struct Task { size_t idx; uint32_t pg0, pg1; };
+    std::vector<Task> tasks;
+    constexpr uint32_t kChunkPages = 512;
+    for (size_t i = 0; i < pending.size(); ++i)
+        for (uint32_t pg = 0; pg < pending[i].pages; pg += kChunkPages)
+            tasks.push_back({i, pg, std::min<uint32_t>(pending[i].pages, pg + kChunkPages)});
+    std::atomic<size_t> next{0};
+    std::atomic<bool> failed{false};
+    std::mutex emu;
+    std::string first_err;
+    std::atomic<uint64_t> tot_signed{0}, tot_rebased{0};
+    auto worker = [&] {
+        uint64_t ns = 0, nr = 0;
+        for (;;) {
+            const size_t t = next.fetch_add(1);
+            if (t >= tasks.size() || failed.load()) break;
+            std::string e;
+            if (!apply_slide_pages(pending[tasks[t].idx].buf, pending[tasks[t].idx].addr, pac, tasks[t].pg0, tasks[t].pg1, &e, &ns, &nr)) {
+                std::lock_guard<std::mutex> lk(emu);
+                if (!failed.exchange(true)) first_err = e;
+            }
+        }
+        tot_signed += ns;
+        tot_rebased += nr;
+    };
+    unsigned n = std::thread::hardware_concurrency();
+    if (const char* e = std::getenv("DS_EXEC_SLIDE_THREADS")) n = unsigned(std::atoi(e));
+    n = std::max(1u, std::min(n, 16u));
+    std::vector<std::thread> ts;
+    for (unsigned i = 1; i < n; ++i) ts.emplace_back(worker);
+    worker();
+    for (auto& t : ts) t.join();
+    if (failed) return fail(err, first_err);
+    stats_.signed_ptrs += tot_signed;
+    stats_.rebased += tot_rebased;
+    for (auto& p : pending)
+        if (mprotect(reinterpret_cast<void*>(p.addr), p.size, p.final_prot) != 0) return fail(err, "mprotect after slide failed");
     return true;
 }
 
@@ -211,6 +266,7 @@ bool CacheMap::map(const std::string& main_path, const Pac& pac, std::string* er
         close(mfd);
         return fail(err, "subcache array read failed");
     }
+    std::vector<PendingSlide> pending;
     std::vector<std::string> files{main_path};
     for (auto& s : subs) files.push_back(main_path + std::string(s.fileSuffix, strnlen(s.fileSuffix, sizeof s.fileSuffix)));
     close(mfd);
@@ -256,18 +312,31 @@ bool CacheMap::map(const std::string& main_path, const Pac& pac, std::string* er
             ++stats_.mappings;
             stats_.mapped_bytes += m.size;
             if (slid) {
-                if (!apply_slide(fd, m.address, m.size, m.slideInfoFileOffset, m.slideInfoFileSize, pac, err)) {
+                PendingSlide ps;
+                ps.addr = m.address;
+                ps.size = m.size;
+                ps.final_prot = final_prot;
+                ps.buf.resize(m.slideInfoFileSize);
+                if (pread(fd, ps.buf.data(), ps.buf.size(), off_t(m.slideInfoFileOffset)) != ssize_t(ps.buf.size())) {
                     close(fd);
-                    return false;
+                    return fail(err, "slide info read failed");
                 }
-                if (mprotect(want, m.size, final_prot) != 0) {
+                SlideInfo5 si;
+                if (ps.buf.size() < sizeof si) { close(fd); return fail(err, "slide info too small"); }
+                std::memcpy(&si, ps.buf.data(), sizeof si);
+                if (si.version != 5) { close(fd); return fail(err, "unsupported slide info version " + std::to_string(si.version)); }
+                if (si.page_size == 0 || sizeof si + 2ull * si.page_starts_count > ps.buf.size() ||
+                    uint64_t(si.page_starts_count) * si.page_size > m.size) {
                     close(fd);
-                    return fail(err, "mprotect after slide failed");
+                    return fail(err, "slide info v5 header inconsistent with mapping");
                 }
+                ps.pages = si.page_starts_count;
+                pending.push_back(std::move(ps));
             }
         }
         close(fd);
     }
+    if (!slide_pending(pending, pac, err)) return false;
     if (hdr.imagesCount) {
         images_.reserve(hdr.imagesCount);
         for (uint32_t i = 0; i < hdr.imagesCount; ++i) {
