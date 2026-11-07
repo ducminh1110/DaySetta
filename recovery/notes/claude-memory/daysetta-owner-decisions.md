@@ -35,3 +35,4 @@ Owner decisions (2026-11-06):
 - 2026-11-07: libdispatch = Apple's from 27 cache (required, no Darling fallback); implement missing kernel features (workq/kevent workloops/QoS) in libsystem_kernel+darlingserver.
 - 2026-11-07 RULE: performance is a requirement — CLI ~1s warm, GUI first window in seconds, near-native steady state, no per-instruction kernel traps on hot paths (user-space trampolines), bench in ~/daysetta/tools/bench with results in artifacts/bench.
 - 2026-11-07 RULE: watch the 5-hour plan limit (get_usage). At ~95% tell running agents to wrap up (commit, handoff file, export) and respawn after reset.
+- 2026-11-07 Owner chose REAL Mach vouchers (bank/importance/pthpriority attr managers in darlingserver) over the old VOUCHER_USE_EMPTY_MACH_BASE_VOUCHER libdispatch_apple workaround. Being done as D9 by crouton-alpha; Sonnet takes over if it stalls.
