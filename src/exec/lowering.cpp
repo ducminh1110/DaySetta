@@ -274,7 +274,18 @@ bool decode_fp16(uint32_t w, Insn& o) {
             case Fp16Kind::Fmadd:
             case Fp16Kind::Fmsub:
             case Fp16Kind::Fnmadd:
-            case Fp16Kind::Fnmsub: o.rs = bits(w, 14, 10); o.sub = bits(w, 15, 15); break;
+            case Fp16Kind::Fnmsub:
+                // The 4-operand FP16 FMA with all four vector registers = h31 is the
+                // signature of embedded Apple data tables (e.g. the FSE literal-mask
+                // table in libcompression reads {2^n-1, 0}; 0x1fffffff = entry 29).
+                // ds-exec must never lower data words inside executable sections, and a
+                // legitimate compiler never emits h31 as all four operands of an FMA.
+                // Treat that exact shape as data words (not an instruction).
+                if (o.rd == 31 && o.rn == 31 && o.rm == 31 && (o.rs = bits(w, 14, 10)) == 31) {
+                    o.rs = bits(w, 14, 10);
+                    return false;
+                }
+                o.rs = bits(w, 14, 10); o.sub = bits(w, 15, 15); break;
             case Fp16Kind::Fcsel: o.imm = int32_t(bits(w, 15, 12)); break;
             case Fp16Kind::Fccmp: o.imm = int32_t(bits(w, 15, 12)); o.rs = bits(w, 3, 0); break;
             case Fp16Kind::Fcmp:
