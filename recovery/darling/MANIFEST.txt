@@ -1,20 +1,20 @@
-_super head=5aa675fa207095c298fd95ca70b9dad89b69a7f1 branch=daysetta/arm64 local_commits=14 
+_super head=28e69a4b19f63c175329b4a237e42075edb20d60 branch=daysetta/unified local_commits=16 
 src/external/AvailabilityVersions head=ea5d00a6fccbc57e7b01d3274efaf7cfb6d5dde2 branch=daysetta/recovered local_commits=1 
-src/external/IOKitUser head=2a91cc188424a71a6c80c1f536e6092a82d0afd5 branch=daysetta/arm64 local_commits=2 
-src/external/bootstrap_cmds head=ee3537315a887e99cebda42b8a767940b0cfeb9e branch=daysetta/arm64 local_commits=3 
+src/external/IOKitUser head=c24152521e6d395ab6bae0b0836914fe9ade4cf8 branch=daysetta/unified local_commits=3 
+src/external/bootstrap_cmds head=50e55e8b54ca39fd5318442051494324c14f669c branch=daysetta/unified local_commits=4 
 src/external/corecrypto head=875f1cd9e75b0029d872b88ce8a77da276c00c84 branch= local_commits=0 
-src/external/foundation head=ce9e41921e35df1348cd2a64b9fb88f6168fae18 branch=daysetta/arm64 local_commits=2 
-src/external/iokitd head=e0bf47f85288579f622ff79f7f8aa86ed0e8298a branch=daysetta/recovered local_commits=1 
-src/external/libc head=15985b056bf6360c7c147fadd939bda33cd2a2b9 branch=daysetta/arm64 local_commits=2 
-src/external/libcxx head=2b403ccf8f5e6a421a796fabcb68590dd940fdbf branch=daysetta/arm64 local_commits=5 excluded_import=c47677d3ba33bdabbfb07e75f531831579355a2d(Merge pull request #3 from darlinghq/fedora_41_fix)
+src/external/darlingserver head=5fcaec21ab4923b2a0656f8f89622f42cb0a2e16 branch=daysetta/unified local_commits=1 
+src/external/foundation head=2ea93ef2b52fd8e44b0b7f8c45f33b7e62d82b89 branch=daysetta/unified local_commits=3 
+src/external/iokitd head=c4adb50573641ad5c37b26294dbe545fc88ae74c branch=daysetta/unified local_commits=2 
+src/external/libc head=917ed447db02b55a960df75d73ec6487a8f46f8e branch=daysetta/unified local_commits=3 
+src/external/libcxx head=2b403ccf8f5e6a421a796fabcb68590dd940fdbf branch=daysetta/arm64 local_commits=5 
 src/external/libcxxabi head=c9c851718eb304a9aefa097aeaaf8c3bd1dff1bc branch= local_commits=0 excluded_import=c9c851718eb304a9aefa097aeaaf8c3bd1dff1bc(Upload README.md)
 src/external/libdispatch head=3d3b8f88c25ef5dda3558488ba9c1ee2b314e0dd branch= local_commits=1 
-src/external/libmalloc head=a3e54b7f474f1d6302f1827629dea8f84205f483 branch=daysetta/arm64 local_commits=2 
-src/external/libressl-2.2.9 head=c5e9edb9d82ccf5fde5d8ae32b162fec8fe11318 branch= local_commits=0 excluded_import=c5e9edb9d82ccf5fde5d8ae32b162fec8fe11318(Install libcrypto, libssl, and libtls)
-src/external/libressl-2.5.5 head=1f663b5bdc9082178717c080e4728fe3e7084de4 branch= local_commits=0 excluded_import=1f663b5bdc9082178717c080e4728fe3e7084de4(Install libcrypto, libssl, and libtls)
-src/external/libressl-2.6.5 head=30826df38d7c0f416158a94e0112c928188e0327 branch= local_commits=0 excluded_import=30826df38d7c0f416158a94e0112c928188e0327(Refactor CMakeList To Support Only Building 64bit)
-src/external/libressl-2.8.3 head=2a56b36b77a00573c53ccd8e6932eb136172c950 branch= local_commits=0 excluded_import=2a56b36b77a00573c53ccd8e6932eb136172c950(Install files to `/private/etc`, not `/etc`)
-src/external/metal head=f741e9708c9039b2ea4b23f8313eb2075c8893c5 branch=daysetta/metal local_commits=1 
-src/external/network_cmds head=372857b8768df75e4694b6871a46bf9bd87bdb16 branch=daysetta/recovered local_commits=1 
-src/external/syslog head=6be9628d2c1ae06d98c8cd746d19e88bd60a1230 branch=daysetta/recovered local_commits=1 
-src/external/xnu head=6d4c2478e64dc1775226f11b666dd45921ee144d branch=daysetta/arm64 local_commits=26 excluded_import=ac9718fb1af618d5ce8678d0dc6e8a58f252216f(xnu-12377.121.6)
+src/external/libkqueue head=90e8a2d9dffc8078b946a4b052722ff5b3320802 branch=daysetta/unified local_commits=1 
+src/external/libmalloc head=46231e12f594baf038e3ed662e9849cb5e8b4b84 branch=daysetta/unified local_commits=3 
+src/external/libsystem head=a347bad5113f2ae7d9701e1f0338a88727fa9f15 branch=daysetta/unified local_commits=1 
+src/external/libxpc head=8bddb88895030e1d0e31365cdb7603459a9cbaa8 branch=daysetta/unified local_commits=1 
+src/external/metal head=f741e9708c9039b2ea4b23f8313eb2075c8893c5 branch=daysetta/unified local_commits=1 
+src/external/network_cmds head=b4f241854e10ac466a40f939d5b3c611ed3b0861 branch=daysetta/unified local_commits=2 
+src/external/syslog head=72c3d8b1f3aaca3db14e6aba1dd0e8945c338457 branch=daysetta/unified local_commits=2 
+src/external/xnu head=b31abc2e5f8429a3a10d8c92e81d001f2124071d branch=daysetta/unified local_commits=28 

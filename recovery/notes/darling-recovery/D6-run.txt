@@ -1,0 +1,23 @@
+# D6 run transcript 2026-11-07 (unified build: daysetta/unified, aarch64 ARMv8.0 host)
+# Apple image provenance (owner rule: macOS 27 only)
+#  - shared cache: /home/ubuntu/macos-re/cache-arm64e/dyld_shared_cache_arm64e* (from UniversalMac_27.0.1_26A434_Restore.ipsw)
+#  - binaries: /home/ubuntu/macos-re/store-27/root/{bin/echo,usr/bin/plutil} (27 IPSW store), slices cut into ~/darltest (not committed)
+#  - NOT used: owner's ~/basesystem, 26.6 caches/apps, dl4.sh BaseSystem env, overlay_basesystem.
+#  - owner's libdispatch_apple "macos26" override (installed by cmake install at usr/lib/darling/macos26) was tried once (I built an arm64e copy),
+#    it is a 26.6-path override -> moved aside to usr/lib/darling/macos26.disabled-27rule and NOT on the load path. Echo below ran without it.
+#    libdispatch used: Darling-built arm64e fat (~/dispatch-a64e, D5 build) at /usr/lib/system; kernel layer = Darling libsystem_kernel.
+# Regression
+$ darling shell echo.s2 hi | xxd   -> 00000000: 6869 0a                                  hi.
+$ darling shell echo-fat hi | xxd  -> 00000000: 6869 0a                                  hi.
+$ darling shell echo.s1 hi | xxd   -> 00000000: 6869 0a                                  hi.
+$ darling shell uname -a           -> Darwin labexp 26.2.0 Darwin Kernel Version 26.2.0 arm64   (owner's EMULATED_RELEASE, was 20.6.0)
+$ darling shell bash -c 'echo $((6*7))' -> 42
+$ darling shell /bin/echo hello    -> hello
+$ daysetta_tests -> 48/48 tests passed
+# D5 resumed: genuine 27 echo on 27 cache via dyl4
+$ env DARLING_DYLINKER=/usr/lib/dyl4 DARLING_DS_CACHE=/home/ubuntu/macos-re/cache-arm64e/dyld_shared_cache_arm64e echo.s1 hi | xxd
+rc=0
+00000000: 6869 0a                                  hi.
+(stderr w/ MLDR_DSEXEC_LOG: 3x "ds-exec: PAC authentication failure at pc=0x505007870 word=0xd63f083f" in disk-loaded libdispatch, non-fatal)
+# plutil -help (27 store, slice arm64e 0x80000002): rc=133, see ESC-D6-1.md (CoreFoundation+0x11c488 brk #0xc473)
+# AppKit dlopen probe (NSApplicationLoad; ~/darltest/probe/probe.c, arm64e): rc=133, same site, ESC-D6-1.md
