@@ -783,6 +783,62 @@ DS_TEST(exec_trampolines_match_trap_path) {
          [&](auto f) { static uint64_t v; v = 40; unsigned long r = f(reinterpret_cast<unsigned long>(&v), 2, 0); return r * 1000 + v; }, "ldaddal", true);
 }
 
+DS_TEST(exec_dotprod_trap_and_trampoline) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_dotprod_trap_and_trampoline: needs an aarch64 host\n");
+    return;
+#endif
+    live_runtime();
+    // Encodings from llvm-mc -mattr=+dotprod.  Program: ldr q0..q2 from [x0]; <dot>; str q0,[x0]; ret
+    struct Case { uint32_t w; bool sgn, q; int lane, rd, rn, rm; };
+    const Case cases[] = {
+        {0x6e829420, false, true, -1, 0, 1, 2},   // udot v0.4s, v1.16b, v2.16b
+        {0x0e829420, true, false, -1, 0, 1, 2},   // sdot v0.2s, v1.8b, v2.8b
+        {0x6fa2e820, false, true, 3, 0, 1, 2},    // udot v0.4s, v1.16b, v2.4b[3]
+        {0x4fa2e020, true, true, 1, 0, 1, 2},     // sdot v0.4s, v1.16b, v2.4b[1]
+        {0x6e809400, false, true, -1, 0, 0, 0},   // udot v0.4s, v0.16b, v0.16b
+        {0x0f82e820, true, false, 2, 0, 1, 2},    // sdot v0.2s, v1.8b, v2.4b[2]
+    };
+    LowerPolicy fast;
+    fast.trampolines = true;
+    for (const Case& k : cases) {
+        Insn in;
+        DS_CHECK(decode(k.w, in) && in.op == Op::Dot && in.sgn == k.sgn && in.q == k.q && in.lane == k.lane &&
+                 in.rd == k.rd && in.rn == k.rn && in.rm == k.rm);
+        uint8_t init[48];
+        for (int i = 0; i < 48; ++i) init[i] = uint8_t(i * 37 + 200);
+        uint32_t ref[4];
+        {
+            uint8_t v[3][16];
+            std::memcpy(v, init, 48);
+            uint32_t d[4];
+            std::memcpy(d, v[k.rd], 16);
+            for (int e = 0; e < 4; ++e) {
+                if (e >= (k.q ? 4 : 2)) { d[e] = 0; continue; }
+                int32_t acc = 0;
+                for (int j = 0; j < 4; ++j) {
+                    const uint8_t a = v[k.rn][e * 4 + j], b = v[k.rm][(k.lane >= 0 ? k.lane : e) * 4 + j];
+                    acc += k.sgn ? int32_t(int8_t(a)) * int8_t(b) : int32_t(a) * b;
+                }
+                d[e] += uint32_t(acc);
+            }
+            std::memcpy(ref, d, 16);
+        }
+        for (int mode = 0; mode < 2; ++mode) {
+            ExecBuf b;
+            LowerCounts c;
+            auto f = mode ? b.load<void (*)(uint8_t*)>({0x3dc00000, 0x3dc00401, 0x3dc00802, k.w, 0x3d800000, 0xd65f03c0}, &c, fast)
+                          : b.load<void (*)(uint8_t*)>({0x3dc00000, 0x3dc00401, 0x3dc00802, k.w, 0x3d800000, 0xd65f03c0}, &c);
+            DS_CHECK_EQ(c.patched[int(Op::Dot)], 1ull);
+            uint8_t buf[48];
+            std::memcpy(buf, init, 48);
+            f(buf);
+            if (std::memcmp(buf, ref, 16) != 0)
+                throw ds::test::Failure(std::string("dot result mismatch, ") + (mode ? "trampoline" : "trap") + " path");
+        }
+    }
+}
+
 DS_TEST(exec_ldadd_four_thread_contention) {
 #if !defined(__aarch64__)
     std::fprintf(stderr, "SKIP exec_ldadd_four_thread_contention: needs an aarch64 host\n");

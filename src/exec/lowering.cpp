@@ -7,7 +7,7 @@ namespace ds::exec {
 const char* op_name(Op op) {
     static const char* names[] = {"none",    "pac-sign", "pac-auth", "pac-strip", "pacga", "br-auth",
                                   "ret-auth", "ldr-auth", "cas",      "casp",      "rmw",   "svc",
-                                  "mrs-tpidrro", "ldapur", "cpa", "mrs-tpidr"};
+                                  "mrs-tpidrro", "ldapur", "cpa", "mrs-tpidr", "dot"};
     return names[static_cast<int>(op)];
 }
 
@@ -215,6 +215,17 @@ bool decode(uint32_t w, Insn& out) {
         o.rn = bits(w, 9, 5);
         o.rd = bits(w, 4, 0);
         ok = true;
+    } else if ((w & 0x9FE0FC00) == 0x0E809400 || (w & 0x9FC0F400) == 0x0F80E000) {
+        // UDOT/SDOT Vd.<2S|4S>, Vn.<8B|16B>, Vm.<8B|16B>   : 0 Q U 01110 10 0 Rm 100101 Rn Rd
+        // UDOT/SDOT Vd.<2S|4S>, Vn.<8B|16B>, Vm.4B[H:L]     : 0 Q U 01111 10 L M Rm 1110 H 0 Rn Rd
+        o.op = Op::Dot;
+        o.q = bits(w, 30, 30);
+        o.sgn = !bits(w, 29, 29);
+        o.rm = bits(w, 20, 16);
+        o.rn = bits(w, 9, 5);
+        o.rd = bits(w, 4, 0);
+        if (bits(w, 24, 24)) o.lane = int8_t((bits(w, 11, 11) << 1) | bits(w, 21, 21));
+        ok = true;
     } else if ((w & 0xFF200400) == 0xF8200400) {
         ok = decode_ldraa(w, o);
     } else {
@@ -279,6 +290,7 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
         const bool want = in.op == Op::Svc ? policy.svc
                           : in.op == Op::Mrs || in.op == Op::MrsTpidr || in.op == Op::Ldapur ? policy.sysreg
                           : in.op == Op::Cpa ? policy.pac
+                          : in.op == Op::Dot ? policy.simd
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
                                                                                        : policy.pac;
         if (!want) continue;

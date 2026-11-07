@@ -21,6 +21,7 @@ struct CpuState {
     // Emulated EffectiveCPTA/CPTM (SCTLR2_EL1.CPTA0/CPTM0 at EL0).  Both 0 = ADDPT behaves as ADD.
     bool cpta = false, cptm = false;
     uint64_t tpidrro = 0;  // emulated TPIDRRO_EL0 (Darwin TSD base), loaded by the handler
+    uint8_t (*v)[16] = nullptr;  // V0-V31 (signal frame fpsimd_context), null when unavailable
     uint64_t get(unsigned r) const { return r == 31 ? 0 : x[r]; }       // XZR
     uint64_t get_sp(unsigned r) const { return r == 31 ? sp : x[r]; }  // SP
     void set(unsigned r, uint64_t v) { if (r != 31) x[r] = v; }

@@ -287,6 +287,39 @@ std::vector<uint32_t> build_inline_atomic(const Insn& in, uint64_t pc, uint64_t 
     return o;
 }
 
+// ---- UDOT/SDOT as ARMv8.0 Advanced SIMD (flags and GPRs untouched) --------------------------------------------------------
+// q0 = [u|s]mull t0.8h, n.8b, m.8b ; [u|s]mull2 t1.8h, n.16b, m.16b ; [u|s]addlp t0/t1.4s ; addp t0.4s, t0, t1 ; add d, d, t0.
+// Products fit 16 bits and pair sums 32 bits, so the result equals the architectural modular sum.  Scratch vectors are spilled
+// below the 128-byte red zone (sp moved first, so a signal on this stack cannot clobber them).
+std::vector<uint32_t> build_inline_dot(const Insn& in, uint64_t pc, uint64_t stub) {
+    std::vector<uint32_t> o;
+    unsigned t[3], k = 0;
+    for (unsigned r = 0; r < 32 && k < 3; ++r)
+        if (r != in.rd && r != in.rn && r != in.rm) t[k++] = r;
+    const unsigned T0 = t[0], T1 = t[1], T2 = t[2], N = in.rn, D = in.rd;
+    auto E = [&](uint32_t w) { o.push_back(w); };
+    E(0xD102C3FFu);                                  // sub sp, sp, #176
+    E(enc_stpq(T0, T1, 0));
+    E(0x3D800BE0u | T2);                             // str qT2, [sp, #32]
+    unsigned M = in.rm;
+    if (in.lane >= 0) {                              // dup t2.4s, m.s[lane]
+        E(0x4E000400u | ((uint32_t(in.lane) << 3 | 4u) << 16) | (in.rm << 5) | T2);
+        M = T2;
+    }
+    const uint32_t mull = in.sgn ? 0x0E20C000u : 0x2E20C000u, addlp = in.sgn ? 0x4E602800u : 0x6E602800u;
+    E(mull | (M << 16) | (N << 5) | T0);
+    if (in.q) E(mull | 0x40000000u | (M << 16) | (N << 5) | T1);
+    E(addlp | (T0 << 5) | T0);
+    if (in.q) E(addlp | (T1 << 5) | T1);
+    E(0x4EA0BC00u | ((in.q ? T1 : T0) << 16) | (T0 << 5) | T0);   // addp t0.4s, t0.4s, (t1|t0).4s
+    E((in.q ? 0x4EA08400u : 0x0EA08400u) | (T0 << 16) | (D << 5) | D);  // add d.<4s|2s>, d, t0
+    E(enc_ldpq(T0, T1, 0));
+    E(0x3DC00BE0u | T2);                             // ldr qT2, [sp, #32]
+    E(0x9102C3FFu);                                  // add sp, sp, #176
+    E(enc_b(int64_t(stub) + int64_t(o.size()) * 4, int64_t(pc + 4)));
+    return o;
+}
+
 }  // namespace
 
 void trampoline_set_pac(const Pac* p) { g_pac = p; }
@@ -298,7 +331,7 @@ bool trampoline_wants(const Insn& in) {
     if (!g_handler) return false;
     switch (in.op) {
         case Op::PacSign: case Op::PacAuth: case Op::PacGa: case Op::BrAuth: case Op::RetAuth: case Op::LdrAuth:
-        case Op::Cas: case Op::Casp: case Op::Rmw: case Op::Ldapur: case Op::Cpa:
+        case Op::Cas: case Op::Casp: case Op::Rmw: case Op::Ldapur: case Op::Cpa: case Op::Dot:
             return true;
         case Op::Mrs:  // TSD base from the thread-local cache (see trampoline_set_mrs_tls); MrsTpidr is rewritten in place by lower_range; Svc keeps BRK
             return g_mrs_tls >= 0 && in.rd != 18 && in.rd != 31;
@@ -332,6 +365,18 @@ uint32_t trampoline_make(uint32_t* site, uint32_t word, const Insn& in, uint64_t
         ++g_stats.sites;
         const int64_t to_stub = (int64_t(reinterpret_cast<uint64_t>(stub)) - int64_t(pc)) / 4;
         return 0x14000000u | (uint32_t(to_stub) & 0x03FFFFFFu);
+    }
+    if (in.op == Op::Dot) {  // self-contained SIMD sequence; no generic stub (the host handler frame does not carry V8-V15)
+        auto code = build_inline_dot(in, pc, ch->base + ch->used);
+        if (ch->used + code.size() * 4 + 16 > kChunk - 1024) return 0;
+        uint32_t* istub = reinterpret_cast<uint32_t*>(ch->base + ch->used);
+        std::memcpy(istub, code.data(), code.size() * 4);
+        ch->used += (code.size() * 4 + 15) & ~15ull;
+        __builtin___clear_cache(reinterpret_cast<char*>(istub), reinterpret_cast<char*>(istub) + code.size() * 4);
+        ++g_stats.sites;
+        ++g_stats.inlined;
+        const int64_t to_i = (int64_t(reinterpret_cast<uint64_t>(istub)) - int64_t(pc)) / 4;
+        return 0x14000000u | (uint32_t(to_i) & 0x03FFFFFFu);
     }
     g_sites.push_back(SiteInfo{in, pc, word});
     const SiteInfo* si = &g_sites.back();
