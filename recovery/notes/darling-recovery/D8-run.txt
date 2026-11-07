@@ -1,0 +1,13 @@
+# D8 run 2026-11-07 (aarch64 ARMv8.0 host; Apple images only from the 27 cache/store; Darling parts = dyl4, libsystem_kernel, mldr)
+## kevent workq/workloop: Apple libdispatch (27 cache) dispatch_async + dispatch_after work (probe dq rc=0); plutil -convert xml1 -o - works;
+## plutil -p and the AppKit probe stop at Mach vouchers / cfprefsd (ESC-D8-1.md)
+## Performance (before -> after), warm unless noted
+echo (27)                    5.4 s  -> 0.87 s   (trampolines+parallel slide)       cold (page cache dropped): 16 s (slide I/O)
+plutil -help                 67 s   -> 1.27 s
+plutil -convert xml1         n/a    -> 1.58 s
+objc_msgSend x1e6            553 ns -> 24 ns/op (BRK 10us/trap -> trampoline 150 ns -> inline PAC ~10 ns)
+CFString len+retain+release  3877 ns-> 239 ns/op   (inline LSE atomics)
+dispatch_async x1e6          165.8 s(stalled, lost futex wakeups) -> 0.33 us/op
+traps in plutil -help        6.8M SIGTRAP -> 0 SIGTRAP, 5k generic trampoline calls (rest inline)
+Timing glitch: micro sometimes prints negative durations (clock_gettime jumps); numbers above are the stable runs.
+## Regression after all steps: echo s1/s2/fat hi OK, uname, bash, plutil -help OK, plutil -convert OK, daysetta_tests 51/51

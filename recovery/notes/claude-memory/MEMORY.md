@@ -9,3 +9,4 @@
 - [Ponytail mode](feedback-ponytail-mode.md) — user wants lazy-senior-dev mode: minimal diffs, terse replies, saves tokens
 - [DaySetta owner decisions](daysetta-owner-decisions.md) — real Apple userland from IPSW; 27 arm64e on ARMv8.0 via explicit PAC/LSE emulation; no fake UI
 - [Reuse Daylight/Darling in briefs](feedback-reuse-daylight-darling.md) — every subagent brief cites Daylight docs, dyl4, Darling fork; require Reuse table
+- [Delegate to OpenCode](feedback-delegate-opencode.md) — cheap models via claudelegate MCP for routine code; Claude subagents only for hard tasks

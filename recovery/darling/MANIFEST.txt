@@ -1,4 +1,4 @@
-_super head=28e69a4b19f63c175329b4a237e42075edb20d60 branch=daysetta/unified local_commits=16 
+_super head=6b93ee0dac9df023920fddf020e072657cc02d09 branch=daysetta/unified local_commits=19 
 src/external/AvailabilityVersions head=ea5d00a6fccbc57e7b01d3274efaf7cfb6d5dde2 branch=daysetta/recovered local_commits=1 
 src/external/IOKitUser head=c24152521e6d395ab6bae0b0836914fe9ade4cf8 branch=daysetta/unified local_commits=3 
 src/external/bootstrap_cmds head=50e55e8b54ca39fd5318442051494324c14f669c branch=daysetta/unified local_commits=4 
@@ -17,4 +17,4 @@ src/external/libxpc head=8bddb88895030e1d0e31365cdb7603459a9cbaa8 branch=daysett
 src/external/metal head=f741e9708c9039b2ea4b23f8313eb2075c8893c5 branch=daysetta/unified local_commits=1 
 src/external/network_cmds head=b4f241854e10ac466a40f939d5b3c611ed3b0861 branch=daysetta/unified local_commits=2 
 src/external/syslog head=72c3d8b1f3aaca3db14e6aba1dd0e8945c338457 branch=daysetta/unified local_commits=2 
-src/external/xnu head=b31abc2e5f8429a3a10d8c92e81d001f2124071d branch=daysetta/unified local_commits=28 
+src/external/xnu head=61aa2a46455b0ae2a3983b9f7c73e8ac8af6c7ff branch=daysetta/unified local_commits=30 
