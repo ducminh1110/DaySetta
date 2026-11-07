@@ -439,6 +439,21 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
     for (uint32_t* p = begin; p < end; ++p) {
         ++counts.words;
         const uint32_t w = *p;
+        // Debug point breakpoint (DS_EXEC_FORCE_BRK=<hex pc>): rewrite one chosen instruction
+        // to BRK and register it in the trap table so emulate() fires there for a full state dump.
+        {
+            static const uint64_t fbrk = getenv("DS_EXEC_FORCE_BRK") ? strtoull(getenv("DS_EXEC_FORCE_BRK"), nullptr, 16) : 0;
+            if (fbrk && reinterpret_cast<uint64_t>(p) == fbrk) {
+                const int64_t idx = trap_table().add(fbrk, w);
+                if (idx >= 0) {
+                    *p = brk_word(static_cast<uint32_t>(idx));
+                    ++counts.patched[0];
+                } else {
+                    *p = w;
+                }
+                continue;
+            }
+        }
         Insn in;
         if (!decode(w, in)) {
             if (is_known_unsupported(w) && policy.ldapr) {
@@ -476,6 +491,7 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
         if (policy.trampolines && trampoline_wants(in)) {
             const uint32_t b = trampoline_make(p, w, in, policy.island_skip);
             if (b) {
+                if (getenv("DS_EXEC_DUMP")) fprintf(stderr, "ds-exec: lower pc=0x%llx w=0x%08x op=%d -> trampoline\n", (unsigned long long)(uintptr_t)p, w, (int)in.op);
                 *p = b;
                 ++counts.patched[static_cast<int>(in.op)];
                 ++counts.trampolined;
@@ -487,6 +503,7 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
             if (err) *err = "ds-exec: trap side table full (65536 distinct words)";
             return false;
         }
+        if (getenv("DS_EXEC_DUMP")) fprintf(stderr, "ds-exec: lower pc=0x%llx w=0x%08x op=%d -> brk\n", (unsigned long long)(uintptr_t)p, w, (int)in.op);
         *p = brk_word(static_cast<uint32_t>(idx));
         ++counts.patched[static_cast<int>(in.op)];
     }
