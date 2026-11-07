@@ -1,0 +1,1 @@
+# default selection (both T4 and llvmpipe visible) picked HW; see vulkaninfo-nvidia-smi.log
