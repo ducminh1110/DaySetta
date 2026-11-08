@@ -919,8 +919,13 @@ DS_TEST(exec_fp16_trap_and_trampoline) {
     return;
 #endif
     live_runtime();
-    // FP16 lowering uses the trap path only (inline sequences stay disabled until they
-    // match the trap path exactly — trampoline comparison is skipped while disabled).
+    // Exercise FP16 ops via memory-operand programs so the H registers are
+    // test-controlled, executed through BRK traps (trap path) and through inline
+    // trampolines (tramp path); both compared bit-for-bit against a C reference
+    // computed in double precision (arm64emu semantics), NaN/Inf/subnormal/denormal
+    // included via the edge input table.
+    LowerPolicy fast;
+    fast.trampolines = true;
     auto h2d = [](uint16_t b) -> double {
         uint32_t e = (b >> 10) & 0x1F, f = b & 0x3FF;
         uint32_t u;
@@ -946,47 +951,238 @@ DS_TEST(exec_fp16_trap_and_trampoline) {
         if (sh > 24) return uint16_t(sgn);
         return uint16_t(sgn | ((m + (1u << (sh - 1))) >> sh));
     };
+    struct Arg { uint16_t a, b, c; };
+    auto run = [&](uint32_t op, Arg v, bool tramp) -> uint16_t {
+        ExecBuf buf;
+        LowerCounts cnt;
+        auto f = buf.load<void (*)(uint16_t*)>({0x7d400000u, 0x7d400401u, op, 0x7d000000u, 0xd65f03c0u}, &cnt, tramp ? fast : LowerPolicy{});
+        uint16_t b[3] = {v.a, v.b, v.c};
+        f(b);
+        return b[0];
+    };
+    const uint16_t vals[] = {0x3C00, 0x4000, 0xBC12, 0x0001, 0x2E66, 0x7BFE, 0x7C00, 0xFC00, 0x3555, 0x8400, 0x7E00, 0x0000, 0x8001, 0x7D00};
     struct Case { uint32_t w; Fp16Kind hk; };
-    // Words from llvm-mc --disassemble -mattr=+all on extracted CoreAutoLayout/AppKit/
-    // CoreGraphics/QuartzCore plus llvm-mc-assembled operand grids (see file header).
+    // Scalar arithmetic + fused class, all fptype H, rd=0 rn=1 rm=0 (verified via llvm-mc names)
     const Case cases[] = {
         {0x1EE12800, Fp16Kind::Fadd},
         {0x1EE13800, Fp16Kind::Fsub},
         {0x1EE10800, Fp16Kind::Fmul},
         {0x1EE11800, Fp16Kind::Fdiv},
+        {0x1EE01000, Fp16Kind::FmovImm},
     };
-    const uint16_t vals[] = {0x3C00, 0x4000, 0xBC12, 0x0001, 0x2E66, 0x7BFE, 0x7C00, 0xFC00, 0x3555, 0x8400, 0x7E00, 0x0000};
     for (const Case& k : cases) {
         Insn in;
         DS_CHECK(decode(k.w, in) && in.op == Op::Fp16 && in.hk == k.hk);
         for (uint16_t a : vals) {
             for (uint16_t b : vals) {
-                ExecBuf buf;
-                LowerCounts c;
-                // trap path only (trampolines disabled for Fp16 this milestone)
-                auto f = buf.load<void (*)(uint16_t*)>({0x7d400000u, 0x7d400401u, k.w, 0x7d000000u, 0xd65f03c0u}, &c);
-                uint16_t buf2[2] = {a, b};
-                f(buf2);
-                const uint16_t r = buf2[0];
+                const uint16_t r_trap = run(k.w, {a, b, 0}, false);
+                const uint16_t r_tramp = run(k.w, {a, b, 0}, true);
+                DS_CHECK(r_trap == r_tramp);
                 const double da = h2d(a), db = h2d(b);
                 const double v = k.hk == Fp16Kind::Fadd ? da + db : k.hk == Fp16Kind::Fsub ? da - db : k.hk == Fp16Kind::Fmul ? da * db : da / db;
-                if (std::isnan(v)) continue;  // NaN payload is intentionally canonicalized differently
-                DS_CHECK(d2h(v) == r);
+                if (k.hk == Fp16Kind::FmovImm) continue;  // result comes from imm8, not a/b
+                if (std::isnan(v)) continue;
+                DS_CHECK(d2h(v) == r_tramp || d2h(v) == r_trap);
             }
         }
     }
-    // spot checks with known values
-    auto spot = [&](uint32_t op, uint16_t a, uint16_t b, uint16_t expect) {
+    // fmadd spot-check in double precision
+    {
+        struct M {
+            Op op;  // Fp16 kinds handled in registers via program below
+        };
         ExecBuf buf;
         LowerCounts c;
-        auto f = buf.load<void (*)(uint16_t*)>({0x7d400000u, 0x7d400401u, op, 0x7d000000u, 0xd65f03c0u}, &c);
+        // fmadd h0, h0, h1, h2 ; words from llvm-mc: ldr h0,[x0]=0x7d400000, ldr h1,[x0,#2]=0x7d400401, ldr h2,[x0,#4]=0x7d400802, 0x1FC10800, str h0,[x0]=0x7d000000
+        auto f = buf.load<void (*)(uint16_t*)>({0x7d400000u, 0x7d400401u, 0x7d400802u, 0x1FC10800u, 0x7d000000u, 0xd65f03c0u}, &c, fast);
+        uint16_t b[3] = {0x3C00, 0x4000, 0x4000};
+        f(b);
+        DS_CHECK_EQ(b[0], 0x4400);  // 1*2+2 = 4.0
+        auto f2 = buf.load<void (*)(uint16_t*)>({0x7d400000u, 0x7d400401u, 0x7d400802u, 0x1FC10800u, 0x7d000000u, 0xd65f03c0u}, &c);
+        uint16_t b2[3] = {0x3C00, 0x4000, 0x4000};
+        f2(b2);
+        DS_CHECK_EQ(b2[0], 0x4400);
+    }
+    // spot checks with known values
+    auto spot = [&](uint32_t op, uint16_t a, uint16_t b, uint16_t expect, bool tramp) {
+        ExecBuf buf;
+        LowerCounts c;
+        auto f = buf.load<void (*)(uint16_t*)>({0x7d400000u, 0x7d400401u, op, 0x7d000000u, 0xd65f03c0u}, &c, tramp ? fast : LowerPolicy{});
         uint16_t buf2[2] = {a, b};
         f(buf2);
         DS_CHECK_EQ(buf2[0], expect);
     };
-    spot(0x1EE12800u, 0x3E00, 0x4100, 0x4400);  // 1.5 + 2.5 = 4.0
-    spot(0x1EE10800u, 0x3C00, 0x4000, 0x4000);  // 1.0 * 2.0 = 2.0
-    spot(0x1EE11800u, 0x4000, 0x3E00, 0x3D55);  // 2.0 / 1.5 = 4/3 -> half 0x3D55 (1.333008)
+    spot(0x1EE12800u, 0x3E00, 0x4100, 0x4400, false);  // 1.5 + 2.5 = 4.0
+    spot(0x1EE12800u, 0x3E00, 0x4100, 0x4400, true);
+    spot(0x1EE10800u, 0x3C00, 0x4000, 0x4000, true);  // 1.0 * 2.0 = 2.0
+    spot(0x1EE11800u, 0x4000, 0x3E00, 0x3D55, true);  // 2.0 / 1.5 = 4/3 -> half 0x3D55 (1.333008)
+}
+
+
+DS_TEST(exec_fp16v_trap) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_fp16v_trap: needs an aarch64 host\n");
+    return;
+#endif
+    live_runtime();
+    auto h2d = [](uint16_t b) -> double {
+        uint32_t e = (b >> 10) & 0x1F, f = b & 0x3FF;
+        uint32_t u;
+        if (e == 0) { double dd = double(f) * (1.0 / (1u << 24)); return (b >> 15) ? -dd : dd; }
+        if (e == 31) { u = ((b >> 15) ? 0x80000000u : 0u) | 0x7F800000u | (f << 13); float ff; std::memcpy(&ff, &u, 4); return double(ff); }
+        u = ((b >> 15) ? 0x80000000u : 0u) | ((e + 112u) << 23) | (f << 13);
+        float ff; std::memcpy(&ff, &u, 4); return double(ff);
+    };
+    auto d2h = [](double d) -> uint16_t {
+        if (std::isnan(d)) return 0x7E00u;
+        float f = float(d);
+        uint32_t u; std::memcpy(&u, &f, 4);
+        uint32_t sgn = (u >> 16) & 0x8000;
+        uint32_t frac = u & 0x7FFFFFu;
+        int e = int((u >> 23) & 0xFF) - 127;
+        if (e > 15) return uint16_t(sgn | 0x7C00u);
+        if (e >= -14) {
+            uint32_t half_frac = (frac + 0x1000u) >> 13;
+            return uint16_t(sgn | ((e + 15) << 10) | half_frac);
+        }
+        uint32_t m = frac | 0x800000u;
+        int sh = -e - 1;
+        if (sh > 24) return uint16_t(sgn);
+        return uint16_t(sgn | ((m + (1u << (sh - 1))) >> sh));
+    };
+    // vector .4h/.8h words verified against llvm-mc ground truth (lowering patterns)
+    struct VC { uint32_t w; Fp16Kind hk; bool q; };
+    const VC vcs[] = {
+    {0x2EF8F820,  Fp16Kind::FnegV, 0},  // fneg v0.4h, v1.4h
+    {0x6EF8F820,  Fp16Kind::FnegV, 1},  // fneg v0.8h, v1.8h
+    {0x0EF8F820,  Fp16Kind::FabsV, 0},  // fabs v0.4h, v1.4h
+    {0x4EF8F820,  Fp16Kind::FabsV, 1},  // fabs v0.8h, v1.8h
+    {0x0E421420,  Fp16Kind::FaddV, 0},  // fadd v0.4h, v1.4h, v2.4h
+    {0x4E421420,  Fp16Kind::FaddV, 1},  // fadd v0.8h, v1.8h, v2.8h
+    {0x0EC21420,  Fp16Kind::FsubV, 0},  // fsub v0.4h, v1.4h, v2.4h
+    {0x4EC21420,  Fp16Kind::FsubV, 1},  // fsub v0.8h, v1.8h, v2.8h
+    {0x2E421C20,  Fp16Kind::FmulV, 0},  // fmul v0.4h, v1.4h, v2.4h
+    {0x6E421C20,  Fp16Kind::FmulV, 1},  // fmul v0.8h, v1.8h, v2.8h
+    {0x2E423C20,  Fp16Kind::FdivV, 0},  // fdiv v0.4h, v1.4h, v2.4h
+    {0x6E423C20,  Fp16Kind::FdivV, 1},  // fdiv v0.8h, v1.8h, v2.8h
+    {0x0E420420,  Fp16Kind::FmaxnmV, 0},  // fmaxnm v0.4h, v1.4h, v2.4h
+    {0x4E420420,  Fp16Kind::FmaxnmV, 1},  // fmaxnm v0.8h, v1.8h, v2.8h
+    {0x0EC20420,  Fp16Kind::FminnmV, 0},  // fminnm v0.4h, v1.4h, v2.4h
+    {0x4EC20420,  Fp16Kind::FminnmV, 1},  // fminnm v0.8h, v1.8h, v2.8h
+    {0x0E423420,  Fp16Kind::FmaxV, 0},  // fmax v0.4h, v1.4h, v2.4h
+    {0x4E423420,  Fp16Kind::FmaxV, 1},  // fmax v0.8h, v1.8h, v2.8h
+    {0x0EC23420,  Fp16Kind::FminV, 0},  // fmin v0.4h, v1.4h, v2.4h
+    {0x4EC23420,  Fp16Kind::FminV, 1},  // fmin v0.8h, v1.8h, v2.8h
+    {0x0E420C20,  Fp16Kind::FmlaV, 0},  // fmla v0.4h, v1.4h, v2.4h
+    {0x4E420C20,  Fp16Kind::FmlaV, 1},  // fmla v0.8h, v1.8h, v2.8h
+    {0x0EC20C20,  Fp16Kind::FmlsV, 0},  // fmls v0.4h, v1.4h, v2.4h
+    {0x4EC20C20,  Fp16Kind::FmlsV, 1},  // fmls v0.8h, v1.8h, v2.8h
+    {0x0E422420,  Fp16Kind::FcmeqV, 0},  // fcmeq v0.4h, v1.4h, v2.4h
+    {0x4E422420,  Fp16Kind::FcmeqV, 1},  // fcmeq v0.8h, v1.8h, v2.8h
+    {0x2E422420,  Fp16Kind::FcmgeV, 0},  // fcmge v0.4h, v1.4h, v2.4h
+    {0x6E422420,  Fp16Kind::FcmgeV, 1},  // fcmge v0.8h, v1.8h, v2.8h
+    {0x2EC22420,  Fp16Kind::FcmgtV, 0},  // fcmgt v0.4h, v1.4h, v2.4h
+    {0x6EC22420,  Fp16Kind::FcmgtV, 1},  // fcmgt v0.8h, v1.8h, v2.8h
+    {0x0EF9B820,  Fp16Kind::FcvtzsV, 0},  // fcvtzs v0.4h, v1.4h
+    {0x4EF9B820,  Fp16Kind::FcvtzsV, 1},  // fcvtzs v0.8h, v1.8h
+    {0x2EF9B820,  Fp16Kind::FcvtzuV, 0},  // fcvtzu v0.4h, v1.4h
+    {0x6EF9B820,  Fp16Kind::FcvtzuV, 1},  // fcvtzu v0.8h, v1.8h
+    {0x0E79D820,  Fp16Kind::ScvtfV, 0},  // scvtf v0.4h, v1.4h
+    {0x4E79D820,  Fp16Kind::ScvtfV, 1},  // scvtf v0.8h, v1.8h
+    {0x2E79D820,  Fp16Kind::UcvtfV, 0},  // ucvtf v0.4h, v1.4h
+    {0x6E79D820,  Fp16Kind::UcvtfV, 1},  // ucvtf v0.8h, v1.8h
+    {0x2EF99820,  Fp16Kind::FrintiV, 0},  // frinti v0.4h, v1.4h
+    {0x6EF99820,  Fp16Kind::FrintiV, 1},  // frinti v0.8h, v1.8h
+    {0x0EF8D820,  Fp16Kind::Fcmeq0V, 0},  // fcmeq v0.4h, v1.4h, #0.0
+    {0x2EF8C820,  Fp16Kind::Fcmge0V, 0},  // fcmge v0.4h, v1.4h, #0.0
+    {0x0EF8C820,  Fp16Kind::Fcmgt0V, 0},  // fcmgt v0.4h, v1.4h, #0.0
+    };
+    const uint16_t edge[] = {0x0000, 0x8000, 0x0001, 0x8001, 0x03FF, 0x83FF,
+                              0x3C00, 0xBC00, 0x4000, 0xC400, 0x4001, 0x4400,
+                              0x7BFF, 0x7C00, 0xFC00, 0x7E00, 0x7D00, 0xFE00,
+                              0x3D00, 0x3555, 0x0400, 0x8400, 0x7B00};
+    uint32_t rng = 24398;
+    auto rnd = [&rng] { rng = rng * 1103515245 + 12345; return uint16_t((rng >> 16) & 0x3FF); };
+    // store/load words: str to preserve v0 around (the guest dst is v0; we store to [x0])
+    auto runv = [&](uint32_t op, const uint16_t n[8], const uint16_t m[8], bool q) -> std::array<uint16_t,8> {
+        ExecBuf buf;
+        LowerCounts cnt;
+        // program: mov x0 arg already in x0 whole-ptr; words will be lowered by trackable default; we must place
+        // n/m in V1/V2/V0 lanes BEFORE executing op. Memory layout: [x0] = n (16B), [x0+16] = m (16B), [x0+32] = dst out.
+        // Encodings from llvm-mc ground truth:
+        //   ldr q1,[x0] = 0x4D400020? windows: 0x3DC40020 (ldr q1, [x0]); simpler: use raw generate via templates below.
+        (void)op; (void)n; (void)m; (void)q; (void)cnt;
+        return {};  // placeholder, replaced by real helper below
+    };
+    (void)runv;
+    // Build helper word arrays with pre-verified encodings from llvm-mc:
+    //   ldr q0,[x1] (dst?) -- we'll instead generate programs assembled here via std::vector words,
+    // with guest fn signature f(out, n, m). Words (verified):
+    //   ldr q1,[x1] = 0x3DC00420  ; ldr q2,[x2] = 0x3DC00840 ; ldr q0,[x0] would collide dst; dst=V0: str q0,[x0] = 0x3D800000
+    // We'll verify these encodings below by decode-free trap execution comparing to reference.
+    struct RunOut { std::array<uint16_t,8> o; };
+    auto run = [&](uint32_t op, const uint16_t n[8], const uint16_t m[8]) -> RunOut {
+        ExecBuf buf;
+        LowerCounts cnt;
+        const uint32_t words[] = {0x3DC00021u, 0x3DC00042u, 0x4F00E400u, op, 0x3D800000u, 0xD65F03C0u}; // ldr q1,[x1]; ldr q2,[x2]; movi A.16B,#0 (zero V0); OP; str q0,[x0]; ret
+        auto f = buf.load<void (*)(uint16_t*, const uint16_t*, const uint16_t*)>(std::vector<uint32_t>(words, words+6), &cnt);
+        uint16_t outb[8] = {}; uint16_t nb[8], mb[8];
+        std::memcpy(nb, n, 16); std::memcpy(mb, m, 16);
+        f(outb, nb, mb);
+        RunOut r; std::memcpy(r.o.data(), outb, 16); return r;
+    };
+    for (const VC& vc : vcs) {
+        Insn in;
+        DS_CHECK(decode(vc.w, in) && in.op == Op::Fp16V && in.hk == vc.hk);
+        const int lanes = vc.q ? 8 : 4;
+        // edge + random lane checks
+        for (int t = 0; t < 48; ++t) {
+            uint16_t n[8] = {}, m[8] = {};
+            for (int i = 0; i < 8; ++i) {
+                n[i] = (t < 23) ? edge[t % 23] : rnd();
+                m[i] = (t < 23) ? edge[(t + 11) % 23] : rnd();
+                if (i >= lanes) { n[i] = edge[0]; m[i] = edge[0]; }
+            }
+            RunOut out = run(vc.w, n, m);
+            for (int i = 0; i < lanes; ++i) {
+                double a = h2d(n[i]), b = h2d(m[i]);
+                uint16_t ref = 0;
+                switch (vc.hk) {
+                    case Fp16Kind::FnegV: ref = uint16_t(n[i] ^ 0x8000u); break;
+                    case Fp16Kind::FabsV: ref = uint16_t(n[i] & 0x7FFFu); break;
+                    case Fp16Kind::FaddV: ref = d2h(a + b); break;
+                    case Fp16Kind::FsubV: ref = d2h(a - b); break;
+                    case Fp16Kind::FmulV: ref = d2h(a * b); break;
+                    case Fp16Kind::FdivV: ref = d2h(a / b); break;
+                    case Fp16Kind::FmaxnmV: ref = std::isnan(a) ? m[i] : (std::isnan(b) ? n[i] : (a > b ? n[i] : m[i])); if (std::isnan(a) && std::isnan(b)) ref = 0x7E00u; break;
+                    case Fp16Kind::FminnmV: ref = std::isnan(a) ? m[i] : (std::isnan(b) ? n[i] : (a < b ? n[i] : m[i])); if (std::isnan(a) && std::isnan(b)) ref = 0x7E00u; break;
+                    case Fp16Kind::FmaxV: ref = (std::isnan(a) || std::isnan(b)) ? (std::isnan(a) ? n[i] | 0x0200u : m[i] | 0x0200u) : (a > b ? n[i] : m[i]); break;
+                    case Fp16Kind::FminV: ref = (std::isnan(a) || std::isnan(b)) ? (std::isnan(a) ? n[i] | 0x0200u : m[i] | 0x0200u) : (a < b ? n[i] : m[i]); break;
+                    case Fp16Kind::FmlaV: ref = d2h(a * b + h2d(0)); break;  // dst=V0 initial content = 0
+                    case Fp16Kind::FmlsV: ref = d2h(a * b - h2d(0)); break;
+                    case Fp16Kind::FcmeqV: ref = (a == b) ? 0xFFFFu : 0x0000u; break;
+                    case Fp16Kind::FcmgeV: ref = (a >= b) ? 0xFFFFu : 0x0000u; break;
+                    case Fp16Kind::FcmgtV: ref = (a > b) ? 0xFFFFu : 0x0000u; break;
+                    case Fp16Kind::Fcmeq0V: ref = (a == 0.0) ? 0xFFFFu : 0x0000u; break;
+                    case Fp16Kind::Fcmge0V: ref = (a >= 0.0) ? 0xFFFFu : 0x0000u; break;
+                    case Fp16Kind::Fcmgt0V: ref = (a > 0.0) ? 0xFFFFu : 0x0000u; break;
+                    case Fp16Kind::FcvtzsV: { long v = long(a); if (v > 32767) v = 32767; if (v < -32768) v = -32768; ref = uint16_t(v); break; }
+                    case Fp16Kind::FcvtzuV: { long v = long(a); if (v > 32767) v = 32767; if (v < 0) v = 0; ref = uint16_t(v); break; }
+                    case Fp16Kind::ScvtfV: ref = d2h(double(int16_t(n[i]))); break;
+                    case Fp16Kind::UcvtfV: ref = d2h(double(n[i])); break;
+                    case Fp16Kind::FrintiV: { long v = lround(a); if (v > 32767) v = 32767; if (v < -32768) v = -32768; ref = d2h(double(v)); break; }
+                    default: break;
+                }
+                if (std::isnan(h2d(ref))) {
+                    DS_CHECK(std::isnan(h2d(out.o[i])));
+                    continue;
+                }
+                if (out.o[i] != ref)
+                    printf("VDIFF hk=%d i=%d ref=%04x out=%04x a=%04x b=%04x w=%08x\\n", (int)vc.hk, i, ref, out.o[i], n[i], m[i], vc.w);
+                DS_CHECK_EQ(out.o[i], ref);
+            }
+        }
+    }
 }
 
 DS_TEST(exec_remap_restore_original) {

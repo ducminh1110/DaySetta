@@ -392,6 +392,174 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
             std::memcpy(c.v[in.rd], d, 16);
             break;
         }
+        case Op::Fp16V: {  // vector FP16 (.4h/.8h): per-lane widen-compute-narrow (trap path only)
+            if (!c.v) { out.status = Emu::Bad; break; }
+            const auto h2d_ = [](uint16_t b) -> double {
+                uint32_t s = (b & 0x8000) ? 0x80000000u : 0u;
+                uint32_t e = (b >> 10) & 0x1F;
+                uint32_t f = b & 0x3FF;
+                if (e == 0) { double dd = double(f) * (1.0 / (1u << 24)); return (b >> 15) ? -dd : dd; }
+                if (e == 31) { uint32_t u = s | 0x7F800000u | (f << 13); float ff; std::memcpy(&ff, &u, 4); return double(ff); }
+                uint32_t u = s | ((e + 112u) << 23) | (f << 13);
+                float ff; std::memcpy(&ff, &u, 4); return double(ff);
+            };
+            const auto d2h_ = [](double d) -> uint16_t {
+                if (std::isnan(d)) return 0x7E00u;
+                float f = float(d);
+                uint32_t u; std::memcpy(&u, &f, 4);
+                uint32_t sgn = (u >> 16) & 0x8000;
+                uint32_t frac = u & 0x7FFFFFu;
+                int e2 = int((u >> 23) & 0xFF) - 127;
+                if (std::isinf(d)) return uint16_t(sgn | 0x7C00u);
+                if (e2 > 15) return uint16_t(sgn | 0x7C00u);
+                if (e2 >= -14) {
+                    uint32_t half_frac = (frac + 0x1000u) >> 13;
+                    return uint16_t(sgn | (((e2 + 15) & 0x1F) << 10) | half_frac);
+                }
+                uint32_t m = frac | 0x800000u;
+                int sh = -e2 - 1;
+                if (m == 0) return uint16_t(sgn);  // true zero
+                if (sh > 24) return uint16_t(sgn);
+                uint32_t k = m >> sh;
+                uint32_t rem = m & ((sh >= 32) ? 0xFFFFFFFFu : ((1u << sh) - 1u));
+                uint32_t halfway = 1u << (sh - 1);
+                if (rem > halfway || (rem == halfway && (k & 1))) k++;
+                return uint16_t(sgn | k);
+            };
+            const int lanes = in.q ? 8 : 4;
+            uint16_t n[8], m[8], z[8] = {};  // 64-bit (.4h) forms must zero the upper half
+            std::memcpy(n, c.v[in.rn], 16);
+            if (in.hk == Fp16Kind::DupV) {
+                for (int i = 0; i < lanes; ++i) z[i] = n[in.lane & 7];
+                std::memcpy(c.v[in.rd], z, 16);
+                break;
+            }
+            std::memcpy(m, c.v[in.rm], 16);
+            if (in.hk == Fp16Kind::FcvtzsV) {  // saturate to int16
+                for (int i = 0; i < lanes; ++i) {
+                    double d = h2d_(n[i]);
+                    long v = long(d);
+                    if (v > 32767) v = 32767;
+                    if (v < -32768) v = -32768;
+                    z[i] = uint16_t(v);
+                }
+                std::memcpy(c.v[in.rd], z, 16);
+                break;
+            }
+            if (in.hk == Fp16Kind::FcvtzuV) {
+                for (int i = 0; i < lanes; ++i) {
+                    double d = h2d_(n[i]);
+                    long v = long(d);
+                    if (v > 32767) v = 32767;
+                    if (v < 0) v = 0;
+                    z[i] = uint16_t(v);
+                }
+                std::memcpy(c.v[in.rd], z, 16);
+                break;
+            }
+            if (in.hk == Fp16Kind::FrintiV) {  // round to nearest integer
+                for (int i = 0; i < lanes; ++i) {
+                    double d = h2d_(n[i]);
+                    long v = lround(d);
+                    if (v > 32767) v = 32767;
+                    if (v < -32768) v = -32768;
+                    z[i] = d2h_(double(v));
+                }
+                std::memcpy(c.v[in.rd], z, 16);
+                break;
+            }
+            if (in.hk == Fp16Kind::ScvtfV) {
+                for (int i = 0; i < lanes; ++i) z[i] = d2h_(double(int16_t(n[i])));
+                std::memcpy(c.v[in.rd], z, 16);
+                break;
+            }
+            if (in.hk == Fp16Kind::UcvtfV) {
+                for (int i = 0; i < lanes; ++i) z[i] = d2h_(double(n[i]));
+                std::memcpy(c.v[in.rd], z, 16);
+                break;
+            }
+            // Flags-safe helpers
+            auto setbits = [&](int i, uint16_t v) { z[i] = v; };
+            uint16_t acc[8];
+            uint16_t mmm[8];
+            if (in.hk == Fp16Kind::FmlaV || in.hk == Fp16Kind::FmlsV || in.hk == Fp16Kind::FmlaIdxV || in.hk == Fp16Kind::FmlsIdxV) std::memcpy(acc, c.v[in.rd], 16);
+            if (in.hk == Fp16Kind::FmulIdxV || in.hk == Fp16Kind::FmlaIdxV || in.hk == Fp16Kind::FmlsIdxV)
+                std::memcpy(mmm, c.v[in.rm], 16);  // by-element: only indexed lane of Rm is used
+            for (int i = 0; i < lanes; ++i) {
+                double a = h2d_(n[i]), b = h2d_(m[i]);
+                if ((in.hk == Fp16Kind::FmulIdxV || in.hk == Fp16Kind::FmlaIdxV || in.hk == Fp16Kind::FmlsIdxV) && in.lane >= 0)
+                    b = h2d_(mmm[in.lane & 7]);
+                double dd = (in.hk == Fp16Kind::FmlaV || in.hk == Fp16Kind::FmlsV || in.hk == Fp16Kind::FmlaIdxV || in.hk == Fp16Kind::FmlsIdxV) ? h2d_(acc[i]) : 0;
+                switch (in.hk) {
+                    case Fp16Kind::FnegV: setbits(i, uint16_t(n[i] ^ 0x8000u)); break;
+                    case Fp16Kind::FabsV: setbits(i, uint16_t(n[i] & 0x7FFFu)); break;
+                    case Fp16Kind::FaddV: setbits(i, d2h_(a + b)); break;
+                    case Fp16Kind::FsubV: setbits(i, d2h_(a - b)); break;
+                    case Fp16Kind::FmulV: setbits(i, d2h_(a * b)); break;
+                    case Fp16Kind::FmulIdxV: setbits(i, d2h_(a * b)); break;
+                    case Fp16Kind::FdivV: setbits(i, d2h_(a / b)); break;
+                    case Fp16Kind::FmaxnmV:
+                        if (std::isnan(a) && std::isnan(b)) z[i] = 0x7E00u;
+                        else if (std::isnan(a)) z[i] = m[i];
+                        else if (std::isnan(b)) z[i] = n[i];
+                        else z[i] = d2h_(a > b ? a : b);
+                        break;
+                    case Fp16Kind::FminnmV:
+                        if (std::isnan(a) && std::isnan(b)) z[i] = 0x7E00u;
+                        else if (std::isnan(a)) z[i] = m[i];
+                        else if (std::isnan(b)) z[i] = n[i];
+                        else z[i] = d2h_(a < b ? a : b);
+                        break;
+                    case Fp16Kind::FmaxV: {
+                        // FMAX: NaN operand propagates (quieted); +0 > -0 (arm64emu FOP_MAX)
+                        if (std::isnan(a) || std::isnan(b)) z[i] = std::isnan(a) ? n[i] | 0x0200u : m[i] | 0x0200u;
+                        else if (a == b) z[i] = (a == 0 && std::signbit(a)) ? m[i] : n[i];
+                        else z[i] = a > b ? n[i] : m[i];
+                        break;
+                    }
+                    case Fp16Kind::FminV: {
+                        if (std::isnan(a) || std::isnan(b)) z[i] = std::isnan(a) ? n[i] | 0x0200u : m[i] | 0x0200u;
+                        else if (a == b) z[i] = (a == 0 && std::signbit(a)) ? n[i] : m[i];
+                        else z[i] = a < b ? n[i] : m[i];
+                        break;
+                    }
+                    case Fp16Kind::FmlaV: setbits(i, d2h_(a * b + dd)); break;
+                    case Fp16Kind::FmlaIdxV: setbits(i, d2h_(a * b + dd)); break;
+                    case Fp16Kind::FmlsV: setbits(i, d2h_(a * b - dd)); break;
+                    case Fp16Kind::FmlsIdxV: setbits(i, d2h_(a * b - dd)); break;
+                    case Fp16Kind::FcmeqV: setbits(i, (a == b) ? 0xFFFFu : 0x0000u); break;
+                    case Fp16Kind::FcmgeV: setbits(i, (a >= b) ? 0xFFFFu : 0x0000u); break;
+                    case Fp16Kind::FcmgtV: setbits(i, (a > b) ? 0xFFFFu : 0x0000u); break;
+                    case Fp16Kind::Fcmeq0V: setbits(i, (a == 0.0) ? 0xFFFFu : 0x0000u); break;
+                    case Fp16Kind::Fcmge0V: setbits(i, (a >= 0.0) ? 0xFFFFu : 0x0000u); break;
+                    case Fp16Kind::Fcmgt0V: setbits(i, (a > 0.0) ? 0xFFFFu : 0x0000u); break;
+                    case Fp16Kind::FaddpV: {
+                        // FADDP: VD[i] = VN[i'] + VM[i'], i' swaps bits 0/1 of the index
+                        int i1 = ((i & 1) << 1) | ((i >> 1) & 1) | (i & ~3);
+                        setbits(i, d2h_(h2d_(n[i1]) + h2d_(m[i1])));
+                        break;
+                    }
+                    case Fp16Kind::FmaxpV: {
+                        int i1 = ((i & 1) << 1) | ((i >> 1) & 1) | (i & ~3);
+                        double x = h2d_(n[i1]), y = h2d_(m[i1]);
+                        setbits(i, (std::isnan(x) || std::isnan(y)) ? (std::isnan(x) ? n[i1] | 0x0200u : m[i1] | 0x0200u)
+                                         : (x > y ? n[i1] : m[i1]));
+                        break;
+                    }
+                    case Fp16Kind::FminpV: {
+                        int i1 = ((i & 1) << 1) | ((i >> 1) & 1) | (i & ~3);
+                        double x = h2d_(n[i1]), y = h2d_(m[i1]);
+                        setbits(i, (std::isnan(x) || std::isnan(y)) ? (std::isnan(x) ? n[i1] | 0x0200u : m[i1] | 0x0200u)
+                                         : (x < y ? n[i1] : m[i1]));
+                        break;
+                    }
+                    default: out.status = Emu::Bad; break;
+                }
+            }
+            if (out.status == Emu::Bad) break;
+            std::memcpy(c.v[in.rd], z, 16);
+            break;
+        }
         case Op::Fp16: {  // scalar FP16 ops (host is ARMv8.0): compute in double and round once
             if (!c.v) { out.status = Emu::Bad; break; }
             auto H = [&c](unsigned r) { uint16_t b; std::memcpy(&b, c.v[r], 2); return b; };
@@ -450,7 +618,6 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
                 else pstate = (0u << 31) | (0u << 30) | (1u << 29) | (0u << 28);
             };
             const double a = h2d(H(in.rn)), b = h2d(H(in.rm)), cc = h2d(H(in.rs));
-            fprintf(stderr, "DEBUG fp16 in.rd=%d in.rn=%d in.rm=%d H(a)=0x%04x H(b)=0x%04x d2h_add=%04x\n", in.rd, in.rn, in.rm, H(in.rn), H(in.rm), (unsigned)d2h(a+b));
             switch (in.hk) {
                 case Fp16Kind::FmovImm: {
                     const uint32_t imm8 = uint32_t(in.imm) & 0xFF;
@@ -513,6 +680,7 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
                 case Fp16Kind::Fneg: setH(in.rd, uint16_t(H(in.rn) ^ 0x8000u)); break;
                 case Fp16Kind::Scvtf: setH(in.rd, d2h(double(int32_t(c.get(in.rn))))); break;
                 case Fp16Kind::Ucvtf: setH(in.rd, d2h(double(uint32_t(c.get(in.rn))))); break;
+                default: out.status = Emu::Bad; break;  // vector kinds handled in the Fp16V case above
             }
             break;
         }
