@@ -1233,6 +1233,27 @@ DS_TEST(exec_tramp_vregs_preserved) {
     unsetenv("DS_TRAMP_NO_INLINE");
 }
 
+
+DS_TEST(exec_fp16_data_alias_rejected) {
+    // FSE literal-mask table word 0x1fffffff ({2^29-1, 0}) inside __text collides with
+    // the FP16 scalar FMA encoding space. It must never be lowered (it is data).
+    {
+        Insn in;
+        DS_CHECK(!decode(0x1FFFFFFFu, in));   // fnmsub h31,h31,h31,h31 pattern -> data
+        DS_CHECK(!decode(0x3FFFFFFFu, in));   // entry 30 mask {2^30-1, 0} same family
+        DS_CHECK(!decode(0x7FFFFFFFu, in));   // entry 31 {2^31-1, 0}
+    }
+    {
+        // Genuine FP16 FMA still decodes: fmadd h0, h0, h1, h2 (0x1FC10800)
+        Insn in;
+        DS_CHECK(decode(0x1FC10800u, in) && in.op == Op::Fp16 && in.hk == Fp16Kind::Fmadd);
+        DS_CHECK_EQ(in.rd, 0);
+        DS_CHECK_EQ(in.rn, 0);
+        DS_CHECK_EQ(in.rm, 1);
+        DS_CHECK_EQ(in.rs, 2);
+    }
+}
+
 DS_TEST(exec_remap_restore_original) {
 #if !defined(__aarch64__)
     std::fprintf(stderr, "SKIP exec_remap_restore_original: needs an aarch64 host\n");
