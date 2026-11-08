@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include "trap.hpp"
 #include "trampoline.hpp"
 
@@ -389,6 +390,130 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
                 d[e] += uint32_t(acc);
             }
             std::memcpy(c.v[in.rd], d, 16);
+            break;
+        }
+        case Op::Fp16: {  // scalar FP16 ops (host is ARMv8.0): compute in double and round once
+            if (!c.v) { out.status = Emu::Bad; break; }
+            auto H = [&c](unsigned r) { uint16_t b; std::memcpy(&b, c.v[r], 2); return b; };
+            auto setH = [&c](unsigned r, uint16_t b) {
+                uint16_t* p = reinterpret_cast<uint16_t*>(c.v[r]);
+                *p = b;
+            };
+            const auto h2d = [](uint16_t b) -> double {
+                uint32_t s = (b & 0x8000) ? 0x80000000u : 0u;
+                uint32_t e = (b >> 10) & 0x1F;                       // exponent field
+                uint32_t f = b & 0x3FF;                              // fraction
+                if (e == 0) {
+                    // subnormal half: value = f * 2^-24 through double
+                    double dd = double(f) * (1.0 / (1u << 24));
+                    return (b >> 15) ? -dd : dd;
+                }
+                if (e == 31) {  // inf / nan
+                    uint32_t f32 = s | 0x7F800000u | (f << 13);
+                    float ff; std::memcpy(&ff, &f32, 4);
+                    return double(ff);
+                }
+                uint32_t f32 = s | ((e + 112u) << 23) | (f << 13);
+                float ff; std::memcpy(&ff, &f32, 4);
+                return double(ff);
+            };
+            const auto d2h = [](double d) -> uint16_t {
+                if (std::isnan(d)) return 0x7E00u;
+                float f = float(d);
+                uint32_t u; std::memcpy(&u, &f, 4);
+                uint32_t sgn = (u >> 16) & 0x8000;
+                uint32_t exp = (u >> 23) & 0xFF;
+                uint32_t frac = u & 0x7FFFFF;
+                if (exp == 0xFF) return uint16_t(sgn | 0x7C00u);  // inf
+                int e2 = int(exp) - 127;
+                if (e2 > 15) return uint16_t(sgn | 0x7C00u);       // overflow -> inf
+                if (e2 >= -14) {
+                    uint32_t half_frac = (frac + 0x1000u) >> 13;   // round-to-nearest-even on the dropped 13 bits
+                    return uint16_t(sgn | (((e2 + 15) & 0x1F) << 10) | half_frac);
+                }
+                // half subnormal: mantissa (with implicit 1) = m * 2^(e2-23); place at 2^-24 with RNE
+                uint32_t m = frac | 0x800000u;
+                if (m == 0) return uint16_t(sgn);
+                int sh = -e2 - 1;
+                if (sh > 24) return uint16_t(sgn);
+                uint32_t half_frac = (m + (1u << (sh - 1))) >> sh;
+                return uint16_t(sgn | half_frac);
+            };
+            const auto hcmp = [&](double a, double b, uint64_t& pstate) {
+                if (std::isnan(a) || std::isnan(b)) {
+                    pstate = (0u << 31) | (0u << 30) | (1u << 29) | (1u << 28);
+                    return;
+                }
+                bool eq = (a == b), lt = (a < b);
+                if (eq) pstate = (0u << 31) | (1u << 30) | (1u << 29) | (0u << 28);
+                else if (lt) pstate = (1u << 31) | (0u << 30) | (0u << 29) | (0u << 28);
+                else pstate = (0u << 31) | (0u << 30) | (1u << 29) | (0u << 28);
+            };
+            const double a = h2d(H(in.rn)), b = h2d(H(in.rm)), cc = h2d(H(in.rs));
+            fprintf(stderr, "DEBUG fp16 in.rd=%d in.rn=%d in.rm=%d H(a)=0x%04x H(b)=0x%04x d2h_add=%04x\n", in.rd, in.rn, in.rm, H(in.rn), H(in.rm), (unsigned)d2h(a+b));
+            switch (in.hk) {
+                case Fp16Kind::FmovImm: {
+                    const uint32_t imm8 = uint32_t(in.imm) & 0xFF;
+                    const uint32_t s = (imm8 >> 7) & 1, e = (imm8 >> 4) & 7, f = imm8 & 15;
+                    const int delta = e < 6 ? int(e) + 1 : int(e) - 7;  // verified via llvm-mc anchors
+                    const double v = (s ? -1.0 : 1.0) * (1.0 + f / 16.0) * std::ldexp(1.0, delta);
+                    setH(in.rd, d2h(v));
+                    break;
+                }
+                case Fp16Kind::FmovRegH: setH(in.rd, H(in.rm)); break;
+                case Fp16Kind::FmovWtoH: setH(in.rd, uint16_t(c.get(in.rm) & 0xFFFFu)); break;
+                case Fp16Kind::FmovHtoW: c.set(in.rd, uint64_t(H(in.rm))); break;
+                case Fp16Kind::FcvtToH: {
+                    if (in.size == 2) setH(in.rd, d2h(a));
+                    else setH(in.rd, d2h(a));
+                    break;
+                }
+                case Fp16Kind::FcvtFromH: setH(in.rd, d2h(a)); break;
+                case Fp16Kind::Fadd: setH(in.rd, d2h(a + b)); break;
+                case Fp16Kind::Fsub: setH(in.rd, d2h(a - b)); break;
+                case Fp16Kind::Fmul: setH(in.rd, d2h(a * b)); break;
+                case Fp16Kind::Fdiv: setH(in.rd, d2h(a / b)); break;
+                case Fp16Kind::Fmadd: setH(in.rd, d2h(cc + a * b)); break;
+                case Fp16Kind::Fmsub: setH(in.rd, d2h(cc - a * b)); break;
+                case Fp16Kind::Fnmadd: setH(in.rd, d2h(-cc - a * b)); break;
+                case Fp16Kind::Fnmsub: setH(in.rd, d2h(-cc + a * b)); break;
+                case Fp16Kind::Fcmp: hcmp(a, b, c.pstate); break;
+                case Fp16Kind::Fcmp0: hcmp(a, 0.0, c.pstate); break;
+                case Fp16Kind::Fcsel: {
+                    const unsigned cond = uint32_t(in.imm);
+                    const bool sel = ((((c.pstate >> 28) & 0xF) >> (cond & 3) & 1) ^ ((cond >> 3) & 1)) != 0;
+                    setH(in.rd, sel ? H(in.rm) : H(in.rs));
+                    break;
+                }
+                case Fp16Kind::Fccmp: {
+                    const unsigned cond = uint32_t(in.imm);
+                    const unsigned nzcv = uint32_t(in.rs);
+                    const bool sel = ((((c.pstate >> 28) & 0xF) >> (cond & 3) & 1) ^ ((cond >> 3) & 1)) != 0;
+                    if (sel) hcmp(a, b, c.pstate);
+                    else c.pstate = nzcv << 28;
+                    break;
+                }
+                case Fp16Kind::Fminnm: {
+                    if (std::isnan(a) && std::isnan(b)) setH(in.rd, 0x7E00u);
+                    else if (std::isnan(a)) setH(in.rd, H(in.rm));
+                    else if (std::isnan(b)) setH(in.rd, H(in.rn));
+                    else if (a == b) setH(in.rd, H(in.rn));
+                    else setH(in.rd, a < b ? H(in.rn) : H(in.rm));
+                    break;
+                }
+                case Fp16Kind::Fmaxnm: {
+                    if (std::isnan(a) && std::isnan(b)) setH(in.rd, 0x7E00u);
+                    else if (std::isnan(a)) setH(in.rd, H(in.rm));
+                    else if (std::isnan(b)) setH(in.rd, H(in.rn));
+                    else if (a == b) setH(in.rd, H(in.rn));
+                    else setH(in.rd, a > b ? H(in.rn) : H(in.rm));
+                    break;
+                }
+                case Fp16Kind::Fabs: setH(in.rd, uint16_t(H(in.rn) & 0x7FFFu)); break;
+                case Fp16Kind::Fneg: setH(in.rd, uint16_t(H(in.rn) ^ 0x8000u)); break;
+                case Fp16Kind::Scvtf: setH(in.rd, d2h(double(int32_t(c.get(in.rn))))); break;
+                case Fp16Kind::Ucvtf: setH(in.rd, d2h(double(uint32_t(c.get(in.rn))))); break;
+            }
             break;
         }
         case Op::Svc:

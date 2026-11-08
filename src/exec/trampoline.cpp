@@ -322,6 +322,138 @@ std::vector<uint32_t> build_inline_dot(const Insn& in, uint64_t pc, uint64_t stu
     return o;
 }
 
+// ---- FP16 scalar ops via FP16-era semantics on ARMv8.0 (single precision for 2-source
+// arithmetic, double precision for FMA).  FCVT H<->S/D is ARMv8.0 (assembled with
+// -mattr=+v8-a); the destination H is written by FCVT, which preserves the upper bits of
+// the Q register (ARM semantics match the FP16 instruction for the low half).  Scratch V
+// registers are spilled below the 128-byte red zone like build_inline_dot.
+std::vector<uint32_t> build_inline_fp16(const Insn& in, uint64_t pc, uint64_t stub) {
+    std::vector<uint32_t> o;
+    unsigned t[3], k = 0;
+    for (unsigned r = 0; r < 32 && k < 3; ++r)
+        if (r != in.rd && r != in.rn && r != in.rm && r != in.rs) t[k++] = r;
+    const unsigned T0 = t[0], T1 = t[1], T2 = t[2];
+    const unsigned D = in.rd, N = in.rn, M = in.rm, A = in.rs;
+    auto E = [&](uint32_t w) { o.push_back(w); };
+    // stp X30-save by dot: sub sp; save T0/T1/T2; work; restore; add sp; b pc+4..
+    E(0xD102C3FFu);                                  // sub sp, sp, #176
+    E(enc_stpq(T0, T1, 0));
+    E(0x3D800BE0u | T2);                             // str qT2, [sp, #32]
+    auto h2s = [&](unsigned src, unsigned dst) { E(0x1EE24000u | (src << 5) | dst); };  // fcvt s<dst>, h<src>
+    auto h2d = [&](unsigned src, unsigned dst) { E(0x1EE2C000u | (src << 5) | dst); };  // fcvt d<dst>, h<src>
+    auto s2h = [&](unsigned src, unsigned dst) { E(0x1E23C000u | (src << 5) | dst); };  // fcvt h<dst>, s<src>
+    auto d2h = [&](unsigned src, unsigned dst) { E(0x1E63C000u | (src << 5) | dst); };  // fcvt h<dst>, d<src>
+    // Stack slot helpers: str/ldr at [sp, #48] (STR W/STRH/LDRH/LDR H are baseline).
+    auto strW = [&](unsigned src) { E(0xB9000000u | (12u << 10) | (31u << 5) | src); };
+    auto strH = [&](unsigned src) { E(0x7D000000u | (12u << 10) | (31u << 5) | src); };
+    auto ldrH = [&](unsigned dst) { E(0x7D400000u | (12u << 10) | (31u << 5) | dst); };
+    auto ldrhW = [&](unsigned dst) { E(0x79400000u | (12u << 10) | (31u << 5) | dst); };
+    auto fmovS = [&](unsigned dst, uint32_t imm) { E(dst == 0 ? 0x1E201000u | imm : 0u); };
+    (void)fmovS;
+    switch (in.hk) {
+        case Fp16Kind::FmovImm:
+            E((0x1E2E1000u & ~(0xFFu << 13) & ~0x1Fu) | ((uint32_t(in.imm) & 0xFFu) << 13) | T0);  // fmov sT, #imm8 (S) then convert
+            s2h(T0, D);
+            break;
+        case Fp16Kind::FmovRegH: {  // hD = hN: bit copy
+            strH(M); ldrH(D);
+            break;
+        }
+        case Fp16Kind::FmovWtoH: {  // hD = Wn: str W then LDR H
+            strW(M); ldrH(D);
+            break;
+        }
+        case Fp16Kind::FmovHtoW: {  // Wd = Hn (zero-extend low half)
+            strH(M); ldrhW(D);
+            break;
+        }
+        case Fp16Kind::FcvtToH: {
+            if (in.size == 2) { h2s(N, T0); s2h(T0, D); } else { h2d(N, T0); d2h(T0, D); }
+            break;
+        }
+        case Fp16Kind::FcvtFromH: {
+            if (in.size == 2) { h2s(N, T0); E(0x1EE24000u | (D << 5) | T0); }
+            else { h2d(N, T0); E(0x1EE2C000u | (D << 5) | T0); }
+            break;
+        }
+        case Fp16Kind::Fadd:
+        case Fp16Kind::Fsub:
+        case Fp16Kind::Fmul:
+        case Fp16Kind::Fdiv: {  // compute in S, single rounding is exact (see file header)
+            h2s(N, T0); h2s(M, T1);
+            switch (in.hk) {
+                case Fp16Kind::Fadd: E((0x1E202800u) | (T1 << 16) | (T0 << 5) | T0); break;
+                case Fp16Kind::Fsub: E((0x1E203800u) | (T1 << 16) | (T0 << 5) | T0); break;
+                case Fp16Kind::Fmul: E((0x1E201800u) | (T1 << 16) | (T0 << 5) | T0); break;
+                case Fp16Kind::Fdiv: E((0x1E201800u) | (T1 << 16) | (T0 << 5) | T0); break;
+                default: break;
+            }
+            s2h(T0, D);
+            break;
+        }
+        case Fp16Kind::Fmadd:
+        case Fp16Kind::Fmsub:
+        case Fp16Kind::Fnmadd:
+        case Fp16Kind::Fnmsub: {  // compute the full FMA in D, one rounding
+            h2d(N, T0); h2d(M, T1); h2d(A, T2);
+            switch (in.hk) {
+                case Fp16Kind::Fmadd: E((0x1F400800u & ~0x1FC7FFu) | (T1 << 16) | (T2 << 10) | (T0 << 5) | T2); break;
+                case Fp16Kind::Fmsub: E((0x1F408800u & ~0x1FC7FFu) | (T1 << 16) | (T2 << 10) | (T0 << 5) | T2); break;
+                case Fp16Kind::Fnmadd: E((0x1F600800u & ~0x1FC7FFu) | (T1 << 16) | (T2 << 10) | (T0 << 5) | T2); break;
+                case Fp16Kind::Fnmsub: E((0x1F608800u & ~0x1FC7FFu) | (T1 << 16) | (T2 << 10) | (T0 << 5) | T2); break;
+                default: break;
+            }
+            d2h(T2, D);
+            break;
+        }
+        case Fp16Kind::Fcmp: {
+            h2s(N, T0); h2s(M, T1);
+            E((0x1E212000u & ~0x1F3FFu) | (T1 << 16) | (T0 << 5) | T0);  // fcmp sT0, sT1 (NaN-aware flags)
+            break;
+        }
+        case Fp16Kind::Fcmp0: {
+            h2s(N, T0);
+            E((0x1E202008u & ~0x3E0u) | (T0 << 5));  // fcmp sT0, #0.0
+            break;
+        }
+        case Fp16Kind::Fcsel: {
+            h2s(N, T0); h2s(M, T1); h2s(A, T2);
+            E(0x1E218C02u | (T1 << 16) | (T2 << 10) | (T0 << 5) | T0);  // fcsel sD, s1, s2, cond
+            s2h(T0, D);
+            break;
+        }
+        case Fp16Kind::Fccmp: {
+            h2s(N, T0); h2s(M, T1);
+            E((0x1E218408u & ~0x1F3FFu) | (T1 << 16) | (in.rs << 10) | (in.imm << 12) | (T0 << 5) | T0);  // fccmp sT0, sT1, #nzcv, cond
+            break;
+        }
+        case Fp16Kind::Fminnm: {
+            h2s(N, T0); h2s(M, T1); E(0x1E226800u | (T1 << 16) | (T0 << 5) | T0); s2h(T0, D); break;  // fminnm sT0, sT0, sT1
+        }
+        case Fp16Kind::Fmaxnm: {
+            h2s(N, T0); h2s(M, T1); E((0x1E226800u & ~0x1F3FFu) | (T1 << 16) | (T0 << 5) | T0); s2h(T0, D); break;  // fmaxnm sT0, sT0, sT1
+        }
+        case Fp16Kind::Fabs: {
+            h2s(N, T0); E(0x1EE0C400u | (T0 << 5) | T0); s2h(T0, D); break;  // fabs sT0, sT0
+        }
+        case Fp16Kind::Fneg: {
+            h2s(N, T0); E(0x1EE14000u | (T0 << 5) | T0); s2h(T0, D); break;  // fneg sT0, sT0
+        }
+        case Fp16Kind::Scvtf: {
+            E(0x1E390C00u | (M << 5) | T0); s2h(T0, D); break;  // scvtf sT, wN  (baseline)
+        }
+        case Fp16Kind::Ucvtf: {
+            E(0x1E798C00u | (M << 5) | T0); s2h(T0, D); break;  // ucvtf sT, wN
+        }
+        default: break;
+    }
+    E(enc_ldpq(T0, T1, 0));
+    E(0x3DC00BE0u | T2);                             // ldr qT2, [sp, #32]
+    E(0x9102C3FFu);                                  // add sp, sp, #176
+    E(enc_b(int64_t(stub) + int64_t(o.size()) * 4, int64_t(pc + 4)));
+    return o;
+}
+
 }  // namespace
 
 void trampoline_set_pac(const Pac* p) { g_pac = p; }
@@ -334,7 +466,11 @@ bool trampoline_wants(const Insn& in) {
     switch (in.op) {
         case Op::PacSign: case Op::PacAuth: case Op::PacGa: case Op::BrAuth: case Op::RetAuth: case Op::LdrAuth:
         case Op::Cas: case Op::Casp: case Op::Rmw: case Op::Ldapur: case Op::Cpa: case Op::Dot:
+            // FP16 inline sequences disabled until they match the trap path (see test);
+            // Fp16 words lower to BRK and are handled exactly by emulate().
             return true;
+        case Op::Fp16:
+            return false;
         case Op::Mrs:  // TSD base from the thread-local cache (see trampoline_set_mrs_tls); MrsTpidr is rewritten in place by lower_range; Svc keeps BRK
             return g_mrs_tls >= 0 && in.rd != 18 && in.rd != 31;
             return !(in.op == Op::LdrAuth && in.writeback && in.rn == 31);  // SP writeback would need the frame SP written back
@@ -372,6 +508,20 @@ uint32_t trampoline_make(uint32_t* site, uint32_t word, const Insn& in, uint64_t
     }
     if (in.op == Op::Dot) {  // self-contained SIMD sequence; no generic stub (the host handler frame does not carry V8-V15)
         auto code = build_inline_dot(in, pc, ch->base + ch->used);
+        if (ch->used + code.size() * 4 + 16 > kChunk - 1024) return 0;
+        uint32_t* istub = reinterpret_cast<uint32_t*>(ch->base + ch->used);
+        std::memcpy(istub, code.data(), code.size() * 4);
+        ch->used += (code.size() * 4 + 15) & ~15ull;
+        __builtin___clear_cache(reinterpret_cast<char*>(istub), reinterpret_cast<char*>(istub) + code.size() * 4);
+        ++g_stats.sites;
+        ++g_stats.inlined;
+        g_sites.push_back(SiteInfo{in, pc, word});
+        g_site_by_pc[pc] = &g_sites.back();
+        const int64_t to_i = (int64_t(reinterpret_cast<uint64_t>(istub)) - int64_t(pc)) / 4;
+        return 0x14000000u | (uint32_t(to_i) & 0x03FFFFFFu);
+    }
+    if (in.op == Op::Fp16) {  // self-contained ARMv8.0 sequence (see build_inline_fp16)
+        auto code = build_inline_fp16(in, pc, ch->base + ch->used);
         if (ch->used + code.size() * 4 + 16 > kChunk - 1024) return 0;
         uint32_t* istub = reinterpret_cast<uint32_t*>(ch->base + ch->used);
         std::memcpy(istub, code.data(), code.size() * 4);

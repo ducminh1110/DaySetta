@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -910,6 +911,82 @@ DS_TEST(exec_probe_genuine_apple_functions) {
     const int rc = pclose(p);
     if (rc != 0 || out.find("MISMATCH") != std::string::npos || out.find("RESULT: 9 match, 0 mismatch") == std::string::npos)
         throw ds::test::Failure("ds-exec-probe failed (status " + std::to_string(rc) + "):\n" + out);
+}
+
+DS_TEST(exec_fp16_trap_and_trampoline) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_fp16_trap_and_trampoline: needs an aarch64 host\n");
+    return;
+#endif
+    live_runtime();
+    // FP16 lowering uses the trap path only (inline sequences stay disabled until they
+    // match the trap path exactly — trampoline comparison is skipped while disabled).
+    auto h2d = [](uint16_t b) -> double {
+        uint32_t e = (b >> 10) & 0x1F, f = b & 0x3FF;
+        uint32_t u;
+        if (e == 0) { double dd = double(f) * (1.0 / (1u << 24)); return (b >> 15) ? -dd : dd; }
+        if (e == 31) { u = ((b >> 15) ? 0x80000000u : 0u) | 0x7F800000u | (f << 13); float ff; std::memcpy(&ff, &u, 4); return double(ff); }
+        u = ((b >> 15) ? 0x80000000u : 0u) | ((e + 112u) << 23) | (f << 13);
+        float ff; std::memcpy(&ff, &u, 4); return double(ff);
+    };
+    auto d2h = [](double d) -> uint16_t {
+        if (std::isnan(d)) return 0x7E00u;
+        float f = float(d);
+        uint32_t u; std::memcpy(&u, &f, 4);
+        uint32_t sgn = (u >> 16) & 0x8000;
+        uint32_t frac = u & 0x7FFFFFu;
+        int e = int((u >> 23) & 0xFF) - 127;
+        if (e > 15) return uint16_t(sgn | 0x7C00u);
+        if (e >= -14) {
+            uint32_t half_frac = (frac + 0x1000u) >> 13;
+            return uint16_t(sgn | ((e + 15) << 10) | half_frac);
+        }
+        uint32_t m = frac | 0x800000u;
+        int sh = -e - 1;
+        if (sh > 24) return uint16_t(sgn);
+        return uint16_t(sgn | ((m + (1u << (sh - 1))) >> sh));
+    };
+    struct Case { uint32_t w; Fp16Kind hk; };
+    // Words from llvm-mc --disassemble -mattr=+all on extracted CoreAutoLayout/AppKit/
+    // CoreGraphics/QuartzCore plus llvm-mc-assembled operand grids (see file header).
+    const Case cases[] = {
+        {0x1EE12800, Fp16Kind::Fadd},
+        {0x1EE13800, Fp16Kind::Fsub},
+        {0x1EE10800, Fp16Kind::Fmul},
+        {0x1EE11800, Fp16Kind::Fdiv},
+    };
+    const uint16_t vals[] = {0x3C00, 0x4000, 0xBC12, 0x0001, 0x2E66, 0x7BFE, 0x7C00, 0xFC00, 0x3555, 0x8400, 0x7E00, 0x0000};
+    for (const Case& k : cases) {
+        Insn in;
+        DS_CHECK(decode(k.w, in) && in.op == Op::Fp16 && in.hk == k.hk);
+        for (uint16_t a : vals) {
+            for (uint16_t b : vals) {
+                ExecBuf buf;
+                LowerCounts c;
+                // trap path only (trampolines disabled for Fp16 this milestone)
+                auto f = buf.load<void (*)(uint16_t*)>({0x7d400000u, 0x7d400401u, k.w, 0x7d000000u, 0xd65f03c0u}, &c);
+                uint16_t buf2[2] = {a, b};
+                f(buf2);
+                const uint16_t r = buf2[0];
+                const double da = h2d(a), db = h2d(b);
+                const double v = k.hk == Fp16Kind::Fadd ? da + db : k.hk == Fp16Kind::Fsub ? da - db : k.hk == Fp16Kind::Fmul ? da * db : da / db;
+                if (std::isnan(v)) continue;  // NaN payload is intentionally canonicalized differently
+                DS_CHECK(d2h(v) == r);
+            }
+        }
+    }
+    // spot checks with known values
+    auto spot = [&](uint32_t op, uint16_t a, uint16_t b, uint16_t expect) {
+        ExecBuf buf;
+        LowerCounts c;
+        auto f = buf.load<void (*)(uint16_t*)>({0x7d400000u, 0x7d400401u, op, 0x7d000000u, 0xd65f03c0u}, &c);
+        uint16_t buf2[2] = {a, b};
+        f(buf2);
+        DS_CHECK_EQ(buf2[0], expect);
+    };
+    spot(0x1EE12800u, 0x3E00, 0x4100, 0x4400);  // 1.5 + 2.5 = 4.0
+    spot(0x1EE10800u, 0x3C00, 0x4000, 0x4000);  // 1.0 * 2.0 = 2.0
+    spot(0x1EE11800u, 0x4000, 0x3E00, 0x3D55);  // 2.0 / 1.5 = 4/3 -> half 0x3D55 (1.333008)
 }
 
 DS_TEST(exec_remap_restore_original) {

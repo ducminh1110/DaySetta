@@ -32,11 +32,29 @@ enum class Op : uint8_t {
     Cpa,       // FEAT_CPA ADDPT/SUBPT/MADDPT/MSUBPT (Arm ARM 2026-03 pseudocode, PointerAddCheck)
     MrsTpidr,  // mrs Xt, tpidr_el0: Darwin keeps a CPU/cluster hint there (libmalloc xzone index); the Linux host value is a TLS pointer, so emulate as 0
     Dot,       // FEAT_DotProd UDOT/SDOT (vector and by-element): expanded to ARMv8.0 widening multiply + pairwise adds
+    Fp16,      // FP16 (FEAT_FP16) scalar ops: fmov/fcvt/fadd/… on H regs. Host is ARMv8.0 (no FP16), so lowered
     kCount
 };
 
 enum class Rmw : uint8_t { Add, Clr, Eor, Set, Smax, Smin, Umax, Umin, Swp, kCount };
 enum class ModSrc : uint8_t { Zero, Reg, Sp, SpPc };  // SpPc: FEAT_PAuth_LR, SP combined with a PC (see emulate)
+
+// FP16 (FEAT_FP16) decoded kinds, selected in Insn::hk (Op::Fp16 only).  Half-precision
+// scalar ops run in single precision then FCVT back to half (a single rounding is exact
+// when p_src >= 2*p_dst + 2); the FMA class runs in double precision for the same reason.
+enum class Fp16Kind : uint8_t {
+    FmovImm,    // fmov hd, #imm8          (imm = imm8 field)
+    FmovRegH,   // fmov hd, hn             (bit copy, upper bits preserved)
+    FmovHtoW,   // fmov wd, hn             (zero-extend low half)
+    FmovWtoH,   // fmov hd, wn             (bits into low half, upper preserved)
+    FcvtToH,    // fcvt hd, sn|dn          (size: 2=S, 1=D)
+    FcvtFromH,  // fcvt sn|dn, hn          (size: 2=S, 1=D)
+    Fadd,  Fsub,  Fmul,  Fdiv,
+    Fmadd, Fmsub, Fnmadd, Fnmsub,           // sub=multiply-subtract, mul=negate-product
+    Fcmp, Fcmp0, Fcsel, Fccmp,             // Fcmp: rm = compare reg (mul = signalling)
+    Fminnm, Fmaxnm, Fabs, Fneg,
+    Scvtf, Ucvtf,                           // rn = general register
+};
 
 struct Insn {
     Op op = Op::None;
@@ -51,14 +69,15 @@ struct Insn {
     bool release = false;
     bool link = false;   // BLRAA*
     bool writeback = false;
-    bool sub = false;    // CPA: SUBPT/MSUBPT
-    bool mul = false;    // CPA: MADDPT/MSUBPT (Ra in rs, shift unused)
+    bool sub = false;    // CPA: SUBPT/MSUBPT; FP16 FMA: product subtract
+    bool mul = false;    // CPA: MADDPT/MSUBPT (Ra in rs, shift unused); FP16 FMA: negate product; FCMP: signalling
     int32_t imm = 0;     // LDRAA offset, SVC immediate, LDAPUR offset, PAuth_LR label distance in bytes (pc - label)
     uint8_t sext = 0;    // LDAPUR: 0 zero-extend, 1 sign-extend to X, 2 sign-extend to W
     Rmw rmw = Rmw::Add;
     int8_t lane = -1;    // Dot: by-element index (0..3), -1 = vector form
     bool sgn = false;    // Dot: SDOT
     bool q = false;      // Dot: 128-bit (4S) form
+    Fp16Kind hk = Fp16Kind::FmovImm;  // Op::Fp16 only
 };
 
 const char* op_name(Op op);
