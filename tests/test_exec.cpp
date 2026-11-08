@@ -948,3 +948,70 @@ DS_TEST(exec_remap_restore_original) {
     check(false);  // BRK trap-table entries
     check(true);   // trampoline sites (`b stub`)
 }
+
+DS_TEST(exec_sha3_trap_and_trampoline) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_sha3_trap_and_trampoline: needs an aarch64 host\n");
+    return;
+#endif
+    live_runtime();
+    // Encodings from clang -march=armv8.2-a+sha3 (verified against llvm-objdump).
+    // Program: ldr q0..q3 from [x0]; <sha3>; str q0,[x0]; ret
+    struct Case { uint32_t w; int sha3, imm, rd, rn, rm, rs; };
+    const Case cases[] = {
+        {0xce020c20, 0, 0, 0, 1, 2, 3},   // eor3 v0.16b, v1.16b, v2.16b, v3.16b
+        {0xce220c20, 1, 0, 0, 1, 2, 3},   // bcax v0.16b, v1.16b, v2.16b, v3.16b
+        {0xce628c20, 2, 0, 0, 1, 2, -1},  // rax1 v0.2d, v1.2d, v2.2d
+        {0xce820420, 3, 1, 0, 1, 2, -1},  // xar v0.2d, v1.2d, v2.2d, #0x1
+        {0xce82fc20, 3, 63, 0, 1, 2, -1}, // xar v0.2d, v1.2d, v2.2d, #0x3f
+        {0xce800000, 3, 0, 0, 0, 0, -1},  // xar v0.2d, v0.2d, v0.2d, #0 (Rd=Rn=Rm alias; imm6=0)
+    };
+    LowerPolicy fast;
+    fast.trampolines = true;
+    uint32_t rng = 0x12345678;
+    auto rnd = [&] { rng = rng * 1664525 + 1013904223; return uint8_t(rng >> 24); };
+    for (const Case& k : cases) {
+        Insn in;
+        DS_CHECK(decode(k.w, in) && in.op == Op::Sha3 && in.sha3 == uint8_t(k.sha3) && in.imm == k.imm &&
+                 in.rd == uint8_t(k.rd) && in.rn == uint8_t(k.rn) && in.rm == uint8_t(k.rm) &&
+                 (k.rs < 0 || in.rs == uint8_t(k.rs)));
+        auto ref = [&](const uint8_t v[4][16], uint8_t out[16]) {
+            uint64_t n[2], m[2], a[2], r[2];
+            std::memcpy(n, v[k.rn], 16);
+            std::memcpy(m, v[k.rm], 16);
+            std::memcpy(a, v[k.rs >= 0 ? k.rs : 0], 16);
+            const auto rol = [](uint64_t x) { return (x << 1) | (x >> 63); };
+            const auto ror = [](uint64_t x, unsigned s) { return s ? (x >> s) | (x << (64 - s)) : x; };
+            switch (k.sha3) {
+                case 0: r[0] = n[0] ^ m[0] ^ a[0]; r[1] = n[1] ^ m[1] ^ a[1]; break;
+                case 1: r[0] = n[0] ^ (m[0] & ~a[0]); r[1] = n[1] ^ (m[1] & ~a[1]); break;
+                case 2: r[0] = n[0] ^ rol(m[0]); r[1] = n[1] ^ rol(m[1]); break;
+                default: r[0] = ror(n[0] ^ m[0], unsigned(k.imm)); r[1] = ror(n[1] ^ m[1], unsigned(k.imm)); break;
+            }
+            std::memcpy(out, r, 16);
+        };
+        for (int iter = 0; iter < 16; ++iter) {
+            uint8_t init[64];
+            for (int i = 0; i < 64; ++i) init[i] = rnd();
+            uint8_t want[16];
+            ref(reinterpret_cast<const uint8_t (*)[16]>(init), want);
+            // case with xar imm 0 was constructed with Rn=Rm=Rd=0: v0 is ref input and output
+            for (int mode = 0; mode < 2; ++mode) {
+                ExecBuf b;
+                LowerCounts c;
+                auto f = mode ? b.load<void (*)(uint8_t*)>({0x3dc00000, 0x3dc00401, 0x3dc00802, 0x3dc00c03, k.w, 0x3d800000, 0xd65f03c0}, &c, fast)
+                              : b.load<void (*)(uint8_t*)>({0x3dc00000, 0x3dc00401, 0x3dc00802, 0x3dc00c03, k.w, 0x3d800000, 0xd65f03c0}, &c);
+                DS_CHECK_EQ(c.patched[int(Op::Sha3)], 1ull);
+                uint8_t buf[64];
+                std::memcpy(buf, init, 64);
+                f(buf);
+                if (std::memcmp(buf + k.rd * 16, want, 16) != 0)
+                    throw ds::test::Failure(std::string("sha3 result mismatch, ") + (mode ? "trampoline" : "trap") + " path");
+            }
+        }
+    }
+    // SHA512 sub-space (0xCE, bits[23:21]=011, bit15=1, bits[14:12]=000, bits[11:10]=0/1/2;
+    // arm64emu crypto_sha3_512) must stay unsupported: only RAX1 (bits[11:10]=3) is SHA3
+    Insn in;
+    DS_CHECK(!decode(0xCE628020, in) && !decode(0xCE628420, in) && !decode(0xCE628820, in));
+}

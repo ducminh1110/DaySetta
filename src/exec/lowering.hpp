@@ -32,6 +32,7 @@ enum class Op : uint8_t {
     Cpa,       // FEAT_CPA ADDPT/SUBPT/MADDPT/MSUBPT (Arm ARM 2026-03 pseudocode, PointerAddCheck)
     MrsTpidr,  // mrs Xt, tpidr_el0: Darwin keeps a CPU/cluster hint there (libmalloc xzone index); the Linux host value is a TLS pointer, so emulate as 0
     Dot,       // FEAT_DotProd UDOT/SDOT (vector and by-element): expanded to ARMv8.0 widening multiply + pairwise adds
+    Sha3,      // FEAT_SHA3 EOR3/BCAX/RAX1/XAR (vector): expanded to ARMv8.0 vector EOR/AND/BIC/SHL/USHR/ORR
     kCount
 };
 
@@ -59,6 +60,7 @@ struct Insn {
     int8_t lane = -1;    // Dot: by-element index (0..3), -1 = vector form
     bool sgn = false;    // Dot: SDOT
     bool q = false;      // Dot: 128-bit (4S) form
+    uint8_t sha3 = 0;    // Sha3: 0 EOR3, 1 BCAX, 2 RAX1, 3 XAR (imm = rotation amount for XAR)
 };
 
 const char* op_name(Op op);
@@ -108,6 +110,7 @@ struct LowerPolicy {
     bool sysreg = true;  // mrs tpidrro_el0, LDAPUR
     bool ldapr = true;   // LDAPR -> LDAR rewrite
     bool simd = true;    // UDOT/SDOT
+    bool sha3 = true;    // FEAT_SHA3 EOR3/BCAX/RAX1/XAR
     // Fast paths (aarch64 runtime only; tests keep the BRK-only default):
     bool trampolines = false;  // rewrite to `b stub` (user-space emulation) where an island is in reach
     uint64_t island_skip = 16ull << 20;  // new island chunks start at least this far above the code (loaders map data segments behind it)

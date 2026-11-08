@@ -7,7 +7,7 @@ namespace ds::exec {
 const char* op_name(Op op) {
     static const char* names[] = {"none",    "pac-sign", "pac-auth", "pac-strip", "pacga", "br-auth",
                                   "ret-auth", "ldr-auth", "cas",      "casp",      "rmw",   "svc",
-                                  "mrs-tpidrro", "ldapur", "cpa", "mrs-tpidr", "dot"};
+                                  "mrs-tpidrro", "ldapur", "cpa", "mrs-tpidr", "dot", "sha3"};
     return names[static_cast<int>(op)];
 }
 
@@ -226,6 +226,31 @@ bool decode(uint32_t w, Insn& out) {
         o.rd = bits(w, 4, 0);
         if (bits(w, 24, 24)) o.lane = int8_t((bits(w, 11, 11) << 1) | bits(w, 21, 21));
         ok = true;
+    } else if ((w & 0xFF000000u) == 0xCE000000u) {  // FEAT_SHA3 (0xCE crypto space; SHA512 shares it, left unsupported)
+        // Encodings from clang -march=armv8.2-a+sha3 (verified against llvm-objdump):
+        // EOR3 Vd.16B,Vn.16B,Vm.16B,Va.16B : 0xCE 0b00 0000 Ra Vm 00 Rn Rd (bits[23:21]=000, bit15=0)
+        // BCAX Vd.16B,Vn.16B,Vm.16B,Va.16B : 0xCE 0b01 0000 Ra Vm 00 Rn Rd (bits[23:21]=001, bit15=0)
+        // XAR  Vd.2D,Vn.2D,Vm.2D,#imm6   : 0xCE 1000 imm6 Vm imm6 Rn Rd  (bits[23:21]=100)
+        // RAX1 Vd.2D,Vn.2D,Vm.2D          : 0xCE 0110 0000 Vm 11 Rn Rd  (bits[23:21]=011, bit15=1, bits[14:12]=000, bits[11:10]=11)
+        const uint32_t b23_21 = bits(w, 23, 21);
+        o.rm = bits(w, 20, 16);
+        o.rn = bits(w, 9, 5);
+        o.rd = bits(w, 4, 0);
+        if (!bits(w, 23, 23) && !bits(w, 15, 15) && b23_21 < 2) {
+            o.op = Op::Sha3;
+            o.sha3 = uint8_t(b23_21);           // 0 EOR3, 1 BCAX
+            o.rs = bits(w, 14, 10);             // Va
+            ok = true;
+        } else if (b23_21 == 4) {               // XAR
+            o.op = Op::Sha3;
+            o.sha3 = 3;
+            o.imm = int32_t(bits(w, 15, 10));
+            ok = true;
+        } else if (b23_21 == 3 && bits(w, 15, 15) && !bits(w, 14, 12) && bits(w, 11, 10) == 3) {
+            o.op = Op::Sha3;
+            o.sha3 = 2;                         // RAX1
+            ok = true;
+        }
     } else if ((w & 0xFF200400) == 0xF8200400) {
         ok = decode_ldraa(w, o);
     } else {
@@ -291,6 +316,7 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
                           : in.op == Op::Mrs || in.op == Op::MrsTpidr || in.op == Op::Ldapur ? policy.sysreg
                           : in.op == Op::Cpa ? policy.pac
                           : in.op == Op::Dot ? policy.simd
+                          : in.op == Op::Sha3 ? policy.sha3
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
                                                                                        : policy.pac;
         if (!want) continue;

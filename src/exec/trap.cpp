@@ -391,6 +391,43 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
             std::memcpy(c.v[in.rd], d, 16);
             break;
         }
+        case Op::Sha3: {  // FEAT_SHA3: 128-bit vector ops (arm64emu exec_fpsimd.c crypto_sha3_512)
+            if (!c.v) { out.status = Emu::Bad; break; }
+            uint64_t n[2], m[2], r[2];
+            std::memcpy(n, c.v[in.rn], 16);
+            std::memcpy(m, c.v[in.rm], 16);
+            switch (in.sha3) {
+                case 0: {  // EOR3 Vd,Vn,Vm,Va = Vn^Vm^Va
+                    uint64_t a[2];
+                    std::memcpy(a, c.v[in.rs], 16);
+                    r[0] = n[0] ^ m[0] ^ a[0];
+                    r[1] = n[1] ^ m[1] ^ a[1];
+                    break;
+                }
+                case 1: {  // BCAX Vd,Vn,Vm,Va = Vn^(Vm&~Va)
+                    uint64_t a[2];
+                    std::memcpy(a, c.v[in.rs], 16);
+                    r[0] = n[0] ^ (m[0] & ~a[0]);
+                    r[1] = n[1] ^ (m[1] & ~a[1]);
+                    break;
+                }
+                case 2: {  // RAX1 Vd,Vn,Vm = Vn ^ ROL(Vm,1) per 64-bit lane
+                    auto rol = [](uint64_t x) { return (x << 1) | (x >> 63); };
+                    r[0] = n[0] ^ rol(m[0]);
+                    r[1] = n[1] ^ rol(m[1]);
+                    break;
+                }
+                default: {  // XAR Vd,Vn,Vm,#imm = ROR(Vn^Vm,imm) per 64-bit lane
+                    const unsigned sh = unsigned(in.imm) & 63;
+                    auto ror = [](uint64_t x, unsigned s) { return s ? (x >> s) | (x << (64 - s)) : x; };
+                    r[0] = ror(n[0] ^ m[0], sh);
+                    r[1] = ror(n[1] ^ m[1], sh);
+                    break;
+                }
+            }
+            std::memcpy(c.v[in.rd], r, 16);
+            break;
+        }
         case Op::Svc:
             out.svc = true;
             out.svc_x16 = int64_t(c.x[16]);

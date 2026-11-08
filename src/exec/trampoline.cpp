@@ -322,6 +322,67 @@ std::vector<uint32_t> build_inline_dot(const Insn& in, uint64_t pc, uint64_t stu
     return o;
 }
 
+// ---- FEAT_SHA3 as ARMv8.0 Advanced SIMD (flags and GPRs untouched) --------------------------------------------------------
+// EOR3: eor s, vn, vm; eor vd, s, va.  BCAX: and s, vn, vm; bic vd, vn, va; eor vd, vd, s.
+// RAX1: shl s, vm, #1; ushr t, vm, #63; orr s, s, t; eor vd, vn, s.
+// XAR:  eor s, vn, vm; (imm==0: eor vd, vn, vm) else shl t, s, #(64-imm); ushr s, s, #imm; orr vd, s, t.
+// Scratch vectors are spilled below the 128-byte red zone (sp moved first, as in build_inline_dot).
+// Encodings below were produced with clang -march=armv8-a + llvm-objdump (class VERIFIED): three-same
+// logicals are 0x4E201C00/0x6E201C00-based with Rm at bits20-16, Rn at 9-5, Rd at 4-0; the shift-by-immediate
+// pair uses imm7 at bits22-16 (shl: 63+imm; ushr: 128-imm).
+std::vector<uint32_t> build_inline_sha3(const Insn& in, uint64_t pc, uint64_t stub) {
+    std::vector<uint32_t> o;
+    unsigned t[2], k = 0;
+    for (unsigned r = 0; r < 32 && k < 2; ++r)
+        if (r != in.rd && r != in.rn && r != in.rm && r != in.rs) t[k++] = r;
+    const unsigned S = t[0], T = t[1], N = in.rn, D = in.rd, M = in.rm;
+    auto E = [&](uint32_t w) { o.push_back(w); };
+    auto vec3 = [&](uint32_t base, unsigned rd, unsigned rn, unsigned rm) {
+        return base | (rm << 16) | (rn << 5) | rd;
+    };
+    const uint32_t kBic = 0x4E601C00u, kOrr = 0x4EA01C00u, kEor = 0x6E201C00u;
+    auto shl2d = [&](unsigned rd, unsigned rn, unsigned imm) {  // imm 1..63
+        return 0x4F005400u | ((64u + imm) << 16) | (rn << 5) | rd;
+    };
+    auto ushr2d = [&](unsigned rd, unsigned rn, unsigned imm) {  // imm 1..63
+        return 0x6F000400u | ((128u - imm) << 16) | (rn << 5) | rd;
+    };
+    E(0xD102C3FFu);                                  // sub sp, sp, #176
+    E(enc_stpq(S, T, 0));
+    switch (in.sha3) {
+        case 0:  // EOR3
+            E(vec3(kEor, S, N, M));
+            E(vec3(kEor, D, S, in.rs));
+            break;
+        case 1:  // BCAX Vd,Vn,Vm,Va = Vn ^ (Vm & ~Va) (Arm ARM; qemu-verified)
+            E(vec3(kBic, S, M, in.rs));
+            E(vec3(kEor, D, N, S));
+            break;
+        case 2:  // RAX1
+            E(shl2d(S, M, 1));
+            E(ushr2d(T, M, 63));
+            E(vec3(kOrr, S, S, T));
+            E(vec3(kEor, D, N, S));
+            break;
+        default: {  // XAR
+            const unsigned imm = unsigned(in.imm) & 63;
+            if (imm == 0) {
+                E(vec3(kEor, D, N, M));
+            } else {
+                E(vec3(kEor, S, N, M));
+                E(shl2d(T, S, 64 - imm));
+                E(ushr2d(S, S, imm));
+                E(vec3(kOrr, D, S, T));
+            }
+            break;
+        }
+    }
+    E(enc_ldpq(S, T, 0));
+    E(0x9102C3FFu);                                  // add sp, sp, #176
+    E(enc_b(int64_t(stub) + int64_t(o.size()) * 4, int64_t(pc + 4)));
+    return o;
+}
+
 }  // namespace
 
 void trampoline_set_pac(const Pac* p) { g_pac = p; }
@@ -333,7 +394,7 @@ bool trampoline_wants(const Insn& in) {
     if (!g_handler) return false;
     switch (in.op) {
         case Op::PacSign: case Op::PacAuth: case Op::PacGa: case Op::BrAuth: case Op::RetAuth: case Op::LdrAuth:
-        case Op::Cas: case Op::Casp: case Op::Rmw: case Op::Ldapur: case Op::Cpa: case Op::Dot:
+        case Op::Cas: case Op::Casp: case Op::Rmw: case Op::Ldapur: case Op::Cpa: case Op::Dot: case Op::Sha3:
             return true;
         case Op::Mrs:  // TSD base from the thread-local cache (see trampoline_set_mrs_tls); MrsTpidr is rewritten in place by lower_range; Svc keeps BRK
             return g_mrs_tls >= 0 && in.rd != 18 && in.rd != 31;
@@ -370,8 +431,9 @@ uint32_t trampoline_make(uint32_t* site, uint32_t word, const Insn& in, uint64_t
         const int64_t to_stub = (int64_t(reinterpret_cast<uint64_t>(stub)) - int64_t(pc)) / 4;
         return 0x14000000u | (uint32_t(to_stub) & 0x03FFFFFFu);
     }
-    if (in.op == Op::Dot) {  // self-contained SIMD sequence; no generic stub (the host handler frame does not carry V8-V15)
-        auto code = build_inline_dot(in, pc, ch->base + ch->used);
+    if (in.op == Op::Dot || in.op == Op::Sha3) {  // self-contained SIMD sequence; no generic stub (the host handler frame does not carry V8-V15)
+        auto code = (in.op == Op::Dot) ? build_inline_dot(in, pc, ch->base + ch->used)
+                                       : build_inline_sha3(in, pc, ch->base + ch->used);
         if (ch->used + code.size() * 4 + 16 > kChunk - 1024) return 0;
         uint32_t* istub = reinterpret_cast<uint32_t*>(ch->base + ch->used);
         std::memcpy(istub, code.data(), code.size() * 4);
