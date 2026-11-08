@@ -331,4 +331,29 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
 
 void flush_icache(void* begin, void* end) { __builtin___clear_cache(static_cast<char*>(begin), static_cast<char*>(end)); }
 
+size_t restore_original(uint32_t* dst, const uint32_t* src_pc, size_t n) {
+    const uint64_t base = reinterpret_cast<uint64_t>(src_pc);
+    size_t restored = 0;
+    for (size_t i = 0; i < n; ++i) {
+        const uint64_t pc = base + 4ull * i;
+        const uint32_t w = dst[i];
+        // Only words still in a lowered form are rewritten: a BRK trap word keyed to this pc,
+        // or a `b stub` branch.  Everything else (native instructions, in-place PC-independent
+        // rewrites, and words of code that was remapped over a lowered range without being
+        // lowered) already holds its final form and is left alone.
+        if ((w & 0xFFE0001Fu) == 0xD4200000u) {  // brk #idx
+            if (const TrapEntry* e = trap_table().find((w >> 5) & 0xFFFF, pc)) {
+                dst[i] = e->word;
+                ++restored;
+            }
+        } else if ((w & 0xFC000000u) == 0x14000000u) {  // b stub
+            if (const SiteInfo* s = trampoline_lookup(pc)) {
+                dst[i] = s->word;
+                ++restored;
+            }
+        }
+    }
+    return restored;
+}
+
 }  // namespace ds::exec

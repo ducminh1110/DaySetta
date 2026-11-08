@@ -10,6 +10,8 @@
 
 #include "session.h"
 #include "window.h"
+#include "process.h"
+#include <stdlib.h>
 
 #define DL_FIRST_WINDOW_ID 0x1f6
 #define DL_WINDOW_SHM_SIZE 0xb0
@@ -121,6 +123,11 @@ static void set_window_layer_context(const dl_request *req, dl_reply *reply, voi
 		const uint32_t note[2] = { 0, wid };
 		dl_session_post(server, conn, DL_NOTE_WINDOW_SPACE_MEMBERSHIP_CHANGED, note, sizeof(note));
 		dl_session_post(server, conn, DL_NOTE_WINDOW_BECAME_VISIBLE, note, sizeof(note));
+		/* Fresh login sessions front the first window owner's process in the real window server; emit the
+		 * activation sequence too so headless-test clients (bare processes with no LaunchServices fronting)
+		 * still see a front process and can finish their first key window ordering. */
+		if (!getenv("DAYLIGHT_NO_AUTO_ACTIVATE"))
+			dl_process_activate(server, conn, 0, 0);
 	}
 }
 
