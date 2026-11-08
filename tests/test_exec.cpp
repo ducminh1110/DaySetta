@@ -1185,6 +1185,54 @@ DS_TEST(exec_fp16v_trap) {
     }
 }
 
+
+DS_TEST(exec_tramp_vregs_preserved) {
+#if !defined(__aarch64__)
+    std::fprintf(stderr, "SKIP exec_tramp_vregs_preserved: needs an aarch64 host\n");
+    return;
+#endif
+    live_runtime();
+    setenv("DS_TRAMP_NO_INLINE", "1", 1);
+    LowerPolicy pol;
+    pol.trampolines = true;
+    auto pat = [](int i) -> uint64_t { return 0x9E3779B97F4A7C15ull ^ (0x2545F4914F6CDD1Dull * (uint64_t)(i + 1)); };
+    std::vector<uint32_t> words;
+    for (int i = 8; i <= 15; ++i) {
+        uint64_t lo = pat(i), hi = pat(i + 16);
+        unsigned xi = 10, xt = 11;
+        words.push_back(0xD2800000u | (uint32_t)(lo & 0xFFFF) << 5 | xi);
+        words.push_back(0xF2800000u | (uint32_t)((lo >> 16) & 0xFFFF) << 5 | 0x00200000u | xi);
+        words.push_back(0xF2800000u | (uint32_t)((lo >> 32) & 0xFFFF) << 5 | 0x00400000u | xi);
+        words.push_back(0xF2800000u | (uint32_t)((lo >> 48) & 0xFFFF) << 5 | 0x00600000u | xi);
+        words.push_back(0xD2800000u | (uint32_t)(hi & 0xFFFF) << 5 | xt);
+        words.push_back(0xF2800000u | (uint32_t)((hi >> 16) & 0xFFFF) << 5 | 0x00200000u | xt);
+        words.push_back(0xF2800000u | (uint32_t)((hi >> 32) & 0xFFFF) << 5 | 0x00400000u | xt);
+        words.push_back(0xF2800000u | (uint32_t)((hi >> 48) & 0xFFFF) << 5 | 0x00600000u | xt);
+        words.push_back(0x4E081D48u | (unsigned)i);  // ins v_i.d[0], x10  (llvm-mc verified)
+        words.push_back(0x4E181D68u | (unsigned)i);  // ins v_i.d[1], x11
+    }
+    words.push_back(0xd503237fu);  // pacibsp -> generic C++ handler
+    const uint32_t store[] = { 0x3d800008u, 0x3d800409u, 0x3d80080au, 0x3d800c0bu, 0x3d80100cu, 0x3d80140du, 0x3d80180eu, 0x3d801c0fu };
+    for (uint32_t w : store) words.push_back(w);
+    words.push_back(0xd50323ffu);  // autibsp
+    words.push_back(0xd65f03c0u);  // ret (LR already authenticated)
+    ExecBuf buf;
+    LowerCounts c;
+    auto f = buf.load<void (*)(uint64_t*)>(words, &c, pol);
+    uint64_t out[16] = {};
+    f(out);
+    for (int i = 8; i <= 15; ++i) {
+        uint64_t lo_got = out[2*(i-8)], hi_got = out[2*(i-8)+1];
+        if (lo_got != pat(i) || hi_got != pat(i + 16))
+            printf("VREGDIFF v%d: lo=%016llx hi=%016llx expect lo=%016llx hi=%016llx\n", i,
+                   (unsigned long long)lo_got, (unsigned long long)hi_got,
+                   (unsigned long long)pat(i), (unsigned long long)pat(i + 16));
+        DS_CHECK_EQ(lo_got, pat(i));
+        DS_CHECK_EQ(hi_got, pat(i + 16));
+    }
+    unsetenv("DS_TRAMP_NO_INLINE");
+}
+
 DS_TEST(exec_remap_restore_original) {
 #if !defined(__aarch64__)
     std::fprintf(stderr, "SKIP exec_remap_restore_original: needs an aarch64 host\n");

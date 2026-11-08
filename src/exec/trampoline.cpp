@@ -17,8 +17,8 @@ namespace {
 
 constexpr uint64_t kReach = 127ull << 20;      // B imm26 reaches +-128 MB; keep a margin
 constexpr size_t kChunk = 1024 * 1024;
-constexpr unsigned kQOff = 288;                                         // v0-v7, v16-v31 (caller-saved vector registers) follow the GPR frame
-constexpr unsigned kFrame = kQOff + 24 * 16, kRedZone = 128, kTotal = kFrame + kRedZone;  // 800, 16-aligned
+constexpr unsigned kQOff = 288;                                         // v0-v15, v16-v31 (caller-saved vector registers) follow the GPR frame
+constexpr unsigned kFrame = kQOff + 32 * 16, kRedZone = 128, kTotal = kFrame + kRedZone;  // 928, 16-aligned
 
 struct Chunk {
     uint64_t base = 0, used = 0, common = 0, consts = 0;
@@ -49,7 +49,7 @@ std::vector<uint32_t> build_common(uint64_t handler, size_t* lit_off_out) {
     c.push_back(enc_str(30, 240));
     {   // vector registers the host handler may clobber
         unsigned off = kQOff;
-        for (unsigned r : {0u, 2u, 4u, 6u, 16u, 18u, 20u, 22u, 24u, 26u, 28u, 30u}) { c.push_back(enc_stpq(r, r + 1, off)); off += 32; }
+        for (unsigned r : {0u, 2u, 4u, 6u, 8u, 10u, 12u, 14u, 16u, 18u, 20u, 22u, 24u, 26u, 28u, 30u}) { c.push_back(enc_stpq(r, r + 1, off)); off += 32; }
     }
     c.push_back(0xD53B4200u);                                         // mrs x0, nzcv
     c.push_back(enc_str(0, 248));
@@ -65,7 +65,7 @@ std::vector<uint32_t> build_common(uint64_t handler, size_t* lit_off_out) {
     for (unsigned r = 0; r < 30; r += 2) c.push_back(enc_ldp(r, r + 1, r * 8));
     {
         unsigned off = kQOff;
-        for (unsigned r : {0u, 2u, 4u, 6u, 16u, 18u, 20u, 22u, 24u, 26u, 28u, 30u}) { c.push_back(enc_ldpq(r, r + 1, off)); off += 32; }
+        for (unsigned r : {0u, 2u, 4u, 6u, 8u, 10u, 12u, 14u, 16u, 18u, 20u, 22u, 24u, 26u, 28u, 30u}) { c.push_back(enc_ldpq(r, r + 1, off)); off += 32; }
     }
     c.push_back(enc_ldr(30, 240));
     c.push_back(enc_ldr(18, 264));                                    // next pc (after the x18 restore: x18 is the branch register)
