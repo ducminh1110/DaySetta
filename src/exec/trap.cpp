@@ -198,6 +198,25 @@ bool plain_range_contains(uint64_t a) {
 EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats) {
     EmuOutcome out;
     stats.by_op[static_cast<int>(in.op)].fetch_add(1, std::memory_order_relaxed);
+    // Debug PC trace (DS_EXEC_TRACE_PC=<hex addr>, off by default): dump the full guest context
+    // the first time an emulated word at the target pc is seen.
+    {
+        static const uint64_t tp = getenv("DS_EXEC_TRACE_PC") ? strtoull(getenv("DS_EXEC_TRACE_PC"), nullptr, 16) : 0;
+        if (tp && c.pc == tp) {
+            for (int r = 0; r < 31; ++r)
+                fprintf(stderr, "ds-exec: TRACE pc=0x%llx x%d=0x%016llx\n", (unsigned long long)tp, r, (unsigned long long)c.x[r]);
+            if (c.v) {
+                for (int r = 0; r < 32; ++r) {
+                    uint64_t lo, hi;
+                    std::memcpy(&lo, c.v[r], 8);
+                    std::memcpy(&hi, (const char*)(const void*)c.v[r] + 8, 8);
+                    fprintf(stderr, "ds-exec: TRACE pc=0x%llx v%d=%016llx/%016llx x0=%016llx x1=%016llx x2=%016llx x3=%016llx sp=%016llx\n",
+                            (unsigned long long)tp, r, (unsigned long long)lo, (unsigned long long)hi, (unsigned long long)c.x[0], (unsigned long long)c.x[1],
+                            (unsigned long long)c.x[2], (unsigned long long)c.x[3], (unsigned long long)c.sp);
+                }
+            }
+        }
+    }
     switch (in.op) {
         case Op::PacSign:
             c.set(in.rd, pac.sign(in.key, c.get(in.rd), modifier(in, c)));
@@ -766,6 +785,26 @@ TrapRes try_trap(ucontext_t* uc, uint32_t* idx_out, uint64_t tsd = 0) {
     const uint32_t idx = (word >> 5) & 0xFFFF;
     if (idx_out) *idx_out = idx;
     const TrapEntry* e = trap_table().find(idx, pc);
+    // Debug dump at a chosen BRK pc (DS_EXEC_TRACE_PC=<hex addr>, off by default): print the full
+    // guest context once, even for non-decodable words (e.g. a forced BRK on a `bl`).
+    {
+        static const uint64_t tp = getenv("DS_EXEC_TRACE_PC") ? strtoull(getenv("DS_EXEC_TRACE_PC"), nullptr, 16) : 0;
+        if (tp && pc == tp) {
+            CpuState cs2;
+            load_state(cs2, uc);
+            for (int r = 0; r < 30; ++r)
+                fprintf(stderr, "ds-exec: TRACE pc=0x%llx x%d=0x%016llx\n", (unsigned long long)pc, r, (unsigned long long)cs2.x[r]);
+            if (cs2.v) {
+                for (int r = 0; r < 32; ++r) {
+                    uint64_t lo, hi;
+                    std::memcpy(&lo, cs2.v[r], 8);
+                    std::memcpy(&hi, (const char*)(const void*)cs2.v[r] + 8, 8);
+                    fprintf(stderr, "ds-exec: TRACE pc=0x%llx v%d=%016llx/%016llx sp=0x%016llx\n",
+                            (unsigned long long)pc, r, (unsigned long long)lo, (unsigned long long)hi, (unsigned long long)cs2.sp);
+                }
+            }
+        }
+    }
     Insn in;
     if (!e || !decode(e->word, in)) return TrapRes::NotLowered;
     CpuState cs;
