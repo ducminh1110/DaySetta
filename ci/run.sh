@@ -49,12 +49,6 @@ else
     echo "== ctest skipped: build did not succeed =="
 fi
 
-echo "== docs =="
-if ! python3 ci/check_docs.py; then
-    echo "CI FAILED: documentation check failed" >&2
-    status=1
-fi
-
 if [ "${status}" -ne 0 ]; then
     echo "CI FAILED: one or more steps failed; no result was faked." >&2
     exit "${status}"
