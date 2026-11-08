@@ -5,6 +5,9 @@
 #include <signal.h>
 #include <sys/mman.h>
 #include <ucontext.h>
+#if defined(__aarch64__)
+#include <asm/sigcontext.h>
+#endif
 #include <unistd.h>
 
 #include <cstdarg>
@@ -369,6 +372,25 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
             c.set(in.rd, v);
             break;
         }
+        case Op::Dot: {  // UDOT/SDOT: each 32-bit lane += sum of four byte products
+            if (!c.v) { out.status = Emu::Bad; break; }
+            uint8_t n[16], m[16];
+            uint32_t d[4];
+            std::memcpy(n, c.v[in.rn], 16);
+            std::memcpy(m, c.v[in.rm], 16);
+            std::memcpy(d, c.v[in.rd], 16);
+            const int lanes = in.q ? 4 : 2;
+            for (int e = 0; e < 4; ++e) {
+                if (e >= lanes) { d[e] = 0; continue; }
+                const int mb = in.lane >= 0 ? in.lane * 4 : e * 4;
+                int32_t acc = 0;
+                for (int k = 0; k < 4; ++k)
+                    acc += in.sgn ? int32_t(int8_t(n[e * 4 + k])) * int8_t(m[mb + k]) : int32_t(n[e * 4 + k]) * m[mb + k];
+                d[e] += uint32_t(acc);
+            }
+            std::memcpy(c.v[in.rd], d, 16);
+            break;
+        }
         case Op::Svc:
             out.svc = true;
             out.svc_x16 = int64_t(c.x[16]);
@@ -421,6 +443,16 @@ void load_state(CpuState& s, const ucontext_t* uc) {
     s.sp = uc->uc_mcontext.sp;
     s.pc = uc->uc_mcontext.pc;
     s.pstate = uc->uc_mcontext.pstate;
+    s.v = nullptr;  // fpsimd_context record in the signal frame (written back by the kernel on sigreturn)
+    for (size_t off = 0; off + sizeof(_aarch64_ctx) <= sizeof(uc->uc_mcontext.__reserved);) {
+        auto* h = reinterpret_cast<const _aarch64_ctx*>(uc->uc_mcontext.__reserved + off);
+        if (h->magic == 0 || h->size == 0) break;
+        if (h->magic == FPSIMD_MAGIC) {
+            s.v = reinterpret_cast<uint8_t (*)[16]>(const_cast<fpsimd_context*>(reinterpret_cast<const fpsimd_context*>(h))->vregs);
+            break;
+        }
+        off += h->size;
+    }
 }
 
 void store_state(const CpuState& s, ucontext_t* uc) {

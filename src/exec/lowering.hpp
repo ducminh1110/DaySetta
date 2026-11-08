@@ -31,6 +31,7 @@ enum class Op : uint8_t {
     Ldapur,    // FEAT_LRCPC2 LDAPUR{B,H,SB,SH,SW,}: emulated with an acquire (LDAR-class) load
     Cpa,       // FEAT_CPA ADDPT/SUBPT/MADDPT/MSUBPT (Arm ARM 2026-03 pseudocode, PointerAddCheck)
     MrsTpidr,  // mrs Xt, tpidr_el0: Darwin keeps a CPU/cluster hint there (libmalloc xzone index); the Linux host value is a TLS pointer, so emulate as 0
+    Dot,       // FEAT_DotProd UDOT/SDOT (vector and by-element): expanded to ARMv8.0 widening multiply + pairwise adds
     kCount
 };
 
@@ -55,6 +56,9 @@ struct Insn {
     int32_t imm = 0;     // LDRAA offset, SVC immediate, LDAPUR offset, PAuth_LR label distance in bytes (pc - label)
     uint8_t sext = 0;    // LDAPUR: 0 zero-extend, 1 sign-extend to X, 2 sign-extend to W
     Rmw rmw = Rmw::Add;
+    int8_t lane = -1;    // Dot: by-element index (0..3), -1 = vector form
+    bool sgn = false;    // Dot: SDOT
+    bool q = false;      // Dot: 128-bit (4S) form
 };
 
 const char* op_name(Op op);
@@ -103,6 +107,7 @@ struct LowerPolicy {
     bool svc = true;
     bool sysreg = true;  // mrs tpidrro_el0, LDAPUR
     bool ldapr = true;   // LDAPR -> LDAR rewrite
+    bool simd = true;    // UDOT/SDOT
     // Fast paths (aarch64 runtime only; tests keep the BRK-only default):
     bool trampolines = false;  // rewrite to `b stub` (user-space emulation) where an island is in reach
     uint64_t island_skip = 16ull << 20;  // new island chunks start at least this far above the code (loaders map data segments behind it)
