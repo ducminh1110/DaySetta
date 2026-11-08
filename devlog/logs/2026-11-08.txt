@@ -1,0 +1,16 @@
+$ ./build/daysetta_tests
+ok   scene_rejects_invalid_rect_level_title_and_surface
+ok   scene_opacity_clamp_and_json_escaping
+ok   scene_counters_and_client_removal
+ok   sdk_fake_server
+ok   sdk_hello_denied
+58/58 tests passed
+
+$ regressions (boot, plutil -p x5)
+boot-ok
+plutil -p 5/5
+
+$ darling shell lzfsetest2
+oss: 1048576 bytes, fnv=aae194cda01aa113 expect 1048576 aae194cda01aa113 MATCH
+oss: match -> crash came from libcompression asm
+lib: 1048576 bytes, fnv=aae194cda01aa113 expect 1048576 aae194cda01aa113 MATCH
