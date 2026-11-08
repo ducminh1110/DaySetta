@@ -2,6 +2,13 @@
 #include "lowering.hpp"
 #include "trampoline.hpp"
 
+#if defined(__aarch64__) && __has_include(<asm/hwcap.h>)
+#include <asm/hwcap.h>
+#include <elf.h>
+#include <sys/auxv.h>
+#define DS_HAVE_HWCAP 1
+#endif
+
 namespace ds::exec {
 
 const char* op_name(Op op) {
@@ -137,6 +144,59 @@ bool decode_ldraa(uint32_t w, Insn& o) {
     return true;
 }
 }  // namespace
+
+HostFeatures host_features() {
+    HostFeatures f;
+#if defined(DS_HAVE_HWCAP)
+    const unsigned long h = getauxval(AT_HWCAP);
+    const unsigned long h2 = getauxval(AT_HWCAP2);
+    f.pac = (h & HWCAP_PACA) || (h & HWCAP_PACG);
+    f.lse = (h & HWCAP_ATOMICS) != 0;
+    f.lrcpc = (h & HWCAP_LRCPC) != 0;
+    f.ilrcpc = (h & HWCAP_ILRCPC) != 0;
+    f.lrcpc3 = (h2 & HWCAP2_LRCPC3) != 0;
+    f.dotprod = (h & HWCAP_ASIMDDP) != 0;
+    f.fp16 = ((h & HWCAP_ASIMDHP) || (h & HWCAP_FPHP)) != 0;
+    f.sha3 = (h & HWCAP_SHA3) != 0;
+    f.fhm = (h & HWCAP_ASIMDFHM) != 0;
+    f.jscvt = (h & HWCAP_JSCVT) != 0;
+    f.fcma = (h & HWCAP_FCMA) != 0;
+    f.flagm = (h & HWCAP_FLAGM) != 0;
+    f.frintts = (h2 & HWCAP2_FRINT) != 0;
+    f.rdm = (h & HWCAP_ASIMDRDM) != 0;
+    // UNVERIFIED: the installed <asm/hwcap.h> defines no HWCAP/HWCAP2 bit for
+    // FEAT_CPA or FEAT_PAuth_LR, so there is nothing to read; both are always
+    // reported absent (their text is always lowered).  Re-check when the
+    // headers gain such a bit.
+    f.cpa = false;
+    f.pauth_lr = false;
+#endif
+    return f;
+}
+
+LowerPolicy policy_for(const HostFeatures& f) {
+    LowerPolicy p;
+    p.pac = !f.pac;
+    p.lse = !f.lse;
+    p.lrcpc = !f.lrcpc;
+    p.ldapr = !f.lrcpc;
+    p.ilrcpc = !f.ilrcpc;
+    p.lrcpc3 = !f.lrcpc3;
+    p.simd = !f.dotprod;
+    p.fp16 = !f.fp16;
+    p.sha3 = !f.sha3;
+    p.fhm = !f.fhm;
+    p.jscvt = !f.jscvt;
+    p.fcma = !f.fcma;
+    p.flagm = !f.flagm;
+    p.cpa = !f.cpa;
+    p.pauth_lr = !f.pauth_lr;
+    p.frintts = !f.frintts;
+    p.rdm = !f.rdm;
+    p.svc = true;
+    p.sysreg = true;
+    return p;
+}
 
 bool decode(uint32_t w, Insn& out) {
     Insn o;
@@ -288,11 +348,13 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
             continue;
         }
         const bool want = in.op == Op::Svc ? policy.svc
-                          : in.op == Op::Mrs || in.op == Op::MrsTpidr || in.op == Op::Ldapur ? policy.sysreg
-                          : in.op == Op::Cpa ? policy.pac
+                          : in.op == Op::Mrs || in.op == Op::MrsTpidr ? policy.sysreg
+                          : in.op == Op::Ldapur ? policy.ilrcpc
+                          : in.op == Op::Cpa ? policy.cpa
                           : in.op == Op::Dot ? policy.simd
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
-                                                                                       : policy.pac;
+                          : in.mod == ModSrc::SpPc ? policy.pauth_lr
+                                                                               : policy.pac;
         if (!want) continue;
         if (in.op == Op::PacStrip && policy.strip_mask) {
             const uint32_t w2 = encode_and_imm64(in.rd, policy.strip_mask);

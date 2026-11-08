@@ -79,9 +79,9 @@ int main(int argc, char** argv) {
     g_ctx.trace = tr && *tr && std::strcmp(tr, "0") != 0;
     g_ctx.describe = describe;
 
-    const bool host_lse = getauxval(AT_HWCAP) & HWCAP_ATOMICS;
+    const exec::HostFeatures host = exec::host_features();
     exec::Pac pac(48);
-    g_cache.policy.lse = !host_lse;
+    g_cache.policy = exec::policy_for(host);
     std::string err;
     if (!g_cache.map(cache, pac, &err)) die("cache map failed: " + err);
     g_ctx.shared_cache_base = g_cache.base();
@@ -93,8 +93,7 @@ int main(int argc, char** argv) {
     }
     if (!darwin::map_commpage(darwin::detect_host_caps(), &err)) die(err);
 
-    exec::LowerPolicy pol;
-    pol.lse = !host_lse;
+    exec::LowerPolicy pol = g_cache.policy;
     if (!darwin::load_macho(exe_path, 0x100000000ull, pol, &g_exe, &err)) die("exe: " + err);
     if (!darwin::load_macho(root + "/usr/lib/dyld", 0, pol, &g_dyld, &err)) die("dyld: " + err);
     if (!g_dyld.unixthread_pc) die("dyld has no LC_UNIXTHREAD");

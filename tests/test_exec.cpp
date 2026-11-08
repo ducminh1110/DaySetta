@@ -948,3 +948,92 @@ DS_TEST(exec_remap_restore_original) {
     check(false);  // BRK trap-table entries
     check(true);   // trampoline sites (`b stub`)
 }
+
+DS_TEST(exec_policy_for_v8_0_host_lowers_everything) {
+    // This host: fp asimd aes pmull sha1 sha2 crc32 only (see /proc/cpuinfo).
+    HostFeatures f;  // all absent
+    LowerPolicy p = policy_for(f);
+    DS_CHECK(p.pac && p.lse && p.lrcpc && p.ldapr && p.ilrcpc && p.lrcpc3 && p.simd && p.fp16 && p.sha3 &&
+             p.fhm && p.jscvt && p.fcma && p.flagm && p.cpa && p.pauth_lr && p.frintts && p.rdm &&
+             p.svc && p.sysreg);
+}
+
+DS_TEST(exec_policy_for_pi5_like_host) {
+    // Raspberry Pi 5 (Cortex-A76, ARMv8.2): LSE, LRCPC, DotProd, FP16, SHA3, FHM, JSCVT, FCMA,
+    // FLAGM, FRINT, RDM; optional PAC off; no LRCPC2/3, no CPA, no PAuth_LR.
+    HostFeatures f;
+    f.lse = f.lrcpc = f.dotprod = f.fp16 = f.sha3 = f.fhm = f.jscvt = f.fcma = f.flagm = f.frintts = f.rdm = true;
+    LowerPolicy p = policy_for(f);
+    DS_CHECK(!p.lse && !p.lrcpc && !p.ldapr && !p.simd && !p.fp16 && !p.sha3 && !p.fhm && !p.jscvt && !p.fcma &&
+             !p.flagm && !p.frintts && !p.rdm);
+    DS_CHECK(p.pac && p.ilrcpc && p.lrcpc3 && p.cpa && p.pauth_lr);  // still lowered
+}
+
+DS_TEST(exec_policy_for_graviton3_like_host) {
+    // Graviton3 (Neoverse V1, ARMv8.4): PAC, LSE, LRCPC, LRCPC2, DotProd, FP16, SHA3, FLAGM;
+    // no CPA, no PAuth_LR, no FHM/JSCVT/FCMA.
+    HostFeatures f;
+    f.pac = f.lse = f.lrcpc = f.ilrcpc = f.dotprod = f.fp16 = f.sha3 = f.flagm = true;
+    LowerPolicy p = policy_for(f);
+    DS_CHECK(!p.pac && !p.lse && !p.lrcpc && !p.ldapr && !p.ilrcpc && !p.simd && !p.fp16 && !p.sha3 && !p.flagm);
+    DS_CHECK(p.cpa && p.pauth_lr && p.fhm && p.jscvt && p.fcma && p.lrcpc3 && p.frintts && p.rdm);
+}
+
+DS_TEST(exec_policy_for_m2_like_host) {
+    // Apple M2 (Firestorm, ARMv8.5): PAC, LSE, LRCPC, LRCPC2, LRCPC3, DotProd, FP16, SHA3, FHM, JSCVT,
+    // FCMA, FLAGM, FRINT; CPA and PAuth_LR are Apple extensions with no Linux HWCAP bit -> always lowered.
+    HostFeatures f;
+    f.pac = f.lse = f.lrcpc = f.ilrcpc = f.lrcpc3 = f.dotprod = f.fp16 = f.sha3 = f.fhm = f.jscvt = f.fcma = f.flagm =
+        f.frintts = f.rdm = true;
+    LowerPolicy p = policy_for(f);
+    DS_CHECK(!p.pac && !p.lse && !p.lrcpc && !p.ldapr && !p.ilrcpc && !p.lrcpc3 && !p.simd && !p.fp16 && !p.sha3 &&
+             !p.fhm && !p.jscvt && !p.fcma && !p.flagm && !p.frintts && !p.rdm);
+    DS_CHECK(p.cpa && p.pauth_lr);
+}
+
+DS_TEST(exec_policy_for_pac_only_host_still_lowers_other_groups) {
+    // PAC host without LSE/DotProd/CPA: PAC stays native, everything else is lowered.
+    HostFeatures f;
+    f.pac = true;
+    LowerPolicy p = policy_for(f);
+    DS_CHECK(!p.pac && p.lse && p.simd && p.cpa && p.pauth_lr && p.ilrcpc && p.lrcpc);
+}
+
+DS_TEST(exec_lower_range_leaves_native_words_alone) {
+    // A host with LSE + DotProd + LRCPC leaves ldaddal, udot, ldapr untouched; paciasp is still lowered.
+    HostFeatures f;
+    f.lse = f.dotprod = f.lrcpc = true;
+    LowerPolicy p = policy_for(f);
+    const uint32_t words[] = {0xf8e10062u /* ldaddal x1,x2,[x3] */, 0x6e829420u /* udot v0.4s,v1.16b,v2.16b */,
+                              0xf8bfc041u /* ldapr x1,[x2] */, 0xd503233fu /* paciasp */};
+    uint32_t buf[4];
+    std::memcpy(buf, words, sizeof words);
+    LowerCounts c;
+    std::string err;
+    DS_CHECK(lower_range(buf, buf + 4, p, c, &err));
+    DS_CHECK_EQ(buf[0], words[0]);
+    DS_CHECK_EQ(buf[1], words[1]);
+    DS_CHECK_EQ(buf[2], words[2]);  // not rewritten to LDAR: the host runs LDAPR natively
+    DS_CHECK(buf[3] != words[3]);   // PAC still lowered (BRK)
+    DS_CHECK_EQ(c.patched[int(Op::PacSign)], 1ull);
+    DS_CHECK_EQ(c.ldapr_rewritten, 0ull);
+}
+
+DS_TEST(exec_lower_range_pac_host_cpa_and_pauth_lr_still_lowered) {
+    // Native-PAC host: paciasp untouched; ADDPT (CPA) and PACIASPPC (PAuth_LR) still lowered.
+    HostFeatures f;
+    f.pac = true;
+    LowerPolicy p = policy_for(f);
+    const uint32_t words[] = {0xd503233fu /* paciasp */, 0x9a00229bu /* addpt x27,x20,x0 */,
+                              0xdac1a7feu /* pacibsppc */};
+    uint32_t buf[3];
+    std::memcpy(buf, words, sizeof words);
+    LowerCounts c;
+    std::string err;
+    DS_CHECK(lower_range(buf, buf + 3, p, c, &err));
+    DS_CHECK_EQ(buf[0], words[0]);
+    DS_CHECK(buf[1] != words[1]);
+    DS_CHECK(buf[2] != words[2]);
+    DS_CHECK_EQ(c.patched[int(Op::Cpa)], 1ull);
+    DS_CHECK_EQ(c.patched[int(Op::PacSign)], 1ull);
+}

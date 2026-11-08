@@ -105,14 +105,60 @@ struct LowerPolicy {
     bool pac = true;
     bool lse = true;
     bool svc = true;
-    bool sysreg = true;  // mrs tpidrro_el0, LDAPUR
-    bool ldapr = true;   // LDAPR -> LDAR rewrite
-    bool simd = true;    // UDOT/SDOT
+    bool sysreg = true;  // mrs tpidrro_el0
+    bool ldapr = true;   // LDAPR -> LDAR rewrite (FEAT_LRCPC)
+    bool simd = true;    // FEAT_DotProd UDOT/SDOT
+    bool lrcpc = true;   // FEAT_LRCPC (LDAPR rewrite)
+    bool ilrcpc = true;  // FEAT_LRCPC2 (LDAPUR)
+    bool lrcpc3 = true;  // FEAT_LRCPC3 (no lowered op yet; reserved)
+    bool fp16 = true;    // FEAT_FP16 (no lowered op yet; reserved)
+    bool sha3 = true;    // FEAT_SHA3 (no lowered op yet; reserved)
+    bool fhm = true;     // FEAT_FHM (no lowered op yet; reserved)
+    bool jscvt = true;   // FEAT_JSCVT (no lowered op yet; reserved)
+    bool fcma = true;    // FEAT_FCMA (no lowered op yet; reserved)
+    bool flagm = true;   // FEAT_FLAGM (no lowered op yet; reserved)
+    bool cpa = true;     // FEAT_CPA ADDPT/SUBPT/MADDPT/MSUBPT
+    bool pauth_lr = true;  // FEAT_PAuth_LR PACIASPPC/AUTIASPPC/RETAASPPC
+    bool frintts = true;  // FEAT_FRINT32/64 (no lowered op yet; reserved)
+    bool rdm = true;     // FEAT_RDM SQRDMLAH/SQRDMLSH (no lowered op yet; reserved)
     // Fast paths (aarch64 runtime only; tests keep the BRK-only default):
     bool trampolines = false;  // rewrite to `b stub` (user-space emulation) where an island is in reach
     uint64_t island_skip = 16ull << 20;  // new island chunks start at least this far above the code (loaders map data segments behind it)
     uint64_t strip_mask = 0;   // nonzero: XPAC{I,D,LRI} become `and xd, xd, #strip_mask` in place (exact for pointers with bit 55 clear)
 };
+
+// Host feature set, one bool per group ds-exec may lower.  True = the host CPU
+// executes that feature natively (so ds-exec must NOT lower it).
+struct HostFeatures {
+    bool pac = false;
+    bool lse = false;
+    bool lrcpc = false;
+    bool ilrcpc = false;
+    bool lrcpc3 = false;
+    bool dotprod = false;
+    bool fp16 = false;
+    bool sha3 = false;
+    bool fhm = false;
+    bool jscvt = false;
+    bool fcma = false;
+    bool flagm = false;
+    bool cpa = false;
+    bool pauth_lr = false;
+    bool frintts = false;
+    bool rdm = false;
+};
+
+// Reads the host CPU features from getauxval(AT_HWCAP)/getauxval(AT_HWCAP2)
+// (bit names from <asm/hwcap.h>).  Features with no HWCAP bit in the installed
+// kernel headers (FEAT_CPA, FEAT_PAuth_LR) are always reported absent
+// (UNVERIFIED: no bit exists to read; see host_features()).
+HostFeatures host_features();
+
+// Lower exactly the groups the host lacks.  PAC special case: when the host
+// has PAC, policy.pac is false (native PAC stays native) while every other
+// missing group is still lowered.  svc/sysreg are unconditional (Darwin ABI,
+// not a host feature).
+LowerPolicy policy_for(const HostFeatures& f);
 
 struct LowerCounts {
     uint64_t words = 0;
