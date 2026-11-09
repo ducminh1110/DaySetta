@@ -40,3 +40,4 @@ short notes so i remember why i did things. newest at the bottom.
   30578, auto-activate fronts with real psn (pid + 0x10000000). insertion still fails:
   events are fetched by skylight but dropped inside dispatch. next: the connection-id
   lookup/key in event_datagram_handler vs newconnectionport, or a real-mac ws record diff.
+- **m5a wire check.** hello still rejects the port stream even with the mac-shaped reply; input continues to be queued but snarf/dispatch remains the cutoff. stopped with a field-ready hello2 before the click/keys sample.

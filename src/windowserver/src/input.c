@@ -133,10 +133,10 @@ static size_t encode(uint8_t *out, size_t cap, const dl_event *ev, int big_endia
 size_t dl_event_encode_activation(uint8_t *out, size_t cap, const dl_activation *a)
 {
 	uint8_t nested[128];
-	writer n = { nested, nested + sizeof(nested), 0, 1 };
-	writer w = { out, out + cap, 0, 1 };
+	writer n = { nested, nested + sizeof(nested), 0, 0 };
+	writer w = { out, out + cap, 0, 0 };
 
-	put32(&n, 2);
+	put32(&n, 3);
 	field64(&n, 0, a->timestamp);
 	field32(&n, 3, 0x40);
 	field32(&n, 4, a->connection);
@@ -144,7 +144,7 @@ size_t dl_event_encode_activation(uint8_t *out, size_t cap, const dl_activation 
 	field64(&n, 0x11, a->pid);
 	field64(&n, 0x12, a->pid);
 
-	put32(&w, 2);
+	put32(&w, 3);
 	field32(&w, 0x35, 3);
 	field32(&w, 0x36, 0);
 	field32(&w, 0x37, 20);
@@ -220,9 +220,8 @@ static void deliver(dl_server *server, int32_t pid, dl_event *ev)
 	if (!conn)
 		return;
 	ev->timestamp = dl_now_ticks();
-	/* The big-endian form: SkyLight decodes both, but loses the location of little-endian records built here
-	 * (checked with CGEventCreateFromData on macOS 27). */
-	n = dl_event_encode_data(buf, sizeof(buf), ev);
+	/* The little-endian form (version 3): the real window server sends this; the v2/v3 decoders handle it. */
+	n = dl_event_encode(buf, sizeof(buf), ev);
 	if (n)
 		dl_session_post_event(server, conn, buf, n);
 	if (server->log)

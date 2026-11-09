@@ -321,6 +321,9 @@ static mach_msg_size_t build_reply(const mach_msg_header_t *request, const dl_re
 		char *p;
 
 		reply->head.msgh_bits = MACH_MSGH_BITS(MACH_MSGH_BITS_REMOTE(request->msgh_bits), 0) | MACH_MSGH_BITS_COMPLEX;
+		/* macOS 27 MIG replies carry request id + 100; the client (CGSSnarfAndDispatchDatagrams) checks it. */
+		if (out->has_ool)
+			reply->head.msgh_id = request->msgh_id + 100;
 		reply->body.msgh_descriptor_count = (mach_msg_size_t)(out->nports + (out->has_ool ? 1 : 0));
 		for (size_t i = 0; i < out->nports; i++) {
 			memset(&reply->ports[i], 0, sizeof(reply->ports[i]));
@@ -334,6 +337,7 @@ static mach_msg_size_t build_reply(const mach_msg_header_t *request, const dl_re
 			memset(d, 0, sizeof(*d));
 			d->address = (void *)out->ool;
 			d->size = (mach_msg_size_t)out->ool_size;
+			/* CGSSnarfAndDispatchDatagrams expects num1 deallocation on its port-stream replies. */
 			d->deallocate = FALSE;
 			d->copy = MACH_MSG_VIRTUAL_COPY;
 			d->type = MACH_MSG_OOL_DESCRIPTOR;
@@ -345,6 +349,9 @@ static mach_msg_size_t build_reply(const mach_msg_header_t *request, const dl_re
 			memcpy(p, out->body, out->body_size);
 			p += out->body_size;
 		}
+		/* The Mac's GetPortStreamOutofline reply is a bare header+descriptor message (56 bytes, no NDR
+		 * or trailing word); CGSSnarfAndDispatchDatagrams rejects anything else. Body-less OOL replies
+		 * (get_port_stream) produce exactly that. */
 		return (mach_msg_size_t)(p - (char *)reply);
 	}
 
@@ -537,7 +544,11 @@ static void serve(dl_server *server, mach_port_t port_set)
 			}
 			reply->msgh_size = build_reply(&request.head, &out, reply_buf);
 		}
-		reply->msgh_remote_port = request.head.msgh_remote_port;
+		/* The snarf (CGSSnarfAndDispatchDatagrams) validates GetPortStreamOutofline replies field by field:
+		 * it expects a bare 56-byte message, with a null remote port. */
+		reply->msgh_remote_port = (req.id == 30117)
+			? MACH_PORT_NULL
+			: request.head.msgh_remote_port;
 		reply->msgh_local_port = MACH_PORT_NULL;
 		reply->msgh_voucher_port = MACH_PORT_NULL;
 		reply->msgh_id = request.head.msgh_id + DL_MIG_REPLY_ID_OFFSET;
