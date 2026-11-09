@@ -34,6 +34,11 @@ static uint32_t first_window_of(dl_server *server, int32_t pid)
 
 void dl_process_activate(dl_server *server, dl_connection *conn, uint32_t psn_low, uint32_t psn_high)
 {
+	/* SkyLight routes events by the front-process PSN; macOS 27 drops them when it is 0. Distinct nonzero PSN per fronted process. */
+	if (!psn_low && !psn_high) {
+		psn_low = (uint32_t)conn->pid ? (uint32_t)conn->pid : 1;
+		psn_high = 0x10000000u;
+	}
 	dl_activation a = {
 		.pid = (uint32_t)conn->pid,
 		.connection = conn->id,
