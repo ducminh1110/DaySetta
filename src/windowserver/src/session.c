@@ -112,11 +112,15 @@ static void get_port_stream(const dl_request *req, dl_reply *reply, void *ctx)
 	uint32_t size = 0;
 	dl_connection *conn = dl_session_connection_for_port(server->session, req->local_port);
 
+	if (!conn && server->log)
+		fprintf(server->log, "daylight: GetPortStreamOutofline no connection for pid %d local_port 0x%x\n", req->client_pid, req->local_port);
 	if (conn) {
 		size = (uint32_t)conn->datagrams_size;
 		memcpy(out, conn->datagrams, size);
 		conn->datagrams_size = 0;
 	}
+	if (server->log && size)
+		fprintf(server->log, "daylight: GetPortStreamOutofline returned %u bytes to pid %d\n", size, req->client_pid);
 	dl_reply_set_ool(reply, size ? out : NULL, size);
 	dl_reply_put(reply, &size, sizeof(size));
 }

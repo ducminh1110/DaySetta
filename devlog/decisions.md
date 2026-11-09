@@ -27,3 +27,10 @@ short notes so i remember why i did things. newest at the bottom.
 - **eor3 sigill = host has no FEAT_SHA3.** vimage/libcache keccak hits eor3 -> native
   sigill on armv8.0 hosts. added sha3 eor3/bcax/rax1/xar to the trap path (same shape
   as the fp16 work, encodings from gnu as + real cache words).
+- **m5a input stalls inside skylight 27, not our encoder.** ws posts + fetches are
+  byte-identical to daylight and skylight fetches our datagrams (logged), yet nothing
+  reaches appkit: no mouse action, no field insertion. our records decode fine via
+  skylight's own codec (unicode "a" extracted), but skylight's encoder refuses both
+  our key and mouse records on re-encode (null), so the records are missing fields
+  27's dispatcher requires. next: diff our records field-by-field against a real ws
+  record (REA on the field descriptors / block_invoke encoders), not more fifo tests.

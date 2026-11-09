@@ -1,0 +1,12 @@
+=== boot ===
+boot-ok
+=== plutil ===
+{
+  "list" => [
+    0 => "a"
+    1 => 1
+  ]
+=== probe ===
+NSApplicationLoad()=1
+=== daysetta_tests ===
+59/59 tests passed
