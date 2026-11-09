@@ -74,15 +74,19 @@ void dl_process_activate(dl_server *server, dl_connection *conn, uint32_t psn_lo
 		fprintf(server->log, "daylight: pid %d (PSN %u.%u) is the front process\n", conn->pid, psn_high, psn_low);
 }
 
-/* SetFrontProcessWithInfo(PSN high, PSN low, options..., OOL plist with timestamps) */
+/* SetFrontProcessWithInfo(PSN high, PSN low, options..., OOL plist with timestamps).
+ * macOS 27's SkyLight calls __SLSSetFrontProcessWithInfo via MIG id 30578 (verified
+ * against a live Mac trace); the recorded reply for this call lives in dl_canned
+ * (body_30577) so the call gets answered byte-exactly, while we still handle the
+ * request's side effect (front registration) for the 26.6-era 30118 entry point. */
 static void set_front_process_with_info(const dl_request *req, dl_reply *reply, void *ctx)
 {
 	dl_server *server = ctx;
 	size_t size;
 	const uint8_t *in = dl_request_inline_data(req, &size);
 	uint32_t psn[2] = { 0, 0 };
-	(void)reply;
 
+	(void)reply;
 	if (in && size >= sizeof(psn))
 		memcpy(psn, in, sizeof(psn));
 	dl_connection *conn = server->session ? dl_session_connection_for_pid(server->session, req->client_pid) : NULL;
