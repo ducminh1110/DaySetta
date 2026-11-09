@@ -411,6 +411,44 @@ EmuOutcome emulate(const Insn& in, CpuState& c, const Pac& pac, TrapStats& stats
             std::memcpy(c.v[in.rd], d, 16);
             break;
         }
+        case Op::Sha3: {  // EOR3/BCAX (bytewise), RAX1 (lane xor with rotate-left-1), XAR (xor then rotate-right)
+            if (!c.v) { out.status = Emu::Bad; break; }
+            uint8_t n[16], m[16], p[16], d[16];
+            std::memcpy(n, c.v[in.rn], 16);
+            std::memcpy(m, c.v[in.rm], 16);
+            std::memcpy(p, c.v[in.rs], 16);
+            switch (in.sk) {
+                case Sha3Kind::Eor3:
+                    for (int i = 0; i < 16; ++i) d[i] = uint8_t(n[i] ^ m[i] ^ p[i]);
+                    break;
+                case Sha3Kind::Bcax:
+                    for (int i = 0; i < 16; ++i) d[i] = uint8_t((n[i] & p[i]) | (~n[i] & m[i]));
+                    break;
+                case Sha3Kind::Rax1:
+                    for (int e = 0; e < 2; ++e) {
+                        uint64_t nl, ml;
+                        std::memcpy(&nl, n + e * 8, 8);
+                        std::memcpy(&ml, m + e * 8, 8);
+                        const uint64_t r = nl ^ ((ml << 1) | (ml >> 63));
+                        std::memcpy(d + e * 8, &r, 8);
+                    }
+                    break;
+                case Sha3Kind::Xar: {
+                    const uint32_t s = uint32_t(in.imm) & 63;
+                    for (int e = 0; e < 2; ++e) {
+                        uint64_t nl, ml;
+                        std::memcpy(&nl, n + e * 8, 8);
+                        std::memcpy(&ml, m + e * 8, 8);
+                        const uint64_t x = nl ^ ml;
+                        const uint64_t r = s ? ((x >> s) | (x << (64 - s))) : x;
+                        std::memcpy(d + e * 8, &r, 8);
+                    }
+                    break;
+                }
+            }
+            std::memcpy(c.v[in.rd], d, 16);
+            break;
+        }
         case Op::Fp16V: {  // vector FP16 (.4h/.8h): per-lane widen-compute-narrow (trap path only)
             if (!c.v) { out.status = Emu::Bad; break; }
             const auto h2d_ = [](uint16_t b) -> double {

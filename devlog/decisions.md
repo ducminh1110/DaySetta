@@ -15,3 +15,15 @@ short notes so i remember why i did things. newest at the bottom.
 - **q8-q15 full save in the trampoline block.** c abi only keeps the low half, handler was eating the top half. found it while chasing lzfse.
 - **reims-vgpu for gpu later, not indium.** reims runs apple's own paravirt metal driver stream on vulkan, so metal stays 100% apple. needed lse/rcpc fallbacks to even build on this cpu.
 - **x86_64 later via an arm64 emulator.** the goal is running arm mac apps, a native x86 macos userland wouldnt do that. arm build has to mature first.
+- **fp16 trampolines.** rewrote build_inline_fp16's encodings (verified against llvm-mc).
+  arithmetic in S precision to match both the host (no FRINT/TCG private instrs) and
+  the trap path's half conversions. NaN results need a canonical 0x7e00 fixup
+  after s2h or results drifted. everything else cleared the validation tests.
+- **host gpu module lives in daysetta-isa/tools/rvg-host.** first brick proven: llvmpipe device + cold frame black png; module owns the device lifecycle. C API only, no QEMU/Apple involvement.
+- **nsscreen empty = 27 display-state layout.** the 26.6 blob (438b) misparses under
+  skylight 27 (header gained a flag+bool+count shift), so screens was 0 and windows
+  collapsed to 1x28. swapped in a 27 blob (one 1920x1080 display, trimmed from the
+  recorded reply): screens=1, visibleframe right, hello2 window drawn at 420x268.
+- **eor3 sigill = host has no FEAT_SHA3.** vimage/libcache keccak hits eor3 -> native
+  sigill on armv8.0 hosts. added sha3 eor3/bcax/rax1/xar to the trap path (same shape
+  as the fp16 work, encodings from gnu as + real cache words).

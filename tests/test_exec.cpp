@@ -1254,6 +1254,65 @@ DS_TEST(exec_fp16_data_alias_rejected) {
     }
 }
 
+DS_TEST(exec_sha3_trap_and_decode) {
+    // Encodings verified with GNU as (aarch64-linux-gnu-as -march=armv8.2-a+sha3) + objdump,
+    // and against real dyld-cache words (0xCE000820 = eor3 v0.16b, v1.16b, v0.16b, v2.16b
+    // faults SIGILL on hosts without FEAT_SHA3).
+    {
+        Insn in;
+        DS_CHECK(decode(0xCE020C20u, in) && in.op == Op::Sha3 && in.sk == Sha3Kind::Eor3);
+        DS_CHECK_EQ(in.rd, 0); DS_CHECK_EQ(in.rn, 1); DS_CHECK_EQ(in.rm, 2); DS_CHECK_EQ(in.rs, 3);
+        DS_CHECK(decode(0xCE261CA4u, in) && in.sk == Sha3Kind::Bcax);
+        DS_CHECK_EQ(in.rd, 4); DS_CHECK_EQ(in.rn, 5); DS_CHECK_EQ(in.rm, 6); DS_CHECK_EQ(in.rs, 7);
+        DS_CHECK(decode(0xCE628C20u, in) && in.sk == Sha3Kind::Rax1);
+        DS_CHECK_EQ(in.rd, 0); DS_CHECK_EQ(in.rn, 1); DS_CHECK_EQ(in.rm, 2);
+        DS_CHECK(decode(0xCE821C20u, in) && in.sk == Sha3Kind::Xar);
+        DS_CHECK_EQ(in.rd, 0); DS_CHECK_EQ(in.rn, 1); DS_CHECK_EQ(in.rm, 2); DS_CHECK_EQ(in.imm, 7);
+    }
+    uint8_t n[16], m[16], p[16], d[16];
+    CpuState cs = fresh();
+    uint8_t vbuf[32][16];
+    cs.v = vbuf;
+    auto run_sha = [&](uint32_t w) {
+        EmuOutcome o = run(w, cs);
+        DS_CHECK(o.status == Emu::Ok);
+        std::memcpy(d, cs.v[0], 16);
+    };
+    // eor3: 0xFF ^ 0x0F ^ 0x33 = 0xC3 per byte
+    for (int i = 0; i < 16; ++i) { n[i] = 0xFF; m[i] = 0x0F; p[i] = 0x33; }
+    std::memcpy(cs.v[1], n, 16); std::memcpy(cs.v[2], m, 16); std::memcpy(cs.v[3], p, 16);
+    run_sha(0xCE020C20u);  // eor3 v0.16b, v1.16b, v2.16b, v3.16b
+    for (int i = 0; i < 16; ++i) DS_CHECK_EQ(d[i], 0xC3);
+    // bcax: (0xA5 & 0xF0) | (~0xA5 & 0x3C) = 0xA0 | 0x18 = 0xB8
+    for (int i = 0; i < 16; ++i) { n[i] = 0xA5; m[i] = 0x3C; p[i] = 0xF0; }
+    std::memcpy(cs.v[1], n, 16); std::memcpy(cs.v[2], m, 16); std::memcpy(cs.v[3], p, 16);
+    run_sha(0xCE220C20u);  // bcax v0.16b, v1.16b, v2.16b, v3.16b
+    for (int i = 0; i < 16; ++i) DS_CHECK_EQ(d[i], 0xB8);
+    // rax1: lane0 = 0x0123456789ABCDEF ^ rol(0x8000000000000000, 1) = 0x0123456789ABCDEE
+    {
+        const uint64_t nl = 0x0123456789ABCDEFull, ml = 0x8000000000000000ull;
+        std::memcpy(cs.v[1], &nl, 8); std::memcpy(cs.v[1] + 8, &nl, 8);
+        std::memcpy(cs.v[2], &ml, 8); std::memcpy(cs.v[2] + 8, &ml, 8);
+        run_sha(0xCE628C20u);  // rax1 v0.2d, v1.2d, v2.2d
+        uint64_t got;
+        std::memcpy(&got, d, 8);
+        DS_CHECK_EQ(got, 0x0123456789ABCDEEull);
+        std::memcpy(&got, d + 8, 8);
+        DS_CHECK_EQ(got, 0x0123456789ABCDEEull);
+    }
+    // xar: ror(0x8000000000000001 ^ 0, 1) = 0xC000000000000000
+    {
+        const uint64_t nl = 0x8000000000000001ull, ml = 0;
+        std::memcpy(cs.v[1], &nl, 8); std::memcpy(cs.v[1] + 8, &nl, 8);
+        std::memcpy(cs.v[2], &ml, 8); std::memcpy(cs.v[2] + 8, &ml, 8);
+        // xar v0.2d, v1.2d, v2.2d, #1 -> encoding 0xCE820420 (imm6=1)
+        run_sha(0xCE820420u);
+        uint64_t got;
+        std::memcpy(&got, d, 8);
+        DS_CHECK_EQ(got, 0xC000000000000000ull);
+    }
+}
+
 DS_TEST(exec_remap_restore_original) {
 #if !defined(__aarch64__)
     std::fprintf(stderr, "SKIP exec_remap_restore_original: needs an aarch64 host\n");

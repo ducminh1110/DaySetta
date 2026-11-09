@@ -1,4 +1,4 @@
-/* Display-system-state blob in the SkyLight 26.6 layout (tools/display/make_state.py). */
+/* Display-system-state blob in the SkyLight 27 layout (see src/dl_display_state.c). */
 #ifndef DL_DISPLAY_STATE_H
 #define DL_DISPLAY_STATE_H
 

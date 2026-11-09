@@ -2,8 +2,8 @@
  * Display and event shared state: GetEventShmem, GetDisplayShmem, GetDisplaySystemState and
  * GetRealtimeDisplayDataShmemPort.
  *
- * Shared regions are seeded from a real window server; the display state is Daylight's own (one display, in the
- * layout SkyLight 26.6 reads, see tools/display/make_state.py).
+ * Shared regions are seeded from a real window server; the display state is one 1920x1080 display in the
+ * layout SkyLight 27 reads (see src/dl_display_state.c).
  */
 #include <stdlib.h>
 #include <string.h>

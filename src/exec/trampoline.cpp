@@ -472,6 +472,7 @@ bool trampoline_wants(const Insn& in) {
             return true;
         case Op::Fp16:
         case Op::Fp16V:
+        case Op::Sha3:
             return false;
         case Op::Mrs:  // TSD base from the thread-local cache (see trampoline_set_mrs_tls); MrsTpidr is rewritten in place by lower_range; Svc keeps BRK
             return g_mrs_tls >= 0 && in.rd != 18 && in.rd != 31;

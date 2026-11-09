@@ -34,6 +34,7 @@ enum class Op : uint8_t {
     Dot,       // FEAT_DotProd UDOT/SDOT (vector and by-element): expanded to ARMv8.0 widening multiply + pairwise adds
     Fp16,      // FP16 (FEAT_FP16) scalar ops: fmov/fcvt/fadd/… on H regs. Host is ARMv8.0 (no FP16), so lowered
     Fp16V,     // FP16 (FEAT_FP16) vector H ops (.4h/.8h): per-lane widen-compute-narrow via the trap path
+    Sha3,      // SHA3 (FEAT_SHA3) EOR3/BCAX/RAX1/XAR: host is ARMv8.0 (no SHA3), so lowered (trap path)
     kCount
 };
 
@@ -66,6 +67,15 @@ enum class Fp16Kind : uint8_t {
     FmulIdxV, FmlaIdxV, FmlsIdxV,
 };
 
+// SHA3 (FEAT_SHA3) decoded kinds, selected in Insn::sk (Op::Sha3 only). Encodings verified with
+// GNU as + aarch64-linux-gnu-objdump and against real words in the dyld cache (see tests/test_exec.cpp).
+enum class Sha3Kind : uint8_t {
+    Eor3,   // eor3 Vd.16B, Vn, Vm, Vp: Vd = Vn ^ Vm ^ Vp
+    Bcax,   // bcax Vd.16B, Vn, Vm, Vp: Vd = (Vn & Vp) ^ (~Vn & Vm)
+    Rax1,   // rax1 Vd.2D, Vn, Vm: Vd[i] = Vn[i] ^ rol(Vm[i], 1)
+    Xar,    // xar Vd.2D, Vn, Vm, #imm6: Vd[i] = ror(Vn[i] ^ Vm[i], imm6)
+};
+
 struct Insn {
     Op op = Op::None;
     PacKey key = PacKey::IA;
@@ -88,6 +98,7 @@ struct Insn {
     bool sgn = false;    // Dot: SDOT
     bool q = false;      // Dot: 128-bit (4S) form
     Fp16Kind hk = Fp16Kind::FmovImm;  // Op::Fp16 only
+    Sha3Kind sk = Sha3Kind::Eor3;     // Op::Sha3 only (rs holds Vp for EOR3/BCAX; imm holds XAR imm6)
 };
 
 const char* op_name(Op op);

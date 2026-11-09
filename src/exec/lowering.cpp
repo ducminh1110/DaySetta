@@ -7,7 +7,8 @@ namespace ds::exec {
 const char* op_name(Op op) {
     static const char* names[] = {"none",    "pac-sign", "pac-auth", "pac-strip", "pacga", "br-auth",
                                   "ret-auth", "ldr-auth", "cas",      "casp",      "rmw",   "svc",
-                                  "mrs-tpidrro", "ldapur", "cpa", "mrs-tpidr", "dot"};
+                                  "mrs-tpidrro", "ldapur", "cpa", "mrs-tpidr", "dot", "fp16", "fp16v",
+                                  "sha3"};
     return names[static_cast<int>(op)];
 }
 
@@ -135,6 +136,44 @@ bool decode_ldraa(uint32_t w, Insn& o) {
     o.rn = bits(w, 9, 5);
     o.rd = bits(w, 4, 0);
     return true;
+}
+
+// SHA3 (FEAT_SHA3): 1100 1110 | opcode(3) | Rm | ... | Rn | Rd. Opcode: 000=EOR3, 001=BCAX,
+// 011=RAX1, 100=XAR. EOR3/BCAX carry a fourth register Vp at bits14:10 (bit15 is 0); RAX1 has
+// fixed bits15:10 == 0b100011; XAR carries imm6 at bits15:10. Fields verified against GNU as
+// output and real dyld-cache words (tests/test_exec.cpp).
+bool decode_sha3(uint32_t w, Insn& o) {
+    if ((w & 0xFF000000u) != 0xCE000000u) return false;
+    const uint32_t opc = bits(w, 23, 21);
+    o.rd = bits(w, 4, 0);
+    o.rn = bits(w, 9, 5);
+    o.rm = bits(w, 20, 16);
+    switch (opc) {
+        case 0:  // EOR3
+            if (bits(w, 15, 15)) return false;
+            o.op = Op::Sha3;
+            o.sk = Sha3Kind::Eor3;
+            o.rs = bits(w, 14, 10);
+            return true;
+        case 1:  // BCAX
+            if (bits(w, 15, 15)) return false;
+            o.op = Op::Sha3;
+            o.sk = Sha3Kind::Bcax;
+            o.rs = bits(w, 14, 10);
+            return true;
+        case 3:  // RAX1
+            if (bits(w, 15, 10) != 0b100011) return false;
+            o.op = Op::Sha3;
+            o.sk = Sha3Kind::Rax1;
+            return true;
+        case 4:  // XAR
+            o.op = Op::Sha3;
+            o.sk = Sha3Kind::Xar;
+            o.imm = int32_t(bits(w, 15, 10));
+            return true;
+        default:
+            return false;
+    }
 }
 
 // FP16 (FEAT_FP16) vector ops on Vd.<4h|8h>: per-lane widen-compute-narrow emulation.
@@ -399,6 +438,8 @@ bool decode(uint32_t w, Insn& out) {
         ok = true;
     } else if ((w & 0xFF200400) == 0xF8200400) {
         ok = decode_ldraa(w, o);
+    } else if (decode_sha3(w, o)) {
+        ok = true;
     } else if (decode_fp16(w, o)) {
         ok = true;
     } else if (decode_fp16v(w, o)) {
@@ -480,7 +521,7 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
         const bool want = in.op == Op::Svc ? policy.svc
                           : in.op == Op::Mrs || in.op == Op::MrsTpidr || in.op == Op::Ldapur ? policy.sysreg
                           : in.op == Op::Cpa ? policy.pac
-                          : in.op == Op::Dot || in.op == Op::Fp16 || in.op == Op::Fp16V ? policy.simd
+                          : in.op == Op::Dot || in.op == Op::Fp16 || in.op == Op::Fp16V || in.op == Op::Sha3 ? policy.simd
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
                           : policy.pac;
         if (!want) continue;

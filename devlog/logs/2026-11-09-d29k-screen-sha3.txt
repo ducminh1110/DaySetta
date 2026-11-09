@@ -1,0 +1,15 @@
+=== boot ===
+boot-ok
+=== plutil ===
+{
+  "list" => [
+    0 => "a"
+    1 => 1
+  ]
+=== probe ===
+NSApplicationLoad=0x1000185113b70
+NSApplicationLoad()=1
+probe-rc=0
+=== daysetta_tests ===
+ok   sdk_hello_denied
+59/59 tests passed
