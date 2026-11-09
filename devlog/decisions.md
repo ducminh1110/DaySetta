@@ -34,3 +34,9 @@ short notes so i remember why i did things. newest at the bottom.
   our key and mouse records on re-encode (null), so the records are missing fields
   27's dispatcher requires. next: diff our records field-by-field against a real ws
   record (REA on the field descriptors / block_invoke encoders), not more fifo tests.
+- **m5a 30578 canned + real front psn.** skylight on 27 calls setfrontprocesswithinfo at
+  mig id 30578 (was 30118/30577): hello2 calls it, old code answered default-success
+  (ran fine but dispatch still dead). recorded 12-byte reply added as canned entry for
+  30578, auto-activate fronts with real psn (pid + 0x10000000). insertion still fails:
+  events are fetched by skylight but dropped inside dispatch. next: the connection-id
+  lookup/key in event_datagram_handler vs newconnectionport, or a real-mac ws record diff.
