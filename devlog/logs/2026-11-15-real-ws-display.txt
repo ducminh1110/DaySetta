@@ -1,0 +1,52 @@
+# kqtest (dispatch MACH_RECV + dispatch_mig_server, 2000 send/rcv) before kevent_qos fix
+m: start 
+s: start ev ok 0 
+g: start ev ok 0 
+# KQT trace before fix
+KQT create port=2563 fl=1C1 ff=0
+KQT copyout port=2563 code=0 fl=1C1 rfl=0 data=A03 ff=0 ext=0,0
+KQT disable port=2563
+KQT enable port=2563
+KQT copyout port=2563 code=0 fl=1C1 rfl=0 data=A03 ff=0 ext=0,0
+KQT disable port=2563
+KQT copyout port=2563 code=0 fl=1C9 rfl=0 data=A03 ff=0 ext=0,0
+# after fix
+g: start ok 0 ok 200 ok 400 ok 600 ok 800 ok 1000 ok 1200 ok 1400 ok 1600 ok 1800 done 
+m: start ok 0 ok 200 ok 400 ok 600 ok 800 ok 1000 ok 1200 ok 1400 ok 1600 ok 1800 done 
+s: start ok 0 ok 200 ok 400 ok 600 ok 800 ok 1000 ok 1200 ok 1400 ok 1600 ok 1800 done 
+# ws: dependency_wait crash before ulock fix
+Darling: fatal signal 5 at pc 0x18089264C (fault address 0x18089264C, sp 0xFFFFF2740)
+Darling:   pc 0x18089264C libsystem_pthread.dylib+0xB64C (pthread_dependency_wait_np.cold.3+0x28)
+# ws after (paravirt display + fixes)
+2026-11-15 10:56:35.783027+0000 WindowServer[18:51] [client] Unable to create event queue via hidd: (10000003)
+2026-11-15 10:56:35.924183+0000 WindowServer[18:18] [client] HID event server is not entitled
+2026-11-15 10:56:36.010228+0000 WindowServer[18:18] [default] IOHIDEventSystemServer died. Reestablishing connection.
+2026-11-15 10:56:36.020313+0000 WindowServer[18:18] [client] HID event server is not entitled
+2026-11-15 10:56:36.074821+0000 WindowServer[18:18] [default] IOHIDEventSystemServer died. Reestablishing connection.
+2026-11-15 10:56:36.084465+0000 WindowServer[18:18] [client] HID event server is not entitled
+2026-11-15 10:56:36.086571+0000 WindowServer[18:18] [default] Failed to register for server availability: 9
+2026-11-15 10:56:36.087880+0000 WindowServer[18:18] [client] Unable to create event queue via hidd: (10000003)
+2026-11-15 10:56:36.096830+0000 WindowServer[18:18] [default] IOMapMemory(ev) failure (2e).
+2026-11-15 10:56:36.107894+0000 WindowServer[18:18] [client] HID event server is not entitled
+2026-11-15 10:56:36.109380+0000 WindowServer[18:18] [default] Fail to get parameter with status 0xe00002d8
+2026-11-15 10:56:36.118793+0000 WindowServer[18:18] [client] HID event server is not entitled
+2026-11-15 10:56:36.120197+0000 WindowServer[18:18] [default] Fail to get parameter with status 0xe00002d8
+2026-11-15 10:56:36.136654+0000 WindowServer[18:51] [connection] C97E2D4B-CC20-46FB-A7B8-A9CD42D616C0: IOHIDConnection process:ws_main_thread pid:18 uuid:C97E2D4B-CC20-46FB-A7B8-A9CD42D616C0 caller:Sk
+2026-11-15 10:56:36.138926+0000 WindowServer[18:95] [client] Unable to open 0
+2026-11-15 10:56:36.140782+0000 WindowServer[18:95] [default] Failed to register for server availability: 9
+2026-11-15 10:56:36.142007+0000 WindowServer[18:95] [client] Unable to create event queue via hidd: (10000003)
+2026-11-15 10:56:36.164816+0000 WindowServer[18:18] [Render] unable to register bootstrap port com.apple.CARenderServer: 11
+2026-11-15 10:56:36.212629+0000 WindowServer[18:18] [packages] 0[outside of RPC]: PKGInitializeAppearanceTransitions running on installer
+2026-11-15 10:56:38.846809+0000 WindowServer[18:18] [default] move_cursor: reset cursor display
+2026-11-15 10:56:39.537514+0000 WindowServer[18:18] [default] move_cursor: reset cursor display
+2026-11-15 10:56:39.538495+0000 WindowServer[18:18] [default] move_cursor: reset cursor display
+2026-11-15 10:56:39.540312+0000 WindowServer[18:95] [default] move_cursor: reset cursor display
+2026-11-15 10:56:39.796670+0000 WindowServer[18:95] [default] move_cursor: reset cursor display
+2026-11-15 10:56:39.807542+0000 WindowServer[18:71] [WindowServer] ColorSyncXPC: XPC_DISPLAY_INFO_REQUEST did not received reply
+2026-11-15 10:57:09.914830+0000 WindowServer[18:18] [default] No suitable Metal devices present after 30 seconds.
+Didn't find ADM service 
+STUB: work_interval_instance_alloc called
+Darling: fatal signal 6 at pc 0x50304B6F4 (fault address 0x3E900000000, sp 0xFFFFF2960)
+Darling:   pc 0x50304B6F4 libsystem_kernel.dylib+0x4B6F4 (linux_syscall+0x8)
+Darling:   lr 0x50305EBBC libsystem_kernel.dylib+0x5EBBC (sys_sigprocmask+0x6C)
+Darling:   x0 0x0 x1 0xFFFFF2968 x2 0xFFFFF2960 x3 0x8 x8 0x87 x16 0x148
