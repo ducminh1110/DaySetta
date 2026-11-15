@@ -41,3 +41,4 @@ short notes so i remember why i did things. newest at the bottom.
   events are fetched by skylight but dropped inside dispatch. next: the connection-id
   lookup/key in event_datagram_handler vs newconnectionport, or a real-mac ws record diff.
 - **m5a wire check.** hello still rejects the port stream even with the mac-shaped reply; input continues to be queued but snarf/dispatch remains the cutoff. stopped with a field-ready hello2 before the click/keys sample.
+- **switch to real windowserver (owner call).** fake ws input on 27 stuck in skylight dispatch for days, real ws gets the protocol for free + reims-vgpu covers metal. spike: ws 27 runs under darling, needed sandbox op 4 allowed in mac_syscall, now dies at "IOMainPort failed" cuz aarch64 darling builds only cli (no iokitd). next is iokitd on arm + fake iomfb/hid user clients, stela's dcp model is the reference for what iomfb publishes.
