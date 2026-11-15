@@ -1,0 +1,31 @@
+# before: workloop spin (WLT ret counts, 40s)
+   6894 id=74810C4D00
+      4 id=7480CB4B40
+      3 id=74810C5380
+# before: crash x3
+Darling: fatal signal 5 at pc 0x1806E7104 (fault address 0x1806E7104, sp 0xE602AD679E70)
+Darling: fatal signal 5 at pc 0x1806E7104 (fault address 0x1806E7104, sp 0xFA6427E3FBA0)
+Darling: fatal signal 5 at pc 0x1806E7104 (fault address 0x1806E7104, sp 0xE29B1DC79D80)
+Darling:   pc 0x1806E7104 libdispatch.dylib+0x1C104 (_dispatch_mach_reply_unregister+0x50)
+Darling:   lr 0x1806E84E0 libdispatch.dylib+0x1D4E0 (_dispatch_mach_reconnect_invoke+0x150)
+Darling:   x0 0x7480CB8B40 x1 0xFFFFF2208 x2 0x122 x3 0x1 x8 0xE602AD679ED8 x16 0xFFFFFFFFFFFFFFFE
+# test before fix
+FAIL exec_trampolines_match_trap_path: trampoline result differs from trap path: xpacd -2
+# after: daysetta_tests 59/59 passed
+# after: ws runs (50s each, killed alive)
+== run 1: lines=66 alive=20910
+== run 2: lines=40 alive=21178
+== run 3: lines=40 alive=21451
+# after: ws log tail run 1
+2026-11-15 09:13:59.703958+0000 WindowServer[18:51] [client] HID event server is not entitled
+2026-11-15 09:13:59.705399+0000 WindowServer[18:51] [default] IOHIDEventSystemServer died. Reestablishing connection.
+2026-11-15 09:13:59.708303+0000 WindowServer[18:18] [client] HID event server is not entitled
+2026-11-15 09:13:59.715103+0000 WindowServer[18:18] [default] IOHIDEventSystemServer died. Reestablishing connection.
+2026-11-15 09:13:59.718628+0000 WindowServer[18:51] [client] HID event server is not entitled
+2026-11-15 09:13:59.722744+0000 WindowServer[18:51] [default] Failed to register for server availability: 9
+2026-11-15 09:13:59.724067+0000 WindowServer[18:51] [client] Unable to create event queue via hidd: (10000003)
+2026-11-15 09:13:59.726472+0000 WindowServer[18:18] [client] HID event server is not entitled
+2026-11-15 09:13:59.731335+0000 WindowServer[18:18] [default] IOHIDEventSystemServer died. Reestablishing connection.
+2026-11-15 09:13:59.740184+0000 WindowServer[18:18] [client] HID event server is not entitled
+2026-11-15 09:13:59.742200+0000 WindowServer[18:18] [default] Failed to register for server availability: 9
+2026-11-15 09:13:59.743524+0000 WindowServer[18:18] [client] Unable to create event queue via hidd: (10000003)
