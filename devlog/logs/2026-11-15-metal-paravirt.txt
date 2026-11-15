@@ -1,0 +1,20 @@
+# metalprobe before (plugin loads, device init dies before dirty ring)
+start
+all=0
+default=(nil)
+# after dyld arm64 iokit trap patch
+dyld[14]: darling: iokit_user_client_trap 0x184d88cb8 -> 0x50306a570 via slot 0x174d88000
+all=1
+dev Apple Paravirtual device regid=100000007 removable=0 headless=0
+default=Apple Paravirtual device
+# ws before: No suitable Metal devices
+2026-11-15 11:05:21.690250+0000 WindowServer[18:18] [default] No suitable Metal devices present after 30 seconds.
+# ws now (alive, killed at 60-70s, no fatal)
+2026-11-15 11:20:30.057965+0000 WindowServer[18:18]  kern_CopyProperty key : GPBandwidth not found
+2026-11-15 11:20:30.062358+0000 WindowServer[18:18]  kern_CopyProperty key : GPBandwidth not found
+2026-11-15 11:20:30.065690+0000 WindowServer[18:18]  kern_CopyProperty key : GPBandwidth not found
+2026-11-15 11:20:30.959409+0000 WindowServer[18:18] [default] move_cursor: reset cursor display
+2026-11-15 11:20:30.960632+0000 WindowServer[18:18] [default] move_cursor: reset cursor display
+2026-11-15 11:20:30.961658+0000 WindowServer[18:18] [default] move_cursor: reset cursor display
+2026-11-15 11:20:31.042593+0000 WindowServer[18:18] CDN - Local Port: 38659 (com.apple.CoreDisplay.Notification)
+2026-11-15 11:20:31.557477+0000 WindowServer[18:18] [Render] unable to register bootstrap port com.apple.CARenderServer: 11
