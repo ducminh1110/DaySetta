@@ -151,6 +151,18 @@ std::vector<uint32_t> build_inline(const Insn& in, uint64_t pc, uint64_t stub, u
     if (!g_pac || !consts) return o;
     const uint64_t FIELD = g_pac->field_mask(), BIT55 = 1ull << 55;
     const unsigned va = g_pac->va_bits();
+    if (in.op == Op::PacStrip) {  // xpac: field gets bit 55 copied in. no temps, no flags
+        const unsigned P = in.rd;
+        const uint32_t clr = enc_logic_imm(0x92400000u, P, P, ~FIELD);  // and P, P, #~field
+        const uint32_t set = enc_logic_imm(0xB2400000u, P, P, FIELD);   // orr P, P, #field
+        if (P == 31 || !clr || !set) return o;
+        o.push_back(enc_tbnz(P, 55, int64_t(stub), int64_t(stub) + 12));
+        o.push_back(clr);
+        o.push_back(enc_b(int64_t(stub) + 8, int64_t(pc + 4)));
+        o.push_back(set);
+        o.push_back(enc_b(int64_t(stub) + 16, int64_t(pc + 4)));
+        return o;
+    }
     const PacKey key = in.key;
     const bool is_sign = in.op == Op::PacSign, is_auth = in.op == Op::PacAuth;
     const bool is_br = in.op == Op::BrAuth, is_ret = in.op == Op::RetAuth;
@@ -464,7 +476,7 @@ bool trampoline_wants(const Insn& in) {
 #if defined(__aarch64__)
     if (!g_handler) return false;
     switch (in.op) {
-        case Op::PacSign: case Op::PacAuth: case Op::PacGa: case Op::BrAuth: case Op::RetAuth: case Op::LdrAuth:
+        case Op::PacSign: case Op::PacAuth: case Op::PacGa: case Op::BrAuth: case Op::RetAuth: case Op::LdrAuth: case Op::PacStrip:
         case Op::Cas: case Op::Casp: case Op::Rmw: case Op::Ldapur: case Op::Cpa: case Op::Dot:
             // FP16 inline sequences disabled until they match the trap path (see test);
             // Fp16 words lower to BRK and are handled exactly by emulate(). Same for

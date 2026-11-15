@@ -525,7 +525,8 @@ bool lower_range(uint32_t* begin, uint32_t* end, const LowerPolicy& policy, Lowe
                           : (in.op == Op::Cas || in.op == Op::Casp || in.op == Op::Rmw) ? policy.lse
                           : policy.pac;
         if (!want) continue;
-        if (in.op == Op::PacStrip && policy.strip_mask) {
+        // the in-place AND is wrong for bit-55 pointers (-1/-2 sentinels), islands do it exactly
+        if (in.op == Op::PacStrip && policy.strip_mask && !(policy.trampolines && trampoline_wants(in))) {
             const uint32_t w2 = encode_and_imm64(in.rd, policy.strip_mask);
             if (w2) {
                 *p = w2;

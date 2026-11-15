@@ -151,7 +151,7 @@ struct LowerPolicy {
     // Fast paths (aarch64 runtime only; tests keep the BRK-only default):
     bool trampolines = false;  // rewrite to `b stub` (user-space emulation) where an island is in reach
     uint64_t island_skip = 16ull << 20;  // new island chunks start at least this far above the code (loaders map data segments behind it)
-    uint64_t strip_mask = 0;   // nonzero: XPAC{I,D,LRI} become `and xd, xd, #strip_mask` in place (exact for pointers with bit 55 clear)
+    uint64_t strip_mask = 0;   // nonzero, no trampolines: XPAC{I,D,LRI} become `and xd, xd, #strip_mask` in place (exact for pointers with bit 55 clear)
 };
 
 struct LowerCounts {

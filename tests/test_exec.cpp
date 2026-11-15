@@ -747,6 +747,8 @@ DS_TEST(exec_trampolines_match_trap_path) {
     both({0xdac10020, 0xd65f03c0}, [&](auto f) { return f(p, 0x1234, 0); }, "pacia x0,x1", true);
     // paciza x0; xpaci x0; ret (inline strip)
     both({0xdac123e0, 0xdac143e0, 0xd65f03c0}, [&](auto f) { return f(p, 0, 0); }, "xpaci", true);
+    // xpacd x0 on a bit-55 value: libdispatch's -2 sentinel must come back as -2
+    both({0xdac147e0, 0xd65f03c0}, [&](auto f) { return f(~1ul, 0, 0); }, "xpacd -2", true);
     // pacibsp; mov x0,#9; retab (sp modifier, return through the trampoline)
     both({0xd503237f, 0xd2800120, 0xd65f0fff}, [&](auto f) { return f(0, 0, 0); }, "pacibsp/retab", true);
     // blraaz x0 into a callee returning 77
