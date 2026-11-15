@@ -19,3 +19,44 @@ COMPONENTS:STRING=cli,cli_dev_gui_stubs
 2026-11-15 08:37:35.848618+0000 WindowServer[40:40] [default] IOHIDSystem not found e00002be
 2026-11-15 08:37:35.850626+0000 WindowServer[40:40] [default] Cannot open the HID and display/cursor system.
 rc=1
+# with IOHIDSystem in iokitd (run A)
+2026-11-15 08:41:33.846496+0000 WindowServer[18:18] Unable to load configuration file.
+2026-11-15 08:41:34.179510+0000 WindowServer[18:18] [User Defaults] All kCFPreferencesCurrentUser domains in this process will be volatile, because homeDirPath starts with /var/empty
+2026-11-15 08:41:35.577471+0000 WindowServer[18:18] TSXDaemonServiceClient -[TSXDaemonServiceClient getSyncEntityManagerProxy]_block_invoke error during call Error Domain=NSCocoaErrorDomain Code=4099 "The connection to service named com.apple.timesync.expositor was invalidated: Connection init failed at lookup with error 113 - Could not find specified service." UserInfo={NSDebugDescription=The connection to service named com.apple.timesync.expositor was invalidated: Connection init failed at lookup with error 113 - Could not find specified service.}
+2026-11-15 08:41:35.580985+0000 WindowServer[18:18] TSSyncEntityManager: -[TSSyncEntityManager dealloc] error during call. Proxy object is nil.
+2026-11-15 08:41:35.753857+0000 WindowServer[18:18] getDisplayListNumber: IORegistryEntryFromPath unable to find /arm-io node
+2026-11-15 08:41:35.755099+0000 WindowServer[18:18] iomfb_populate_all_display_infos: All Display Instances enumerated successfully - FB Count = 0
+2026-11-15 08:41:35.756592+0000 WindowServer[18:18] iomfb_populate_all_display_infos: All Display Instances enumerated successfully - FB Count = 0
+2026-11-15 08:41:35.757643+0000 WindowServer[18:18] iomfb_populate_all_display_infos: All Display Instances enumerated successfully - FB Count = 0
+2026-11-15 08:41:35.771899+0000 WindowServer[18:18] [SMCOpenConnection:47] Connection to AppleSMC failed
+2026-11-15 08:41:35.773133+0000 WindowServer[18:18] [default] SMC connection unavailable; applying workaround (fallback)
+Unimplemented syscall (499)
+2026-11-15 08:41:35.862906+0000 WindowServer[18:18] invalid product id '(null)'
+2026-11-15 08:41:35.901936+0000 WindowServer[18:18] [default] Unexpected reply type error
+Unimplemented syscall (530)
+Unimplemented syscall (530)
+Darling: fatal signal 11 at pc 0x18023BF54 (fault address 0xF2718EE8DFF8, sp 0xF2718EE8E090)
+Darling:   pc 0x18023BF54
+Darling:   lr 0x1806EF7D4 libdispatch.dylib+0x247D4 (_dispatch_event_loop_merge+0xA0)
+Darling:   x0 0x74810C8C00 x1 0xF2718EE8E090 x2 0xFFFFFFFFFFFFFFF8 x3 0xF2718EE8E098 x8 0x74810C8C08 x16 0x53000180897D60
+# with launchservicesd job (run B1, B2)
+2026-11-15 08:53:42.467768+0000 WindowServer[18:18] [default] Fail to get parameter with status 0xe00002d8
+2026-11-15 08:53:42.496760+0000 WindowServer[18:57] [connection] Connection invalidated!
+2026-11-15 08:53:42.516043+0000 WindowServer[18:71] [connection] XPC message send failed
+2026-11-15 08:53:42.565759+0000 WindowServer[18:71] [connection] Handshake failed with error: <Error Domain=NSCocoaErrorDomain Code=4101 "Couldn’t communicate with a helper application.">
+2026-11-15 08:53:42.566862+0000 WindowServer[18:71] [connection] Handshake aborted as the connection has been invalidated
+2026-11-15 08:53:42.631011+0000 WindowServer[18:18] [cas] CLIENT: Failure to determine if this machine is in the process of shutting down, err=2/No such file or directory
+2026-11-15 08:53:43.966845+0000 WindowServer[18:18] [cas] Didn't get a proper reply from launchservices, got XPC_ERROR_CONNECTION_INTERRUPTED after sending {clientversion=277872640U, command=100, session=100000, },
+2026-11-15 08:53:43.968073+0000 WindowServer[18:18] [cas] CRASHSTRING: <rdar://problem/28724618> Application unable to connect to launchservicesd for an unknown reason (received XPC_ERROR_CONNECTION_INTERRUPTED)
+Darling: fatal signal 5 at pc 0x1806E7104 (fault address 0x1806E7104, sp 0xE9D38CBE1360)
+Darling:   pc 0x1806E7104 libdispatch.dylib+0x1C104 (_dispatch_mach_reply_unregister+0x50)
+Darling:   lr 0x1806E84E0 libdispatch.dylib+0x1D4E0 (_dispatch_mach_reconnect_invoke+0x150)
+Darling:   x0 0x7480CB4B40 x1 0xFFFFF2348 x2 0x122 x3 0x1 x8 0xE9D38CBE13C8 x16 0xFFFFFFFFFFFFFFFE
+2026-11-15 08:54:04.128232+0000 WindowServer[18:18] invalid product id '(null)'
+2026-11-15 08:54:04.162924+0000 WindowServer[18:18] [default] Unexpected reply type error
+Unimplemented syscall (530)
+Unimplemented syscall (530)
+Darling: fatal signal 11 at pc 0x18023E124 (fault address 0xEA03BC4BDFF8, sp 0xEA03BC4BE090)
+Darling:   pc 0x18023E124
+Darling:   lr 0x1806EF7D4 libdispatch.dylib+0x247D4 (_dispatch_event_loop_merge+0xA0)
+Darling:   x0 0x74810C8D00 x1 0xEA03BC4BE090 x2 0xFFFFFFFFFFFFFFF8 x3 0xEA03BC4BE098 x8 0x74810C8D08 x16 0x42000180897D60
