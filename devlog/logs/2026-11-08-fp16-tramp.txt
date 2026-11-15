@@ -1,0 +1,75 @@
+UNIMPLEMENTED bsd 38 sys_crossarch_trap at ?
+/tmp/daysetta-e2e-374128/broker.sock
+daysetta-server: service=org.daysetta.server socket=/tmp/daysetta-e2e-374128/server.sock size=320x240 broker=/tmp/daysetta-e2e-374128/broker.sock
+daysetta-server: frame 1 hash 4d856b7a9008759aff68a0d1cde95b895fb952761719549f339d00d6eda9f543
+daysetta-server: client 4 connected (pid=374128 uid=1001 gid=1001)
+daysetta-server: frame 2 hash 4d856b7a9008759aff68a0d1cde95b895fb952761719549f339d00d6eda9f543
+daysetta-server: frame 3 hash 4d856b7a9008759aff68a0d1cde95b895fb952761719549f339d00d6eda9f543
+daysetta-server: frame 4 hash 4d856b7a9008759aff68a0d1cde95b895fb952761719549f339d00d6eda9f543
+daysetta-server: frame 5 hash 4d856b7a9008759aff68a0d1cde95b895fb952761719549f339d00d6eda9f543
+daysetta-server: frame 6 hash 111e07da30ce4c9be6dce4ec08bbe6b417110e9700c5c7d2a3663bce81620c84
+daysetta-server: frame 7 hash f3cd11c556d556d8fff5f41a5af6dda40ba3b8f15eaaa08d5a833a7aae683460
+daysetta-server: client 6 connected (pid=374128 uid=1001 gid=1001)
+daysetta-server: frame 8 hash f3cd11c556d556d8fff5f41a5af6dda40ba3b8f15eaaa08d5a833a7aae683460
+daysetta-server: frame 9 hash c60eb011cdfc580b65a5a44749c1326f970c41ee81cc4ba65312602c3d8dbcef
+daysetta-server: frame 10 hash 4d856b7a9008759aff68a0d1cde95b895fb952761719549f339d00d6eda9f543
+ok   broker_proto_roundtrip
+ok   broker_proto_malformed
+ok   broker_live_registry
+ok   compositor_clear_and_opaque_pixel
+ok   compositor_alpha_blend_exact
+ok   compositor_clips_negative_and_oversized_windows
+ok   compositor_swaps_rgba_source
+ok   compositor_damage_only_changes_clip
+ok   compositor_sha256_and_checksum_vectors
+ok   compositor_output_ppm_pam_and_bgra
+ok   compositor_rejects_bad_frame_size_and_frame
+ok   compositor_deterministic_scene_hash
+ok   darwin_errno_translation
+ok   darwin_open_flags
+ok   darwin_mmap_flags
+ok   darwin_stat_translation
+ok   darwin_signal_translation
+ok   darwin_initial_stack_layout
+ok   darwin_commpage_fields
+ok   darwin_dynamic_region
+ok   darwin_syscall_dispatch_errno_carry
+ok   darwin_lowering_mrs_ldapur_ldapr
+ok   darwin_macho_slice_selection
+R3 NOT REACHED (status 34048, stdout ""): see artifacts/exec/r3-dyld27-requirements.md
+ok   darwin_r3_echo_integration
+ok   e2e_two_windows_capture_and_input
+ok   event_ring_move
+ok   exec_siphash_reference_vector
+ok   exec_pac_round_trip_and_poison
+ok   exec_libkernel_function_ptr_auth_schema
+ok   exec_decode_matches_assembler_table
+ok   exec_emulate_pac_instructions
+ok   exec_emulate_combined_auth_branches
+ok   exec_cross_abi_unsigned_pointer_into_plain_range
+ok   exec_emulate_pauth_lr
+ok   exec_emulate_cpa
+ok   exec_emulate_lse_semantics
+ok   exec_emulate_svc_darwin_syscall
+ok   exec_live_lowered_code_traps
+ok   exec_trampolines_match_trap_path
+ok   exec_dotprod_trap_and_trampoline
+ok   exec_ldadd_four_thread_contention
+ok   exec_trap_table_rejects_foreign_brk
+ok   exec_trap_table_overflow_is_found_by_pc
+ok   exec_probe_genuine_apple_functions
+ok   exec_fp16_trap_and_trampoline
+ok   exec_fp16v_trap
+ok   exec_tramp_vregs_preserved
+ok   exec_fp16_data_alias_rejected
+ok   exec_remap_restore_original
+ok   scene_ids_are_monotonic_and_not_reused
+ok   scene_orders_by_level_then_commit
+ok   scene_visibility_and_hit_test
+ok   scene_order_raises_and_lowers
+ok   scene_rejects_invalid_rect_level_title_and_surface
+ok   scene_opacity_clamp_and_json_escaping
+ok   scene_counters_and_client_removal
+ok   sdk_fake_server
+ok   sdk_hello_denied
+58/58 tests passed

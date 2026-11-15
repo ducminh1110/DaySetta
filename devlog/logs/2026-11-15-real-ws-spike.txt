@@ -12,3 +12,10 @@ rc=1
 rc=1
 # darling aarch64 build
 COMPONENTS:STRING=cli,cli_dev_gui_stubs
+# iokitd built (COMPONENTS=cli,cli_dev_gui_stubs,iokitd), running under launchd
+  11049 /usr/sbin/iokitd
+# ws run 3
+2026-11-15 08:37:35.630159+0000 WindowServer[40:40] Unable to load configuration file.
+2026-11-15 08:37:35.848618+0000 WindowServer[40:40] [default] IOHIDSystem not found e00002be
+2026-11-15 08:37:35.850626+0000 WindowServer[40:40] [default] Cannot open the HID and display/cursor system.
+rc=1
