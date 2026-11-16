@@ -1,0 +1,1049 @@
+machtrace: 16/16 send id=200 remote=503 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=300 size=72
+machtrace: 16/16 send id=206 remote=703 local=507 opt=3 rcv=507 timeout=0
+machtrace: 16/16 done -> 0 id=306 size=40
+machtrace: 16/16 send id=3418 remote=103 local=507 opt=3 rcv=507 timeout=0
+machtrace: 16/16 done -> 0 id=3518 size=40
+machtrace: 16/16 send id=3409 remote=103 local=507 opt=3 rcv=507 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace: 17/17 send id=206 remote=503 local=403 opt=3 rcv=403 timeout=0
+machtrace: 17/17 done -> 0 id=306 size=40
+machtrace: 17/17 send id=3418 remote=103 local=403 opt=3 rcv=403 timeout=0
+machtrace: 17/17 done -> 0 id=3518 size=40
+machtrace: 17/17 send id=3409 remote=103 local=403 opt=3 rcv=403 timeout=0
+machtrace: 17/17 done -> 0 id=3509 size=40
+machtrace: 18/18 send id=206 remote=503 local=403 opt=3 rcv=403 timeout=0
+machtrace: 18/18 done -> 0 id=306 size=40
+machtrace: 18/18 send id=3418 remote=103 local=403 opt=3 rcv=403 timeout=0
+machtrace: 18/18 done -> 0 id=3518 size=40
+machtrace: 18/18 send id=3409 remote=103 local=403 opt=3 rcv=403 timeout=0
+machtrace: 18/18 done -> 0 id=3509 size=40
+machtrace: 18/18 send id=200 remote=503 local=603 opt=3 rcv=603 timeout=0
+machtrace: 18/18 done -> 0 id=300 size=72
+machtrace: 18/18 send id=206 remote=703 local=507 opt=3 rcv=507 timeout=0
+machtrace: 18/18 done -> 0 id=306 size=40
+machtrace: 18/18 send id=3418 remote=103 local=507 opt=3 rcv=507 timeout=0
+machtrace: 18/18 done -> 0 id=3518 size=40
+machtrace: 18/18 send id=3409 remote=103 local=507 opt=3 rcv=507 timeout=0
+machtrace: 18/18 done -> 0 id=3509 size=40
+machtrace: 16/16 send id=200 remote=503 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=300 size=72
+machtrace: 16/16 send id=206 remote=703 local=507 opt=3 rcv=507 timeout=0
+machtrace: 16/16 done -> 0 id=306 size=40
+machtrace: 16/16 send id=3418 remote=103 local=507 opt=3 rcv=507 timeout=0
+machtrace: 16/16 done -> 0 id=3518 size=40
+machtrace: 16/16 send id=3409 remote=103 local=507 opt=3 rcv=507 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace: 16/16 send id=200 remote=403 local=503 opt=3 rcv=503 timeout=0
+machtrace: 16/16 done -> 0 id=300 size=72
+machtrace: 16/16 send id=206 remote=703 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=306 size=40
+machtrace: 16/16 send id=3418 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3518 size=40
+machtrace: 16/16 send id=4822 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=4922 size=36
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace: 16/16 send id=3410 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3510 size=36
+machtrace: 16/16 send id=3405 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3505 size=72
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.system.notification_center
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+machtrace-body: @CPX@
+machtrace-body: handle
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.system.opendirectoryd.libinfo
+machtrace-body: type
+machtrace-body: lookup-handle
+machtrace: 16/16 send id=1073742628 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=116
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.logd
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+machtrace: 16/16 send id=0 remote=0 local=0 opt=4000102 rcv=1403 timeout=0
+machtrace: 16/16 done -> 10004003 id=0 size=0
+machtrace-body: t00w
+machtrace: 16/16 send id=1999646836 remote=1203 local=0 opt=1 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace-body: @CPX@
+machtrace-body: rpc_version
+machtrace-body: rpc_name
+machtrace-body: getpwuid
+machtrace: 16/16 send id=1073741824 remote=A03 local=1303 opt=3304207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 10004004 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=3300202 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=284
+machtrace: 16/16 send id=0 remote=0 local=0 opt=4000102 rcv=1403 timeout=0
+machtrace: 16/16 done -> 10004003 id=0 size=0
+machtrace-body: @CPX@
+machtrace-body: rpc_version
+machtrace-body: rpc_name
+machtrace-body: getpwuid
+machtrace: 16/16 send id=1073741824 remote=A03 local=1303 opt=3304207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 10004004 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=3300202 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=284
+start
+machtrace: 16/16 send id=205 remote=1003 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=305 size=40
+machtrace: 16/16 send id=2877 remote=B03 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2977 size=44
+machtrace-body: IONameMatch
+machtrace-body: IOSurfaceRoot
+machtrace: 16/16 send id=2881 remote=B03 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2981 size=40
+machtrace: 16/16 send id=2802 remote=1007 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace: 16/16 send id=2862 remote=B07 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2962 size=52
+machtrace: 16/16 send id=2865 remote=C03 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2965 size=92
+machtrace-body: @CPX@
+machtrace-body: rpc_version
+machtrace-body: rpc_name
+machtrace-body: getpwuid
+machtrace: 16/16 send id=1073741824 remote=A03 local=1303 opt=3304207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 10004004 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=3300202 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=284
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: outgsk
+machtrace-body: self
+machtrace-body: type
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742125 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: outgsk
+machtrace-body: self
+machtrace-body: type
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742125 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=60
+machtrace-body: @CPX@
+machtrace-body: handle
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.cfprefsd.daemon
+machtrace-body: type
+machtrace-body: lookup-handle
+machtrace: 16/16 send id=1073742628 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=116
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: @CPX@
+machtrace-body: rpc_version
+machtrace-body: rpc_name
+machtrace-body: getpwuid
+machtrace: 16/16 send id=1073741824 remote=A03 local=1303 opt=3304207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 10004004 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=3300202 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=284
+machtrace: 16/16 send id=412 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=512 size=36
+machtrace-body: t00w
+machtrace: 16/16 send id=1999646836 remote=D03 local=0 opt=31 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.gpu
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=144
+machtrace: 16/16 send id=0 remote=0 local=0 opt=4000102 rcv=1403 timeout=0
+machtrace: 16/16 done -> 10004003 id=0 size=0
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.gpu
+machtrace-body: CFPreferencesSandboxExtension
+machtrace-body: com.apple.cfprefsd.read
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=172
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.opengl
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=148
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.opengl
+machtrace-body: CFPreferencesSandboxExtension
+machtrace-body: com.apple.cfprefsd.read
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=172
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesIsManaged
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesCurrentApplicationDomain
+machtrace-body: CFPreferencesDomain
+machtrace-body: metalprobe
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=144
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesCurrentApplicationDomain
+machtrace-body: CFPreferencesDomain
+machtrace-body: metalprobe
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=184
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesCurrentApplicationDomain
+machtrace-body: CFPreferencesDomain
+machtrace-body: metalprobe
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=140
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesIsManaged
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesDomain
+machtrace-body: kCFPreferencesAnyApplication
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=152
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesDomain
+machtrace-body: kCFPreferencesAnyApplication
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=192
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesDomain
+machtrace-body: kCFPreferencesAnyApplication
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=232
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesMessages
+machtrace-body: CFPreferencesIsManaged
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesCurrentApplicationDomain
+machtrace-body: CFPreferencesDomain
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesIsManaged
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesCurrentApplicationDomain
+machtrace-body: CFPreferencesDomain
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesCurrentApplicationDomain
+machtrace-body: CFPreferencesDomain
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesCurrentApplicationDomain
+machtrace-body: CFPreferencesDomain
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesSandboxExtension
+machtrace-body: com.apple.cfprefsd.read
+machtrace-body: CFPreferencesIsManaged
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: kCFPreferencesAnyApplication
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: kCFPreferencesAnyApplication
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: kCFPreferencesAnyApplication
+machtrace-body: CFPreferencesSandboxExtension
+machtrace-body: com.apple.cfprefsd.read
+machtrace-body: com.apple.cfprefsd.read
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesCurrentApplicationDomain
+machtrace-body: CFPreferencesDomain
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: kCFPreferencesAnyApplication
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=1472
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.CoreServices.coreservicesd
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:48.510685+0000 metalprobe[16:16] [sharedcache] checkinWithServer: Failed bootstrap_lookup2 for name of coreservicesd, kern_return_t=#113/0x71 unknown error code name=com.apple.CoreServices.coreservicesd
+machtrace: 16/16 send id=205 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=305 size=40
+machtrace-body: BSD Name
+machtrace-body: disk1s1
+machtrace-body: IOProviderClass
+machtrace-body: IOMedia
+machtrace: 16/16 send id=2880 remote=1703 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2980 size=40
+machtrace-body: IOService
+machtrace-body: Protocol Characteristics
+machtrace: 16/16 send id=2889 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=64
+machtrace-body: IOService
+machtrace-body: IOMediaIcon
+machtrace: 16/16 send id=2889 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=64
+machtrace-body: Ejectable
+machtrace: 16/16 send id=2889 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=64
+machtrace-body: Removable
+machtrace: 16/16 send id=2889 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=64
+machtrace: 16/16 send id=205 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=305 size=40
+machtrace-body: BSD Name
+machtrace-body: disk1s1
+machtrace-body: IOProviderClass
+machtrace-body: IOMedia
+machtrace: 16/16 send id=2880 remote=1707 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2980 size=40
+machtrace-body: IOService
+machtrace: 16/16 send id=2833 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2933 size=40
+machtrace: 16/16 send id=2834 remote=170B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2934 size=40
+machtrace: 16/16 send id=2802 remote=170B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: AppleDiskImageDevice
+machtrace: 16/16 send id=2801 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=170B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: AppleDiskImageDevice
+machtrace: 16/16 send id=2801 remote=2603 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2603 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=170B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: AppleDiskImageDevice
+machtrace: 16/16 send id=2801 remote=2607 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2607 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=170B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: AppleDiskImageDevice
+machtrace: 16/16 send id=2801 remote=260B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=260B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=170B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=36
+machtrace-body: IOService
+machtrace: 16/16 send id=2833 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2933 size=40
+machtrace: 16/16 send id=2834 remote=170F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2934 size=40
+machtrace: 16/16 send id=2802 remote=170F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOHDIXHDDrive
+machtrace: 16/16 send id=2801 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=170F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOHDIXHDDrive
+machtrace: 16/16 send id=2801 remote=260F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=260F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=170F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOHDIXHDDrive
+machtrace: 16/16 send id=2801 remote=2613 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2613 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=170F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOHDIXHDDrive
+machtrace: 16/16 send id=2801 remote=2617 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2617 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=170F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=36
+machtrace: 16/16 send id=205 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=305 size=40
+machtrace-body: BSD Name
+machtrace-body: disk1s1
+machtrace-body: IOProviderClass
+machtrace-body: IOMedia
+machtrace: 16/16 send id=2880 remote=1713 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2980 size=40
+machtrace-body: IOService
+machtrace: 16/16 send id=2814 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2914 size=40
+machtrace: 16/16 send id=2802 remote=1717 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOSCSIPeripheralDeviceNub
+machtrace: 16/16 send id=2801 remote=261B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=261B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOService
+machtrace: 16/16 send id=2814 remote=261B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2914 size=40
+machtrace: 16/16 send id=2802 remote=171B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOSCSIPeripheralDeviceNub
+machtrace: 16/16 send id=2801 remote=2503 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2503 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOService
+machtrace: 16/16 send id=2814 remote=2503 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2914 size=40
+machtrace: 16/16 send id=2802 remote=261F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOSCSIPeripheralDeviceNub
+machtrace: 16/16 send id=2801 remote=171F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=171F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOService
+machtrace: 16/16 send id=2814 remote=171F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2914 size=40
+machtrace: 16/16 send id=2802 remote=2507 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=36
+machtrace: 16/16 send id=205 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=305 size=40
+machtrace-body: BSD Name
+machtrace-body: disk1s1
+machtrace-body: IOProviderClass
+machtrace-body: IOMedia
+machtrace: 16/16 send id=2880 remote=1723 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2980 size=40
+machtrace-body: IOCDMedia
+machtrace: 16/16 send id=2801 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IODVDMedia
+machtrace: 16/16 send id=2801 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOService
+machtrace: 16/16 send id=2814 remote=1803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2914 size=40
+machtrace: 16/16 send id=2802 remote=1727 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOBlockStorageDriver
+machtrace: 16/16 send id=2801 remote=250B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=250B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOCDMedia
+machtrace: 16/16 send id=2801 remote=250B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=250B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IODVDMedia
+machtrace: 16/16 send id=2801 remote=250B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=250B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOService
+machtrace: 16/16 send id=2814 remote=250B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2914 size=40
+machtrace: 16/16 send id=2802 remote=172B local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOBlockStorageDriver
+machtrace: 16/16 send id=2801 remote=250F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=250F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOCDMedia
+machtrace: 16/16 send id=2801 remote=250F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=250F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IODVDMedia
+machtrace: 16/16 send id=2801 remote=250F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=250F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOService
+machtrace: 16/16 send id=2814 remote=250F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2914 size=40
+machtrace: 16/16 send id=2802 remote=172F local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOBlockStorageDriver
+machtrace: 16/16 send id=2801 remote=2513 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2513 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOCDMedia
+machtrace: 16/16 send id=2801 remote=2513 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2513 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IODVDMedia
+machtrace: 16/16 send id=2801 remote=2513 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2513 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOService
+machtrace: 16/16 send id=2814 remote=2513 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2914 size=40
+machtrace: 16/16 send id=2802 remote=1733 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=36
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.DiskArbitration.diskarbitrationd
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:48.913683+0000 metalprobe[16:16] [FileIDMap] FileIDTreeGetVRefNumForDevice(2050) returned -35
+2026-11-16 11:17:48.927157+0000 metalprobe[16:16] [FileIDMap] FileIDTreeGetVRefNumForDevice(2050) returned -35
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesIsManaged
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.Metal
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=148
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.Metal
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=188
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.Metal
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=144
+machtrace-body: @CPX@
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesMessages
+machtrace-body: CFPreferencesIsManaged
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.Metal
+machtrace-body: CFPreferencesIsManaged
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.Metal
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.Metal
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesUser
+machtrace-body: kCFPreferencesCurrentUser
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.Metal
+machtrace-body: CFPreferencesSandboxExtension
+machtrace-body: com.apple.cfprefsd.read
+machtrace-body: CFPreferencesIsByHost
+machtrace-body: CFPreferencesHostBundleIdentifier
+machtrace-body: metalprobe
+machtrace-body: CFPreferencesOperation
+machtrace-body: CFPreferencesDomain
+machtrace-body: com.apple.Metal
+machtrace: 16/16 send id=1073741824 remote=E03 local=1303 opt=100231 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700420E rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=812
+machtrace: 16/16 send id=205 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=305 size=40
+machtrace-body: IOServicePublish
+machtrace-body: IOProviderClass
+machtrace-body: IOAccelerator
+machtrace: 16/16 send id=2884 remote=1807 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2984 size=40
+machtrace: 16/16 send id=2802 remote=2517 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: MetalPluginName
+machtrace: 16/16 send id=2889 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=64
+machtrace-body: MetalPluginClassName
+machtrace: 16/16 send id=2889 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=64
+machtrace: 16/16 send id=200 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=300 size=48
+machtrace: 16/16 send id=200 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=300 size=48
+machtrace: 16/16 send id=2802 remote=2517 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=36
+machtrace-body: IOServiceCompatibility
+machtrace: 16/16 send id=2801 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=205 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=305 size=40
+machtrace: 16/16 send id=2871 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2971 size=44
+machtrace-body: IOGeneralInterest
+machtrace: 16/16 send id=2869 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2969 size=40
+machtrace-body: SafeEjectRequested
+machtrace: 16/16 send id=2889 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: @CPX@
+machtrace-body: handle
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.system.opendirectoryd.membership
+machtrace-body: type
+machtrace-body: lookup-handle
+machtrace: 16/16 send id=1073742628 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=116
+machtrace-body: t00w
+machtrace: 16/16 send id=1999646836 remote=2303 local=0 opt=1 rcv=0 timeout=0
+machtrace: 16/16 done -> 0 id=0 size=0
+machtrace-body: @CPX@
+machtrace-body: identifier
+machtrace-body: requesting
+machtrace-body: rpc_version
+machtrace-body: type
+machtrace-body: rpc_name
+machtrace-body: mbr_identifier_translate
+machtrace: 16/16 send id=1073741824 remote=1A03 local=1303 opt=3304207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=124
+machtrace: 16/16 send id=2862 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2962 size=52
+machtrace: 16/16 send id=2865 remote=1B03 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2965 size=588
+machtrace: 16/16 send id=2865 remote=1B03 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2965 size=116
+machtrace: 16/16 send id=2865 remote=1B03 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2965 size=84
+machtrace: 16/16 send id=2865 remote=C03 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2965 size=60
+machtrace: 16/16 send id=2871 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2971 size=44
+machtrace-body: IOService
+machtrace-body: AAPL,slot-name
+machtrace: 16/16 send id=2889 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace-body: IOService
+machtrace: 16/16 send id=2833 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2933 size=40
+machtrace: 16/16 send id=2802 remote=2103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOPCIDevice
+machtrace: 16/16 send id=2801 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2623 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=2103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=40
+machtrace-body: IOPCIDevice
+machtrace: 16/16 send id=2801 remote=2003 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2901 size=40
+machtrace-body: IOClassNameOverride
+machtrace: 16/16 send id=2889 remote=2003 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2989 size=36
+machtrace: 16/16 send id=2802 remote=2103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2902 size=36
+machtrace: 16/16 send id=200 remote=2803 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=300 size=88
+machtrace: 16/16 send id=2865 remote=1B03 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=2965 size=344
+machtrace-body: TKID
+machtrace: 16/16 send id=1145654100 remote=1B03 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=1145654200 size=104
+all=1
+dev Apple Paravirtual device regid=100000007 removable=0 headless=0
+machtrace: 16/16 send id=0 remote=0 local=0 opt=4000102 rcv=1403 timeout=0
+machtrace: 16/16 done -> 10004003 id=0 size=0
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: outgsk
+machtrace-body: self
+machtrace-body: type
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742125 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+machtrace-body: @CPX@
+machtrace-body: handle
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.tccd.system
+machtrace-body: type
+machtrace-body: lookup-handle
+machtrace: 16/16 send id=1073742628 remote=707 local=1303 opt=3114207 rcv=1303 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700020E rcv=1303 timeout=0
+machtrace: 16/16 done -> 10004006 id=0 size=0
+machtrace-body: @CPX@
+machtrace-body: handle
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.tccd.system
+machtrace-body: type
+machtrace-body: lookup-handle
+machtrace: 16/16 send id=1073742628 remote=707 local=1307 opt=3114207 rcv=1307 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+machtrace: 16/16 send id=0 remote=0 local=0 opt=700020E rcv=1307 timeout=0
+machtrace: 16/16 done -> 10004006 id=0 size=0
+2026-11-16 11:17:49.474826+0000 metalprobe[16:16] [access] send_message_with_reply_sync(): XPC_ERROR_CONNECTION_INVALID for msgID=16.1 (function=TCCAccessRequest, service=kTCCServiceListenEvent)
+2026-11-16 11:17:49.475951+0000 metalprobe[16:16] [access] TCCAccessRequest_block_invoke: Connection invalid
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.487700+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.488860+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+machtrace: 16/16 send id=29010 remote=0 local=2107 opt=304003 rcv=2107 timeout=0
+machtrace: 16/16 done -> 10000003 id=0 size=0
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.494195+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.495327+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+machtrace: 16/16 send id=32006 remote=0 local=2107 opt=304003 rcv=2107 timeout=0
+machtrace: 16/16 done -> 10000003 id=0 size=0
+2026-11-16 11:17:49.498536+0000 metalprobe[16:16] [default] This user is not allowed access to the window system right now.
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.592794+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.593934+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+machtrace: 16/16 send id=29010 remote=0 local=2107 opt=304003 rcv=2107 timeout=0
+machtrace: 16/16 done -> 10000003 id=0 size=0
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.599025+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.600085+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.605045+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.606178+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+machtrace: 16/16 send id=29010 remote=0 local=2107 opt=304003 rcv=2107 timeout=0
+machtrace: 16/16 done -> 10000003 id=0 size=0
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.611235+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.612383+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.617851+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.618903+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+machtrace: 16/16 send id=29010 remote=0 local=2107 opt=304003 rcv=2107 timeout=0
+machtrace: 16/16 done -> 10000003 id=0 size=0
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.623792+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.624895+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.629649+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.630700+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+machtrace: 16/16 send id=29010 remote=0 local=2107 opt=304003 rcv=2107 timeout=0
+machtrace: 16/16 done -> 10000003 id=0 size=0
+machtrace: 16/16 send id=3409 remote=103 local=603 opt=3 rcv=603 timeout=0
+machtrace: 16/16 done -> 0 id=3509 size=40
+machtrace-body: CPX@
+machtrace-body: handle
+machtrace-body: instance
+machtrace-body: flags
+machtrace-body: name
+machtrace-body: com.apple.windowserver.active
+machtrace-body: type
+machtrace-body: targetpid
+machtrace-body: domain-port
+machtrace: 16/16 send id=1073742031 remote=707 local=2107 opt=3114207 rcv=2107 timeout=0
+machtrace: 16/16 done -> 0 id=536870912 size=64
+2026-11-16 11:17:49.635425+0000 metalprobe[16:16] [default] Server root port lookup error - unknown error code
+2026-11-16 11:17:49.636475+0000 metalprobe[16:16] [default] On-demand launch of the Window Server is allowed for root user only.
+2026-11-16 11:17:49.637741+0000 metalprobe[16:16] [default] Invalid display 0x00000000
+default=Apple Paravirtual device

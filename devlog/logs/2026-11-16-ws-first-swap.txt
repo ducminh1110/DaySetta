@@ -1,0 +1,30 @@
+# iomfb selectors seen in 90s (count sel)
+     19 iomfb: sel=78 scalarIn=6 scalarOut=0 structIn=656 structOut=0
+     12 iomfb: sel=78 scalarIn=5 scalarOut=0 structIn=64 structOut=0
+      3 iomfb: sel=88 scalarIn=1 scalarOut=0 structIn=0 structOut=0
+      3 iomfb: sel=78 scalarIn=3 scalarOut=0 structIn=76 structOut=0
+      2 iomfb: sel=8 scalarIn=0 scalarOut=2 structIn=0 structOut=0
+      2 iomfb: sel=74 scalarIn=1 scalarOut=2 structIn=0 structOut=64
+      2 iomfb: sel=72 scalarIn=4 scalarOut=0 structIn=0 structOut=0
+      2 iomfb: sel=68 scalarIn=1 scalarOut=0 structIn=8 structOut=0
+      2 iomfb: sel=6 scalarIn=3 scalarOut=0 structIn=0 structOut=0
+      2 iomfb: sel=5 scalarIn=0 scalarOut=0 structIn=1760 structOut=0
+      2 iomfb: sel=4 scalarIn=0 scalarOut=1 structIn=0 structOut=0
+      1 iomfb: sel=83 scalarIn=1 scalarOut=1 structIn=0 structOut=0
+      1 iomfb: sel=79 scalarIn=2 scalarOut=0 structIn=0 structOut=44
+      1 iomfb: sel=69 scalarIn=0 scalarOut=0 structIn=136 structOut=0
+      1 iomfb: sel=57 scalarIn=0 scalarOut=1 structIn=0 structOut=0
+      1 iomfb: sel=33 scalarIn=1 scalarOut=0 structIn=0 structOut=0
+      1 iomfb: sel=29 scalarIn=0 scalarOut=0 structIn=0 structOut=8
+      1 iomfb: sel=28 scalarIn=0 scalarOut=1 structIn=0 structOut=0
+      1 iomfb: sel=25 scalarIn=0 scalarOut=1 structIn=0 structOut=0
+      1 iomfb: sel=22 scalarIn=1 scalarOut=0 structIn=0 structOut=0
+      1 iomfb: sel=15 scalarIn=2 scalarOut=1 structIn=0 structOut=0
+      1 iomfb: sel=12 scalarIn=1 scalarOut=0 structIn=0 structOut=0
+# surfaces created
+create id=1 1440x24 bpr=5760 fmt=42475241
+create id=2 1440x900 bpr=5888 fmt=42475241
+# swapend struct: +0x98 swap id, +0x9c surface id, +0xb4/+0xb8 = 1440x900
+sid=2 found=1
+sid=2 found=1
+# dumped surface 2 -> artifacts/screenshots/real-ws27-first-swap.png, all zero (no gpu exec yet)
