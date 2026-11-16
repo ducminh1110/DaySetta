@@ -1,0 +1,11 @@
+# mldr slice: MTLCompilerService fat = x86_64, arm64e, arm64 subtype 12 -> old mldr took the last (12) -> SIGILL
+# before darlingserver fix (ws41/42)
+2026-11-15 14:37:43.113435+0000 WindowServer[18:52] [server.listener] mach_msg_server_once() error kr=268451843((ipc/rcv) timed out)
+-[VirtualDisplayListener rx] (ipc/rcv) timed out
+Assertion failed: ((write - read) < _dirtyRO->dirtyRingLength), function -[AppleParavirtDevice addDirtyResource:command:arg0:arg1:], file AppleParavirtDevice.mm, line 594.
+# after (ws50, 90s)
+timed out lines: 0 fatal: 0 asserts: 0
+2026-11-16 08:38:50.474484+0000 WindowServer[18:18] [WindowServer] copy_read_only: vm_protect failed: status 5.
+2026-11-16 08:38:50.775997+0000 WindowServer[18:18] [WindowServer] Failed to disable skip spinner!
+# metalprobe
+default=Apple Paravirtual device
