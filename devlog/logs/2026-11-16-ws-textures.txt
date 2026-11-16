@@ -1,0 +1,4 @@
+# ws60: descriptor2 only
+Assertion failed: (descriptorPrivate.usage == (decltype(descriptorPrivate.usage))newDescriptor.usage), function -[PGSerializer serializeTextureDescriptor:textureDescriptor:], file PGSerializer.mm, line 188.
+# ws61: + swizzled
+texture errs: 0 fatal: 0
