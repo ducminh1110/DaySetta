@@ -1,0 +1,70 @@
+# host spike: driving reims-vgpu as the guest kext, no vm (~/darling-recovery/pvg-spike/spike.c, deepseek-written, lead-checked)
+reims-vgpu WARN reims_vgpu_vulkan::os: views of scattered guest pages take a kernel mapping a run of pages, counted against vm.max_map_count, as /dev/udmabuf would not open (Permission denied (os error 13)): load the udmabuf module, and put the user in the group that owns the node (kvm on Ubuntu)
+reims-vgpu WARN reims_vgpu_vulkan::caps: gpuCoreCount (gpu-core-count-unknown): llvmpipe (LLVM 21.1.8, 128 bits): its driver reports no core count and no Metal device stands for it, so the guest's device info carries none (key 34) and its device answers 0
+reims-vgpu INFO reims_vgpu_core::device: device starting on Metal device llvmpipe (LLVM 21.1.8, 128 bits)
+reims-vgpu INFO reims_vgpu_core::device: argument buffers off
+reims-vgpu INFO reims_vgpu_core::guest::abi::features: guest asked for binary version 245; version 0xf5 is stored
+reims-vgpu INFO reims_vgpu_vulkan::os::linux::hints: FIFO threads ask the scheduler for a utilization floor of 1024 of 1024
+ok: memfd_create
+ok: ftruncate 64 MiB
+ok: mmap guest RAM
+ok: rvg_device_create
+binary version reads 0xf5
+root page 0x4000, fifo page 0x4001
+0x1000=0x1 0x103c=0xffffffff
+ok: root FIFO enabled
+init: stamp=0 read=0 fault=0 fault_offset=0xffffffff irqs=0
+irq 0
+ok: opcode 58 stamp
+device info: stamp=0x1 read=0x18 fault=0 fault_offset=0xffffffff irqs=1
+{1,4}
+{2,0}
+{3,1024}
+{4,1024}
+{5,1024}
+{6,32768}
+{7,1}
+{8,1}
+{9,1}
+{10,8}
+{11,511}
+{12,1}
+{13,16}
+{14,1}
+{15,256}
+{16,1}
+{17,1}
+{18,131079}
+{19,1}
+{20,2}
+{21,1}
+{22,2}
+{23,1}
+{24,1}
+{25,1}
+{26,1}
+{27,1}
+{28,7}
+{33,2719}
+{36,4294967295}
+{29,1024}
+{30,31}
+{31,65536}
+{32,16}
+{41,7}
+{35,2048}
+{37,1009}
+{42,0}
+{44,31}
+{40,16}
+{0,0}
+irq 0
+ok: opcode 56 stamp
+root task word 0x4003
+define task: stamp=0x2 read=0x34 fault=0 fault_offset=0xffffffff irqs=2
+irq 0
+ok: opcode 32 stamp
+root task word 0
+delete task: stamp=0x3 read=0x44 fault=0 fault_offset=0xffffffff irqs=3
+after disable: 0x1000=0 0x103c=0
+spike: ok (0 failures)
