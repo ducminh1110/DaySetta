@@ -1,0 +1,21 @@
+== ws201.log (runws.sh 60s, current build) ==
+2026-11-17 13:32:32.163585+0000 WindowServer[13:13] Unable to load configuration file.
+2026-11-17 13:32:32.653333+0000 WindowServer[13:13] [User Defaults] All kCFPreferencesCurrentUser domains in this proces
+2026-11-17 13:32:34.465087+0000 WindowServer[13:13] TSXDaemonServiceClient -[TSXDaemonServiceClient getSyncEntityManager
+aborts=0
+machtrace: 13/13 done -> 0 id=0 size=0
+machtrace: 13/13 send id=0 remote=0 local=0 opt=700420E rcv=530B timeout=0
+
+== iomfb swap + submit selectors (submit-dumps/pvg-submit-1117.txt) ==
+3:m 5 sc=st[0]=
+18:m 6 sc=st[0]=
+55:t 0 sc=1 30 ffffe1570 ffffe15e4 0 0 st[0]=
+67:t 0 sc=1 30 ffffe10c0 ffffe1134 0 0 st[0]=
+
+== reims fatal (submit-dumps/reims-fatal-1117.log) ==
+4 reims_vgpu_vulkan::gpu::serialized: newRenderPipelineDescriptorWithSerializedData:deserializationContext: 324 bytes: 0500041f00000003044c000000080418010000010423000000020422000000636f6d2e6
+4 reims_vgpu_vulkan::gpu::timing: newFunctionWithName:: 0.0 ms, synchronous on the calling thread: found; "attachment_clear_frag_lph"
+4 reims_vgpu_vulkan::gpu::timing: newRenderPipelineDescriptorWithSerializedData:deserializationContext:: 4.0 ms, synchronous on the calling thread: vertex "air.vertexFetchFunction", fragment
+4 reims_vgpu_vulkan::gpu::timing: newRenderPipelineStateWithDescriptor:options:reflection:error:: 4.3 ms, synchronous on the calling thread (its VkPipelines are made at the draws that first 
+4 reims_vgpu_core::iosurface::table: map surface 2
+reims-vgpu: fatal: platform call setRenderPipelineState:: the Vulkan runtime refused it: invalid use of set_render_pipeline_state: Draw(AttachmentFormat(Color(0)))
