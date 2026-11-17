@@ -1,0 +1,19 @@
+2 reims_vgpu_vulkan::os: views of scattered guest pages take a kernel mapping a run of pages, counted against vm.max_map_count, as /dev/udmabuf would not open (Permission denied (os error 13)): load the udmabuf module, and put the user in the group that owns the node (kvm on Ubuntu)
+2 reims_vgpu_vulkan::caps: gpuCoreCount (gpu-core-count-unknown): llvmpipe (LLVM 21.1.8, 128 bits): its driver reports no core count and no Metal device stands for it, so the guest's device info carries none (key 34) and its device answers 0
+3 reims_vgpu_core::device: device starting on Metal device llvmpipe (LLVM 21.1.8, 128 bits)
+3 reims_vgpu_core::device: argument buffers off
+3 reims_vgpu_core::guest::abi::features: guest asked for binary version 245; version 0xf5 is stored
+3 reims_vgpu_vulkan::os::linux::hints: FIFO threads ask the scheduler for a utilization floor of 1024 of 1024
+2 reims_vgpu_core::resources::manager::lookup: texture lookup failed: object 8 has an empty entry
+2 reims_vgpu_core::tasks::local::exec: task 1: exec faulted: texture lookup failed
+2 reims_vgpu_core::resources::manager::lookup: texture lookup failed: object 17 has an empty entry
+2 reims_vgpu_core::tasks::local::exec: task 1: exec faulted: texture lookup failed
+2 reims_vgpu_core::resources::manager::lookup: texture lookup failed: object 8 has an empty entry
+2 reims_vgpu_core::tasks::local::exec: task 1: exec faulted: texture lookup failed
+2 reims_vgpu_core::resources::manager::lookup: texture lookup failed: object 9 has an empty entry
+2 reims_vgpu_core::tasks::local::exec: task 1: exec faulted: texture lookup failed
+2 reims_vgpu_core::resources::manager::lookup: texture lookup failed: object 17 has an empty entry
+2 reims_vgpu_core::tasks::local::exec: task 1: exec faulted: texture lookup failed
+2 reims_vgpu_core::resources::manager::lookup: texture lookup failed: object 9 has an empty entry
+2 reims_vgpu_core::tasks::local::exec: task 1: exec faulted: texture lookup failed
+define task id=1 root=50b028000 submit=1 fault=0
