@@ -1,0 +1,58 @@
+images=4088 __text sections=3965 words=906420576
+must-handle words=46439398 (lowered=45454995, gaps=984403)
+  pac-sign         17626141  pacibsp=9749433 pacia=3242342 pacda=3035545 paciza=1057517 pacdb=534073 pacib=3253 pacib1716=1924 pacia1716=1869 pacdza=185
+  pac-auth          9627116  autda=5816405 autibsp=3711724 autdb=34747 autdza=29700 autia=21593 autib=12088 autiza=859
+  br-auth           8464408  blraa=7411199 braa=752364 blraaz=280086 braaz=20331 blrab=345 brab=83
+  ret-auth          6707429  retab=6707429
+  pac-strip         1753748  xpacd=1718801 xpaci=34947
+  rmw                830940  ldadd=566952 ldaddal=193018 ldaddl=53740 swpal=7545 ldsetal=3709 ldclral=1769 swpalb=1580 ldaddalh=460 swpab=416 swp=247 ldclr=222 ldset=192
+  ldapr              193313  ldaprb=167233 ldapr=26038 ldaprh=42
+  cas                 82446  casl=24235 caslb=15690 casab=13288 casa=12200 cas=9837 casal=5804 casb=792 casalb=545 cash=20 casalh=15 caslh=11 casah=9
+  mrs-tpidrro         66644  mrs=66644
+  fp16                45181  fcvt=29771 fcmp=4965 fmov=2785 fadd=1621 fmul=1270 fcsel=1040 fmadd=924 ucvtf=889 fsub=385 fdiv=314 fccmp=257 fneg=245
+  fp16v               30745  dup=12111 fmla=4565 fadd=3436 fmul=2933 fmin=1189 fcvtzu=1055 fmax=1024 fcmgt=821 fcmeq=821 ucvtf=611 fsub=553 fdiv=328
+  dot                 22857  udot=21939 sdot=918
+  sha3                 1890  eor3=1058 bcax=445 xar=331 rax1=56
+  pacga                 763  pacga=763
+  svc                   713  svc=713
+  casp                  565  caspal=243 caspl=195 casp=98 caspa=29
+  mrs-tpidr              63  mrs=63
+  ldr-auth               22  ldraa=21 ldrab=1
+  ldapur                 11  ldapurh=4 ldapursw=4 ldapur=3
+--- bridge selfcheck:
+d503233f 12 pac-sign 
+88a17c62 3 cas 
+f8bfc020 7 ldapr 
+8b010000 100 none 
+--- rn sweep fadd.4h (0e401400|rn<<5):
+0e401400 1 fp16v hk=26
+0e401420 1 fp16v hk=26
+0e401440 1 fp16v hk=26
+0e401460 1 fp16v hk=26
+0e401480 1 none 
+0e401500 1 fp16v hk=26
+0e401600 1 none 
+--- families:
+FAMILIES:
+  undefined-data         598159
+  sve-sme                318207
+  fp16-neon-missed        29748
+  neon-fcma               25270
+  mte                      7327
+  jscvt                    2161
+  bf16                     1207
+  sha512                   1152
+  cssc                      632
+  the                       223
+  neon-fhm                  180
+  misc-v9x                   73
+  hbc                        53
+  rcpc3-misc                  5
+  rcpc2-store                 5
+  neon-lut                    1
+sum: 984403
+fp16-missed: total=29748, words with Rn bit4|bit2 set=25212
+--- mask victims:
+fp16-family missed unique: 12097 total words: 29748
+opcode SUPPORTED when Rn field zeroed (mask overconstraint): uniq=11196 words=25422
+opcode genuinely absent from decoder, by mnemonic:

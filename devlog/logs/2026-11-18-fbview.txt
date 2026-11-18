@@ -1,0 +1,58 @@
+== test_client.py live (genfb running, final code) ==
+server version: RFB 003.008
+security types: [1]
+security result: 0
+server init: 1440x900 bpp=32 depth=24 tc=1 shifts=(16, 8, 0) name='daysetta'
+update 1: 900 rects, 5184000 pixel bytes, full=True
+update 2: 900 rects, 5184000 pixel bytes
+update 3: 900 rects, 190800 pixel bytes
+update 4: 900 rects, 471600 pixel bytes
+update 5: 900 rects, 471600 pixel bytes
+OK
+
+== test_client.py static, noVNC pixel format (0,8,16) ==
+server version: RFB 003.008
+security types: [1]
+security result: 0
+server init: 1440x900 bpp=32 depth=24 tc=1 shifts=(16, 8, 0) name='daysetta'
+update 1: 900 rects, 5184000 pixel bytes, full=True
+pixel check rows 0,450,899: 0/4320 wrong (fb counter 41)
+OK
+
+== test_ws.py via start.sh websockify 100.120.104.95:6081 (final code) ==
+HTTP/1.1 101 Switching Protocols
+rfb version: RFB 003.008
+server init over ws: 1440x900 name='daysetta' shifts=(16, 8, 0)
+full update over ws: 900 rects, 5184000 bytes
+OK
+
+== start.sh output ==
+open http://100.120.104.95:6081/vnc.html?host=100.120.104.95&port=6081&autoconnect=true&resize=scale
+fbview: waiting for /dev/shm/daysetta-fb.bgra
+fbview: 1440x900 on 127.0.0.1:5901, input -> /dev/shm/daysetta-input
+WebSocket server settings:
+  - Listen on 100.120.104.95:6081
+  - Web server. Web root: /usr/share/novnc
+  - No SSL/TLS support (no cert file)
+  - proxying from 100.120.104.95:6081 to 127.0.0.1:5901
+fbview: client from ('127.0.0.1', 57540)
+fbview: client gone: BrokenPipeError(32, 'Broken pipe')
+In exit
+
+== /dev/shm/daysetta-input decoded after live+static runs (file since unlinked externally, 2nd time) ==
+10 records
+(0, 97, 0, 0, 0)
+(1, 97, 0, 0, 1)
+(2, 1, 123, 456, 2)
+(2, 0, 123, 456, 3)
+(2, 0, 700, 300, 4)
+(0, 97, 0, 0, 5)
+(1, 97, 0, 0, 6)
+(2, 1, 123, 456, 7)
+(2, 0, 123, 456, 8)
+(2, 0, 700, 300, 9)
+last ws-test record: (2, 1, 42, 84, 0)
+
+== cpu: fbview 5s live gen no clients: 43 ticks/100hz = 8.6% of one core; 3s idle: 3 ticks ==
+== curl: vnc.html http 200, 17810 bytes; root http 200 ==
+== real iokitd dumps: frames/frame1-s2-1.bgra + frame2 = 5184000 bytes each, 0/1296000 nonzero pixels ==

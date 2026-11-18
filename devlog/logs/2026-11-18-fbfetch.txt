@@ -1,0 +1,93 @@
+== cargo test -p metal2vulkan-runtime color_reformat (unit, no cfg; toolchain 1.98.1, CARGO_BUILD_JOBS=1) ==
+   Compiling metal2vulkan-runtime v0.2.0 (/home/ubuntu/ref/metal2vulkan/crates/metal2vulkan-runtime)
+    Finished `test` profile [unoptimized] target(s) in 4m 38s
+     Running unittests src/lib.rs (target/debug/deps/metal2vulkan_runtime-cde150afcfcbca8e)
+
+running 8 tests
+test tests::color_reformat::channel_order_twins_draw_through_the_pass_s_own_format ... ok
+test tests::color_reformat::bytes_no_view_stores_have_none ... ok
+test tests::color_reformat::other_encodings_draw_through_a_view_of_the_state_s ... ok
+test tests::color_reformat::an_uncovered_color_is_zeroed_where_metal_s_code_reads_no_attachment ... ok
+test tests::color_reformat::a_misplaced_color_is_the_lowest_that_moves ... ok
+test tests::color_reformat::a_two_color_clear_state_in_a_one_color_pass_places_and_drops ... ok
+test tests::color_reformat::each_state_color_is_routed_to_the_pass_color_at_its_place ... ok
+test tests::color_reformat::held_formats_are_metal_s_own ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 1175 filtered out; finished in 0.71s
+
+== cargo test -p metal2vulkan-runtime bgra_fetch (RUSTFLAGS='--cfg m2v_cpu_icd' LP_NUM_THREADS=1; run 2, PASS; 1 unused_parens warning since fixed) ==
+    Finished `test` profile [unoptimized] target(s) in 11m 46s
+     Running unittests src/lib.rs (target/debug/deps/metal2vulkan_runtime-22a1673eb7cf31e8)
+
+running 1 test
+TU: error: ../src/freedreno/vulkan/tu_knl.cc:369: failed to open device /dev/dri/renderD128 (VK_ERROR_INCOMPATIBLE_DRIVER)
+test tests::bgra_fetch::a_bgra_attachment_read_sees_the_clear_and_the_draw_before_it ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1482 filtered out; finished in 0.53s
+
+== run 1 of bgra_fetch (failed on the test's own bugs, kept as the red-before-green record) ==
+thread 'tests::bgra_fetch::a_bgra_attachment_read_sees_the_clear_and_the_draw_before_it' (77144) panicked at crates/metal2vulkan-runtime/src/tests/bgra_fetch.rs:191:9:
+assertion `left == right` failed: texel 0
+  left: [0.2509804, 0.5019608, 0.75294125, 1.0]
+ right: [0.2509804, 0.5019608, 0.7529412, 1.0]
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1482 filtered out; finished in 2.06s
+
+== vulkaninfo (host GPU0, the fatal log's device) ==
+	deviceName        = llvmpipe (LLVM 21.1.8, 128 bits)
+	driverVersion     = 26.0.8 (109051912)
+	rasterizationOrderColorAttachmentAccess   = true
+	fragmentShaderPixelInterlock       = true
+	dynamicRenderingLocalRead              = true
+
+== cached CA/RenderBox fragment SPIR-V: SubpassData (input attachment) counts, spirv-dis ==
+6e965baa94cd.spv SubpassData=0   (2 float4 outputs, 0 inputs, stores zero: the clear)
+a2b085776c99.spv SubpassData=0
+c773134b4999.spv SubpassData=0
+d376b5cea2d5.spv SubpassData=0
+e668ef13f115.spv SubpassData=0   (792KB RenderBox shader, 299 OpImageSampleImplicitLod)
+
+== run 3 (final: warning fix + shared helpers + rustfmt; RUSTFLAGS='--cfg m2v_cpu_icd' LP_NUM_THREADS=1) ==
+running 1 test
+TU: error: ../src/freedreno/vulkan/tu_knl.cc:369: failed to open device /dev/dri/renderD128 (VK_ERROR_INCOMPATIBLE_DRIVER)
+test tests::bgra_fetch::a_bgra_attachment_read_sees_the_clear_and_the_draw_before_it ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1482 filtered out; finished in 1.65s
+
+     Running tests/consumer_auto_traits.rs (target/debug/deps/consumer_auto_traits-bd97614d89fd7957)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+test tests::color_reformat::channel_order_twins_draw_through_the_pass_s_own_format ... ok
+test tests::color_reformat::bytes_no_view_stores_have_none ... ok
+test tests::color_reformat::a_misplaced_color_is_the_lowest_that_moves ... ok
+test tests::color_reformat::a_two_color_clear_state_in_a_one_color_pass_places_and_drops ... ok
+test tests::color_reformat::other_encodings_draw_through_a_view_of_the_state_s ... ok
+test tests::color_reformat::each_state_color_is_routed_to_the_pass_color_at_its_place ... ok
+test tests::color_reformat::held_formats_are_metal_s_own ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 1475 filtered out; finished in 0.63s
+
+     Running tests/consumer_auto_traits.rs (target/debug/deps/consumer_auto_traits-bd97614d89fd7957)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+test tests::framebuffer_fetch::storage_answers_keep_the_latest_asked ... ok
+test tests::framebuffer_fetch::the_planes_usage_is_offered_to_multisampled_color_targets_where_the_fetch_reads_planes ... ok
+test tests::framebuffer_fetch::multisampled_depth_stencil_targets_are_offered_sampled_where_the_copies_read_them ... ok
+test tests::framebuffer_fetch::an_a8_target_takes_the_planes_copies_in_its_own_format ... ok
+test tests::framebuffer_fetch::storage_is_offered_to_the_interlock_forms_color_targets ... ok
+test tests::framebuffer_fetch::single_sample_depth_targets_are_offered_sampled_where_the_driver_keeps_hiz_so ... ok
+test tests::framebuffer_fetch::the_word_gap_is_the_word_kinds_whose_fetch_is_not_built ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 1476 filtered out; finished in 1.12s
+
+     Running tests/consumer_auto_traits.rs (target/debug/deps/consumer_auto_traits-bd97614d89fd7957)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+

@@ -1,0 +1,24 @@
+== tests/vm-page-query-unsupported.sh ==
+PASS: mach_vm page queries reject unsupported requests with error codes
+rc=0
+== mentrytest (darling shell, dyl4 env) ==
+allocate kr=0 buf=0x50e000000
+make_entry kr=0 size=0x4000 entry=2563
+vm_map kr=0 map2=0xff62fdee6000
+shared writes both directions ok
+named_create kr=0 size=0x2000 entry2=2819
+named map kr=0 map3=0xff62fdeba000
+writable map of read-only entry kr=17 (want 17 KERN_INVALID_RIGHT)
+read-only map kr=0 map4=0xff62fdeb8000
+PASS mentrytest
+== mentrytest2 ==
+vm_copy entry kr=0 size=0x4000
+vm_copy is a snapshot ok
+sub-range kr=0 size=0x1000
+sub-range shares parent pages ok
+oob sub-range kr=4 (want 4 KERN_INVALID_ARGUMENT)
+writable child of r/o parent kr=2 (want 2 KERN_PROTECTION_FAILURE)
+fork child wrote, parent sees 0xc0ffee (want 0xc0ffee)
+PASS mentrytest2
+== dserver.log stub lines since port (grep -c) ==
+0
