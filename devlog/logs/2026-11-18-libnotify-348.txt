@@ -1,0 +1,75 @@
+$ git -C ~/darling/src/external/libnotify log --oneline 227c145..HEAD
+4cb2c1e readme points at 348 now
+5979166 add the darling glue so it actually builds
+0780094 wip libnotify 348 port, doesnt build yet
+
+$ git -C ~/darling/src/external/libxpc log --oneline -1
+bc9e2b9 stop the entitlement stub from logging, it deadlocks notify
+
+$ sha256sum build (3) then installed (3)
+5975c603c31ba29d0d92
+131b1ef27b2a12ce197b
+1b1ca5e69bd984958293
+5975c603c31ba29d0d92
+131b1ef27b2a12ce197b
+1b1ca5e69bd984958293
+
+$ darling shell echo (old pair, then new pair)
+ctl-boot
+newboot
+
+# strace -f of the launchctl child: new libsystem_notify + old libxpc
+Darling: fatal signal 5 at pc 0x3010FC510 (fault address 0x3010FC510, sp 0xFFFFF1DC0)
+Darling:   pc 0x3010FC510 libdispatch.dylib+0x68510 (_dispatch_once_wait+0x23C)
+Darling:   lr 0x3010FC47C libdispatch.dylib+0x6847C (_dispatch_once_wait+0x1A8)
+Darling:   x0 0x0 x1 0xFFFFF1FB8 x2 0x302048FA0 x3 0x0 x8 0x1 x16 0x3009862CC
+Darling:   frame 0x3010D099C libdispatch.dylib+0x3C99C (dispatch_once_f+0x1F4)
+Darling:   frame 0x3010D079C libdispatch.dylib+0x3C79C (dispatch_once+0x28)
+Darling:   frame 0x302044100 libsystem_notify.dylib+0x8100 (_notification_introspection_is_exempt+0xFC)
+Darling:   frame 0x302044388 libsystem_notify.dylib+0x8388 (notify_register_check+0x40)
+Darling:   frame 0x30239FCA8 libsystem_asl.dylib+0xFCA8 (_asl_notify_open+0xB8)
+Darling:   frame 0x30239FBE0 libsystem_asl.dylib+0xFBE0 (asl_open+0x28)
+Darling:   frame 0x301C705FC libsystem_trace.dylib+0x45FC (__get_client_block_invoke+0x1C)
+Darling:   frame 0x3010D0574 libdispatch.dylib+0x3C574 (_dispatch_client_callout+0x20)
+Darling:   frame 0x3010D09D4 libdispatch.dylib+0x3C9D4 (_dispatch_once_callout+0x24)
+Darling:   frame 0x3010D0990 libdispatch.dylib+0x3C990 (dispatch_once_f+0x1E8)
+Darling:   frame 0x3010D079C libdispatch.dylib+0x3C79C (dispatch_once+0x28)
+Darling:   frame 0x301C704F0 libsystem_trace.dylib+0x44F0 (_os_log_impl+0x210)
+Darling:   frame 0x30001A220 libxpc.dylib+0x1A220 (_xpc_stub+0xC0)
+Darling:   frame 0x3000120CC libxpc.dylib+0x120CC (xpc_copy_entitlement_for_token+0x20)
+Darling:   frame 0x302048FF0 libsystem_notify.dylib+0xCFF0 (___notification_introspection_is_exempt_block_invoke+0x50)
+Darling:   frame 0x3010D0574 libdispatch.dylib+0x3C574 (_dispatch_client_callout+0x20)
+Darling:   frame 0x3010D09D4 libdispatch.dylib+0x3C9D4 (_dispatch_once_callout+0x24)
+Darling:   frame 0x3010D0990 libdispatch.dylib+0x3C990 (dispatch_once_f+0x1E8)
+Darling:   frame 0x3010D079C libdispatch.dylib+0x3C79C (dispatch_once+0x28)
+Darling:   frame 0x302044100 libsystem_notify.dylib+0x8100 (_notification_introspection_is_exempt+0xFC)
+Darling:   frame 0x302044388 libsystem_notify.dylib+0x8388 (notify_register_check+0x40)
+Darling:   frame 0x30161D63C libsystem_info.dylib+0x1963C (__si_module_static_ds_block_invoke+0x70)
+
+# notify round trip (-w in one process, -p in another)
+com.darling.rt.26951
+notifyd ids: id=1000 id=1023 id=1027 
+
+# state round trip (-s 42, -g, post to a live -v watcher)
+set: []
+get: [com.darling.st3.30625 42|]
+post delivered: [2] 1794987274.798 com.darling.st3.30625 42 port
+
+# runws 100s hello2: new pair vs old-pair control
+  175 /tmp/ws-notify348.log
+  187 /tmp/ws-ctl.log
+  362 total
+Credentials.c: new=0 old=0
+fatal signal: new=0 old=0
+hello2 printed: new=[t=1794986644.034498 tid=114 mark main|] old=[t=1794987003.176615 tid=114 mark main|]
+
+# pre-port logs, >5000 lines was normal until 11-17 16:17
+/tmp/ws122.log 19875 lines 2026-11-17 13:51:40 creds=0
+/tmp/ws124.log 5967 lines 2026-11-17 14:09:10 creds=1
+/tmp/ws127.log 62 lines 2026-11-17 16:17:35 creds=0
+/tmp/ws128.log 187 lines 2026-11-17 16:26:15 creds=0
+/tmp/ws129.log 182 lines 2026-11-17 16:30:45 creds=0
+/tmp/ws130.log 182 lines 2026-11-17 17:18:27 creds=0
+
+# notifyd log
+fatal=0 non-machtrace=0
