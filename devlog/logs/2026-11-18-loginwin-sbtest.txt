@@ -1,0 +1,3 @@
+rc=0 errno=0 len=12 val=.sb-6afde93d
+sizequery rc=0 qlen=12
+PASS

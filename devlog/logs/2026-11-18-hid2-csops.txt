@@ -1,0 +1,40 @@
+# hid2 csops arm64 fat-slice fix — build + verification (raw). NOT installed (G0 parked).
+$ cd ~/darling/build-aarch64 && ninja -j1 src/external/xnu/darling/src/libsystem_kernel/libsystem_kernel.dylib
+[6/6] Linking C shared library src/external/xnu/darling/src/libsystem_kernel/libsystem_kernel.dylib
+(csops.c:507 errno_linux_to_bsd implicit-decl warning is pre-existing, in sys_mac_syscall, untouched)
+
+# WS is fat arm64e; old csops picks no slice -> EBADEXEC; new picks arm64e slice + reads entitlements
+$ python3 simulate_csops.py <WindowServer>
+current csops selects slice: None -> EBADEXEC (no entitlements)
+slice 0 cputype 0x100000c subtype 0x80000002
+slice 1 cputype 0x100000c subtype 0x8000000c
+NEW csops selects slice offset: 114688 size: 93824
+entitlements blob found, len 4920
+  hid.client.admin: True
+  iohideventsystem.server: True
+LC_CODE_SIGNATURE parsed OK: True
+
+# built dylib map_signature now compares cputype against 0x0100000c (CPU_TYPE_ARM64)
+$ llvm-objdump -d --start-address=0x56370 ... libsystem_kernel.dylib | grep movk
+56554: mov w13, #0xc
+56568: movk w13, #0x100, lsl #16      ; w13 = 0x0100000c
+5652c: movk w9, #0xcafe, lsl #16      ; FAT_MAGIC check
+
+# WS checks in com.apple.iohideventsystem itself (pid 20 = WS); no separate hidd
+$ grep iohideventsystem ~/.darling/private/tmp/launchd-lookups.log | sort | uniq -c
+      1 lookup checkin com.apple.iohideventsystem pid=20
+      3 lookup fail com.apple.iohideventsystem pid=20
+     16 lookup ok com.apple.iohideventsystem pid=20
+     19 lookup req com.apple.iohideventsystem pid=20
+
+# baseline error profile (ws186, reached HID: 7 move_cursor)
+HID event server is not entitled                   14
+Unable to create event queue via hidd              3
+IOMapMemory(ev) failure                            1
+Fail to get parameter                              4
+missing the 'com.apple.private.hid.client.admin'   2
+IOHIDEventSystemServer died                        8
+
+# G0 still black -> hid2 parked, no install
+$ python3 -c "d=open('~/.darling/private/tmp/frame1-s2-1.bgra','rb').read();print(sum(1 for b in d if b))"
+0

@@ -1,0 +1,9 @@
+$ cc /tmp/coord-check/notif_layout.c (pre-fix struct) && run
+hdr=0 notify=24 notify.reference=32 result=0x60 args=0x68
+sizeof OSNotificationHeader64=72 (spec content starts at 0x18+0x48=0x60)
+$ cc /tmp/coord-check/notif_layout_fixed.c (args[8] packed) && run
+hdr=0 notify=24 notify.reference=32 result=0x60 args=0x64
+sizeof OSNotificationHeader64=72 (spec content starts at 0x18+0x48=0x60)
+$ ninja -j1 iokitd
+[42/42] Linking CXX executable src/external/iokitd/iokitd
+(no new compiler warnings; only pre-existing ld static-initializer warnings)
