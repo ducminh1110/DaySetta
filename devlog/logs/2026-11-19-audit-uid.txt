@@ -1,0 +1,19 @@
+== ninja -j1 src/external/darlingserver/darlingserver
+[3/3] Linking CXX executable src/external/darlingserver/darlingserver  (rc=0; baseline before fix: ninja: no work to do.)
+
+== red: new test against pre-fix task.c (git HEAD)
+FAIL: parent->xnu_task.audit_token.val[1] == (unsigned)getuid() (line 41)
+rc=1
+
+== green: host tests after fix
+task-audit-token-uid.sh: PASS: audit token uid init matches getuid/getgid; session/pid-version and uidgid RPC intact
+memory-entry-empty-shared.sh: PASS: purgable EMPTY discards all shared mappings; a failed discard changes nothing
+memory-entry-map-copy.sh: PASS: mach_vm_map copy=YES maps a private copy of a named entry
+memory-entry-map-mem-only.sh: PASS: MAP_MEM_ONLY enforces is_object / protection checks
+memory-entry-purgable.sh: PASS: named-entry purgable control state machine
+memory-entry-snapshot.sh: PASS: make_memory_entry snapshots private ranges without replacing the task's pages
+ls-session-share-live.sh: PASS: VM_SHARE over a remapped LS page yields a LIVE entry (client sees lsd writes)
+vm-page-query-unsupported.sh: PASS: mach_vm page queries reject unsupported requests with error codes
+
+== id (host user running these tests)
+uid=1001(ubuntu) gid=1001(ubuntu) groups=1001(ubuntu),4(adm),24(cdrom),27(sudo),30(dip),101(lxd)

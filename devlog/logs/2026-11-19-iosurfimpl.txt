@@ -1,0 +1,48 @@
+$ diff -u wip/iosurfimpl/IOSurfaceRootApple.h src/external/iokitd/src/IOSurfaceRootApple.h (excerpt)
++	uint64_t timestamps[5] = {};
++	uint64_t bulkDirtyMask = 0;
++	uint8_t bulkAttachments[0x84] = {};
+$ diff counts: IOSurfaceRootApple.h +3 -0; IOSurfaceRootApple.mm +50 -0
+$ cd ~/darling/build-aarch64 && ninja -j1 iokitd
+[44/44] Linking CXX executable src/external/iokitd/iokitd
+exit=0
+$ touch IOSurfaceRootApple.mm && ninja -j1 .../IOSurfaceRootApple.mm.o  (warnings check)
+[41/41] Building CXX object src/external/iokitd/CMakeFiles/iokitd.dir/src/IOSurfaceRootApple.mm.o
+3 warnings generated.   (all pre-existing SDK macro redefines: TargetConditionals.h:106,107, thread_state.h:41)
+$ grep -c 'IOSurfaceRootApple.mm:[0-9]*:[0-9]*: warning' obj-build.log
+0
+$ ninja -j1 iokitd (relink after touch)
+[41/41] Linking CXX executable src/external/iokitd/iokitd
+exit=0
+$ ls -la src/external/iokitd/iokitd
+-rwxrwxr-x 1 ubuntu ubuntu 415680 Nov 19 03:05 src/external/iokitd/iokitd
+$ file src/external/iokitd/iokitd
+Mach-O 64-bit arm64 executable, flags:<NOUNDEFS|DYLDLINK|TWOLEVEL|WEAK_DEFINES|BINDS_TO_WEAK|PIE>
+$ sh /tmp/iosurfimpl/build-test.sh   (cases text-extracted verbatim from the .mm)
+--- extracted 3 cases, 44 lines ---
+34 checks, 0 failures
+exit=0
+$ g++ -std=c++17 -g -fsanitize=address,undefined ... test_iosurf.cpp -o test_asan && ./test_asan
+34 checks, 0 failures
+asan exit=0
+$ sed 's/index > 4/index > 5/' cases.inc > mut/cases.inc; compile+run
+FAIL mut/test_iosurf.cpp:155: callCase(33, &a) == kIOReturnBadArgument
+34 checks, 1 failures
+mutant1(index>5) exit=1
+$ sed 's/return kIOReturnBadArgument; \/\/ macOS/return (IOReturn)0xE00002F0; \/\/ macOS/' cases.inc > mut/cases.inc
+FAIL mut/test_iosurf.cpp:102: callCase(5, &a) == kIOReturnBadArgument
+34 checks, 1 failures
+mutant2(sel5 wrong errcode) exit=1
+$ sed 's/+ 0x6e/+ 0x6f/' cases.inc > mut/cases.inc
+FAIL mut/test_iosurf.cpp:96: statePage(s)[0x6e] == 0x02
+FAIL mut/test_iosurf.cpp:110: statePage(s)[0x6d] == 0xAB && statePage(s)[0x6f] == 0xAB
+34 checks, 2 failures
+mutant3(matrix offset) exit=1
+$ awk-extract | diff - cases.inc
+cases.inc identical to repo
+$ grep -nE 'printf|fprintf|os_log|getenv|TEMP|TODO|FIXME' cases.inc
+(no hits, exit=1)
+$ grep -n 'unhandled selector' ~/darling-recovery/wip/wsprobe/ws237/iokitd.err
+2722/2732/2741/2746/2761: selector 27; 2727: selector 5; 2843/2848/3056/3061: selector 33
+$ df -h /
+/dev/sda2 98G 82G 13G 87% /

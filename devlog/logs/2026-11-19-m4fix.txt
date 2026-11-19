@@ -1,0 +1,48 @@
+== m4fix red/green ==
+extracted from /home/ubuntu/darling/src/external/iokitd/src/PVGHost.mm, 1765 B
+extracted client from /home/ubuntu/darling/src/external/iokitd/src/IOMobileFramebuffer.mm, 2668 B
+extracted from /home/ubuntu/darling-recovery/wip/m4fix/PVGHost.mm.before, 371 B
+extracted client from /home/ubuntu/darling-recovery/wip/m4fix/IOMobileFramebuffer.mm.before, 1458 B
+--- fixed (live repo text) ---
+19 checks, 0 failures
+exit=0
+--- before (pre-fix text): reclaim checks must fail ---
+19 checks, 6 failures
+exit=1
+RED confirmed: pre-fix arena never reuses a dead client's pages
+
+== night-1119-0341 regression ==
+extracted execSegments + mapSurface, 4547 B
+extracted pre-fix text, 4132 B
+16 checks, 0 failures
+exit=0
+Segmentation fault (core dumped)
+exit=139 (139=segfault, 124=timeout/wedge)
+RED confirmed: pre-fix code crashes or wedges on the wrap cases
+
+== objimpl regression ==
+extracted: addObject 1576 B, createResource 5515 B, objCreate block 1827 B
+captured object creates: 256=2 257=18 260=12 261=1
+captured sel9 creates: 13
+302 checks, 0 failures
+
+== iosurfimpl regression ==
+--- extracted 3 cases, 44 lines ---
+34 checks, 0 failures
+exit=0
+
+== r2m1 regression ==
+exit=0
+exit=1
+RED confirmed: pre-fix code leaks on error paths
+fixed ok-count: 32
+
+== m5fix regression ==
+31 checks, 0 failures
+exit=0
+31 checks, 10 failures
+exit=1
+RED confirmed: pre-fix code reports completion for skipped chunks
+
+== build ==
+[41/41] Linking CXX executable src/external/iokitd/iokitd
