@@ -26,15 +26,48 @@ def svg(vb, body, label=None):
     a = f'role="img" aria-label="{label}"' if label else 'aria-hidden="true"'
     return f'<svg viewBox="{vb}" {a}>{body}</svg>'
 
-collage = svg("0 0 600 600",
-    f'<rect width="600" height="600" fill="{C["lilac"]}"/>'
-    f'<rect x="56" y="56" width="150" height="488" fill="{C["ultra"]}"/>'
-    + checker(56, 56, 2, 2, 75, C["ultra"], C["lime"])
-    + quarter(206, 300, 244, C["ember"], 0)
-    + quarter(206, 300, 244, C["lime"], 1) + rings(206, 300, 244, C["forest"], 5)
-    + f'<circle cx="510" cy="96" r="58" fill="{C["pink"]}"/>'
-    + checker(478, 452, 3, 3, 30, C["ink"], C["paper"]),
-    "the daysetta mark as a collage: a stem, a rising quarter sun and a quarter of rings")
+import random
+
+def torn(seed, amp=1.6, n=26):
+    # clip-path polygon for a torn paper sheet, edges jittered in percent
+    r = random.Random(seed); pts = []
+    for i in range(n): pts.append((i * 100 / n, r.uniform(0, amp)))
+    for i in range(n): pts.append((100 - r.uniform(0, amp), i * 100 / n))
+    for i in range(n): pts.append((100 - i * 100 / n, 100 - r.uniform(0, amp)))
+    for i in range(n): pts.append((r.uniform(0, amp), 100 - i * 100 / n))
+    return "polygon(" + ",".join(f"{x:.1f}% {y:.1f}%" for x, y in pts) + ")"
+
+def torn_edge(seed, down=True, n=160):
+    # strip with one ragged edge (paper tear: slow wave + fine fibre jitter). down=True means ragged at the bottom
+    import math
+    r = random.Random(seed); ph = r.uniform(0, 6)
+    def y(i):
+        t = i / n
+        return 55 + 14 * math.sin(t * 9 + ph) + 8 * math.sin(t * 23 + ph * 2) + r.uniform(-9, 9)
+    rag = [(i * 100 / n, y(i)) for i in range(n + 1)]
+    pts = [(0, 0), (100, 0)] + rag[::-1] if down else [(0, 100), (100, 100)] + [(x, 100 - v) for x, v in rag[::-1]]
+    return "polygon(" + ",".join(f"{x:.2f}% {v:.1f}%" for x, v in pts) + ")"
+
+RIM = 'stroke="#FFFBF2" stroke-width="7" paint-order="stroke" stroke-linejoin="round"'
+def piece(x, y, w, depth, rot, inner, cls="", tape=None, delay=0):
+    t = f'<span class="tape" style="--tr:{tape}deg"></span>' if tape is not None else ""
+    return (f'<div class="pc {cls}" data-depth="{depth}" style="left:{x}%;top:{y}%;width:{w}%">'
+            f'<div class="pi" style="--r:{rot}deg;--d:{delay}ms">{inner}{t}</div></div>')
+
+def cut(vb, body):
+    return f'<svg viewBox="{vb}" aria-hidden="true" overflow="visible">{body.replace("<path ", f"<path {RIM} ").replace("<rect ", f"<rect {RIM} ").replace("<circle ", f"<circle {RIM} ")}</svg>'
+
+collage = (
+    piece(6, 6, 78, .15, -3, f'<div class="sheet" style="clip-path:{torn(3)};background:#FFF8EA;aspect-ratio:1/1.02"></div>', "back", None, 0)
+  + piece(40, 44, 56, .3, 7, f'<div class="sheet" style="clip-path:{torn(9)};background:var(--lilac);aspect-ratio:1.1/1"></div>', "back", None, 80)
+  + piece(12, 14, 20, .55, -7, cut("0 0 64 192", '<rect x="0" y="0" width="64" height="192" fill="#4B3CF5"/>' + checker(0, 0, 2, 2, 32, "#4B3CF5", "#E4FF7A")), "", -4, 160)
+  + piece(30, 8, 42, .85, 9, cut("0 0 96 96", quarter(0, 96, 96, "#FF6B2C", 0)), "", None, 260)
+  + piece(36, 46, 40, .7, -5, cut("0 0 96 96", quarter(0, 0, 96, "#E4FF7A", 1) + rings(0, 0, 96, "#0F5C3A", 3)), "", 6, 340)
+  + piece(72, 4, 20, 1.2, 0, cut("0 0 40 40", '<circle cx="20" cy="20" r="20" fill="#FF2E88"/>'), "", None, 420)
+  + piece(74, 66, 18, 1, 11, cut("0 0 90 90", checker(0, 0, 3, 3, 30, "#111111", "#F4EFE6")), "", -8, 500)
+  + piece(6, 74, 12, 1.4, 0, cut("0 0 40 40", '<circle cx="20" cy="20" r="20" fill="#FFD23F"/>'), "", None, 560)
+  + piece(48, 86, 34, .9, -6, '<div class="tag">arm64e · no vm · real WindowServer</div>', "", None, 640)
+)
 
 ico = {
  "sun":   svg("0 0 96 96", f'<circle cx="48" cy="48" r="40" fill="currentColor"/>'),
@@ -53,7 +86,7 @@ def nav(prefix, current=""):
     b = "./" if prefix == "./" else "../"
     return f'''<a class="skip" href="#main">skip to content</a>
 <header class="nav"><div class="wrap nav-in">
-  <a class="brand" href="{b}" aria-label="daysetta home"><img class="lt" src="{b}brand/lockup-horizontal-color.svg" alt="daysetta" width="190" height="34"><img class="dk" src="{b}brand/lockup-horizontal-color-dark.svg" alt="" width="190" height="34"></a>
+  <a class="brand" href="{b}" aria-label="daysetta home"><img class="lt" src="{b}brand/lockup-small-color.svg" alt="daysetta" width="200" height="38"><img class="dk" src="{b}brand/lockup-small-color-dark.svg" alt="" width="200" height="38"></a>
   <nav class="nav-links" aria-label="main">{a}</nav>
   <div class="nav-actions">
     <button class="theme-btn" id="themeBtn" type="button" aria-label="switch dark mode" aria-pressed="false">
@@ -92,7 +125,7 @@ try {{
 
 def foot(b):
     return f'''<footer class="foot"><div class="wrap">
-  <img class="foot-word" src="{b}brand/wordmark-white.svg" alt="daysetta" width="948" height="305">
+  <img class="foot-word" data-rv="rise" src="{b}brand/wordmark-white.svg" alt="daysetta" width="948" height="305">
   <div class="foot-grid">
     <p>the real macOS desktop on arm linux. no vm.<br>a personal project, for fun.</p>
     <nav aria-label="footer"><a href="{b}#how">how it works</a><a href="{b}#status">status</a><a href="{b}#roadmap">roadmap</a><a href="{b}devlog/">devlog</a><a href="https://github.com/ducminh1110/DaySetta">GitHub</a><a href="https://github.com/darlinghq/darling">Darling</a><a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a></nav>
@@ -119,102 +152,125 @@ def card(p, short=False, i=None):
     if short:
         body = re.split(r'(?<=\.)\s', html.unescape(body), maxsplit=1)[0]
         body = html.escape(body)
-    return (f'<article class="card {cls}" id="{pid}"><span class="tag">{tagtxt}</span>'
+    tape = f'<span class="tape" style="--tr:{(-4, 3, -2)[i % 3] if i is not None else 0}deg"></span>' if short else ""
+    return (f'<article class="card {cls}" id="{pid}" data-rv="drop">{tape}<span class="tag">{tagtxt}</span>'
             f'<h3>{h}</h3><p>{body}</p><span class="src">{src}</span></article>')
+
+TICK = ["no vm", "real WindowServer", "xnu-12377 in userspace", "arm64e on ARMv8.0", "metal → vulkan", "no fake ui", "fake the floor"]
+def band(cls, words):
+    items = "".join(f"<span>{w}</span><i aria-hidden=\"true\"></i>" for w in words)
+    return f'<div class="band {cls}" aria-hidden="true"><div class="track">{items}{items}</div></div>'
+
+FLOORS = [
+    ("01", "Linux aarch64", "plain ARMv8.0 with no PAC or LSE, so those instructions get emulated (src/exec).", "stem", "the ground floor"),
+    ("02", "reims-vgpu", "a paravirt GPU device: the guest's Metal command buffers are translated to Vulkan. Metal stays Apple's own driver.", "quart", "↑ syscalls"),
+    ("03", "iokitd", "there are no kexts. iokitd answers their user clients: IOMobileFramebuffer, AppleParavirtGPU (IOGPU), IOSurface, IOHID.", "check", "↑ fake devices"),
+    ("04", "Darling", "the kernel that isn't: userspace XNU (darlingserver), dyld, libsystem_kernel, ported up to xnu-12377.", "arch", "↑ fake kernel"),
+    ("05", "macOS 27 userland", "real arm64e binaries from the IPSW: WindowServer, AppKit apps, launchd daemons. unmodified.", "sun", "↑ Mach · XPC · IOKit"),
+]
+floors = "".join(f'<div class="floor f{i+1}" style="--i:{i}"><span class="n">{n}</span><span class="via">{via}</span><h3>{t}</h3><p>{d}</p>{ico[k]}</div>'
+                 for i, (n, t, d, k, via) in enumerate(FLOORS))
+
+STEPS = [
+    ("r1", "sun", "now", "first real window pixels", "The display path works end to end; the composite still comes out black. Find the stage where it turns to zero, fix it."),
+    ("r2", "dot", "next", "input, end to end", "HID is half done: the event plumbing exists, the last dispatch gaps don't. Keys and clicks need to land in AppKit."),
+    ("r3", "half", "then", "a desktop you can use", "Finder, the Dock, the default macOS&nbsp;27 apps behaving like a daily desktop."),
+    ("r4", "check", "planned", "third-party apps", ".dmg and .pkg install paths the way macOS does them, then app-by-app work. No app-specific hacks."),
+    ("r5", "quart", "north star", "drop an IPSW in a window", "A desktop app where you drag a macOS IPSW in and the desktop appears inside that window. Planned, not started."),
+]
+steps = "".join(f'<div class="step {c}"><span class="big-n">0{i+1}</span>{ico[k]}<span class="chip">{when}</span><h3>{t}</h3><p>{d}</p></div>'
+                for i, (c, k, when, t, d) in enumerate(STEPS))
+
+QA = [
+    ("so… is it a Hackintosh?", "No. Linux stays Linux. DaySetta doesn't boot macOS or replace your OS. It runs the macOS userland (WindowServer, AppKit, daemons) as processes and fakes the kernel and devices below them."),
+    ("where do the Apple binaries come from?", "Your own macOS 27 IPSW. No Apple binaries are committed to git; the repo only holds the translation layers and tooling."),
+    ("does it work today?", "Not as a usable desktop, no. Login completes and all the desktop agents run, but composited frames are still black. The repo's own guess is days to weeks, not hours."),
+    ("what hardware do I need?", "An ARM (aarch64) Linux box. The reference host is plain ARMv8.0; macOS 27 is arm64e, so PAC and LSE instructions get emulated. A GPU helps: without one, Vulkan falls back to llvmpipe and it's slow."),
+    ("why not just use Darling's GUI?", "Darling is the kernel floor here, not the whole stack. DaySetta adds the display, GPU and input side (iokitd and reims-vgpu) so Apple's real WindowServer and Metal driver can run instead of a reimplemented server."),
+    ("what about x86 hosts?", "Later. The goal is running ARM Mac apps first; the ARM build has to mature before an x86_64 path (via an ARM64 emulator) makes sense."),
+    ("is this affiliated with Apple?", "No. It's a personal project, for fun. macOS is a trademark of Apple Inc."),
+]
+QC = ["lime", "blush", "mint", "sun", "lilac", "paper", "ember"]
+qa = "".join(f'<details class="q-{QC[i % len(QC)]}" data-rv><summary>{q}</summary><p>{a}</p></details>' for i, (q, a) in enumerate(QA))
 
 INDEX = head("daysetta: the real macOS desktop on arm linux. no vm.",
              "DaySetta runs Apple's own macOS 27 userland unmodified on a plain ARM Linux box. No VM, no hypervisor. A personal project, with an honest devlog.", "./") + nav("./") + f'''
+<div class="progress" aria-hidden="true"><i></i></div>
 <main id="main">
 <section class="hero"><div class="wrap hero-grid">
-  <div>
-    <span class="chip lime">a personal systems project</span>
-    <h1>the real macOS desktop. on arm linux. <span class="pill">no&nbsp;vm.</span></h1>
-    <p class="lede">DaySetta runs Apple's own macOS&nbsp;27 userland (WindowServer, AppKit, the daemons) unmodified, on a plain ARM Linux box. Everything below it is faked: a userspace XNU, fake kexts, Metal translated to Vulkan.</p>
-    <div class="cta"><a class="btn btn-solid" href="devlog/">read the devlog</a><a class="btn btn-ghost" href="https://github.com/ducminh1110/DaySetta">view on GitHub</a></div>
+  <div class="hero-copy">
+    <span class="chip lime" data-rv>a personal systems project</span>
+    <h1 data-split>the real macOS desktop. on arm linux. <span class="pill">no&nbsp;vm.</span></h1>
+    <p class="lede" data-rv>DaySetta runs Apple's own macOS&nbsp;27 userland (WindowServer, AppKit, the daemons) unmodified, on a plain ARM Linux box. Everything below it is faked: a userspace XNU, fake kexts, Metal translated to Vulkan.</p>
+    <div class="cta" data-rv><a class="btn btn-solid" href="devlog/">read the devlog</a><a class="btn btn-ghost" href="https://github.com/ducminh1110/DaySetta">view on GitHub</a></div>
   </div>
-  <div class="collage">{collage}</div>
+  <div class="collage" role="img" aria-label="a scrapbook collage of cut-paper shapes: a blue stem, an orange quarter sun, a quarter of green rings, a pink dot and a checker square">{collage}</div>
 </div></section>
 
 <div class="wrap stats" aria-label="facts">
-  <div class="stat s1"><b>macOS 27</b><span>guest userland,<br>arm64e</span></div>
-  <div class="stat s2"><b>xnu-12377</b><span>kernel, running<br>in userspace</span></div>
-  <div class="stat s3"><b>ARMv8.0</b><span>host cpu, PAC + LSE<br>emulated</span></div>
-  <div class="stat s4"><b>0 VMs</b><span>no hypervisor.<br>really.</span></div>
+  <div class="stat s1" data-rv><b>macOS 27</b><span>guest userland,<br>arm64e</span></div>
+  <div class="stat s2" data-rv><b>xnu-12377</b><span>kernel, running<br>in userspace</span></div>
+  <div class="stat s3" data-rv><b>ARMv8.0</b><span>host cpu, PAC + LSE<br>emulated</span></div>
+  <div class="stat s4" data-rv><b><span data-count="3">0</span> VMs</b><span>no hypervisor.<br>really.</span></div>
 </div>
 
+<div class="tapes">{band("b1", TICK)}{band("b2", TICK[::-1])}</div>
+
 <section class="sec" id="what"><div class="wrap">
-  <div class="sec-head"><span class="chip">what this is</span><h2>don't reimplement macOS. run it, and fake the floor.</h2></div>
+  <div class="sec-head"><span class="chip" data-rv>what this is</span><h2 data-split>don't reimplement macOS. run it, and fake the floor.</h2></div>
   <div class="what-grid">
-    <div class="what-text">
+    <div class="what-text" data-rv>
       <p>Most macOS-on-Linux attempts rewrite Apple's software. DaySetta goes the other way: it runs Apple's own binaries (WindowServer, SkyLight, AppKit, the launchd daemons) exactly as shipped in the macOS&nbsp;27 IPSW, and fakes everything below them.</p>
       <p>It's the follow-up to Daylight, an older x86 experiment that tried to reimplement WindowServer. That taught the lesson this project is built on: the protocol is the hard part, so let Apple's code speak it.</p>
     </div>
-    <div class="note"><span class="chip lime">rule #1</span><p>Apple binaries never live in git. Everything Apple comes from your own IPSW.</p></div>
+    <div class="note" data-rv="drop" style="clip-path:{torn(21, 1.2)}"><span class="tape" style="--tr:-6deg"></span><span class="chip lime">rule #1</span><p>Apple binaries never live in git. Everything Apple comes from your own IPSW.</p></div>
   </div>
 </div></section>
 
 <section class="sec" id="how"><div class="wrap">
-  <div class="sec-head"><span class="chip ultra">how it works</span><h2>five floors. each one pretends to be what the floor above expects.</h2></div>
-  <div class="floors">
-    <div class="floor f1"><span class="n">05</span><h3>macOS 27 userland</h3><p>real arm64e binaries from the IPSW: WindowServer, AppKit apps, launchd daemons.</p>{ico["sun"]}</div>
-    <div class="joint">↕ Mach · XPC · IOKit</div>
-    <div class="floor f2"><span class="n">04</span><h3>Darling</h3><p>the kernel that isn't: userspace XNU (darlingserver), dyld, libsystem_kernel, ported up to xnu-12377.</p>{ico["arch"]}</div>
-    <div class="floor f3"><span class="n">03</span><h3>iokitd</h3><p>there are no kexts. iokitd answers their user clients: IOMobileFramebuffer, AppleParavirtGPU (IOGPU), IOSurface, IOHID.</p>{ico["check"]}</div>
-    <div class="floor f4"><span class="n">02</span><h3>reims-vgpu</h3><p>a paravirt GPU device: the guest's Metal command buffers are translated to Vulkan. Metal stays Apple's own driver.</p>{ico["quart"]}</div>
-    <div class="joint">↕ syscalls</div>
-    <div class="floor f5"><span class="n">01</span><h3>Linux aarch64</h3><p>plain ARMv8.0 with no PAC or LSE, so those instructions get emulated (src/exec).</p>{ico["stem"]}</div>
-  </div>
+  <div class="sec-head"><span class="chip ultra" data-rv>how it works</span><h2 data-split>build it from the floor up. each floor fakes what the one above expects.</h2></div>
+  <div class="floors">{floors}</div>
 </div></section>
 
 <section class="sec" id="status"><div class="wrap">
-  <div class="sec-head"><span class="chip pink">honest status · nov 2026</span><h2>login completes. the pixels are still black.</h2><p class="lede">No mock-ups here. This is exactly where the project stands, with the log line to prove it.</p></div>
+  <div class="sec-head"><span class="chip pink" data-rv>honest status · nov 2026</span><h2 data-split>login completes. the pixels are still black.</h2><p class="lede" data-rv>No mock-ups here. This is exactly where the project stands, with the log line to prove it.</p></div>
   <div class="status-grid">
-    <div class="box ok"><h3>works</h3><ul>
+    <div class="box ok" data-rv><h3>works</h3><ul>
       <li>WindowServer 27 boots and stays up</li>
       <li>the Metal driver comes up, command buffers execute, swaps reach the display</li>
       <li>first real pixels through the whole GPU → present → readback path (a test pattern, not a window yet)</li>
       <li>an AppKit test app launches, connects to WindowServer and runs its whole script</li>
       <li>login completes: Dock, MenuBarAgent, SystemUIServer, WallpaperAgent and WindowManager all run</li>
     </ul></div>
-    <div class="box nope"><h3>not yet</h3><ul>
+    <div class="box nope" data-rv><h3>not yet</h3><ul>
       <li>composited frames are still black. the current fight: tracing where between draw and present the pixels turn to zero</li>
       <li>keyboard / mouse (HID) is half done</li>
       <li>Finder and the default apps as a usable desktop</li>
       <li>a desktop screenshot. none exists yet, so this page has no fake one</li>
     </ul></div>
-    <div class="log"><span class="chip lime">boot log · lw452</span><p class="mono"><span class="k">LoginComplete</span>, ALL desktop agents alive (Dock, MenuBarAgent, SystemUIServer, WallpaperAgent, WindowManager), 12 frames all zero. the black is real, not probe damage.</p></div>
+    <div class="log" data-rv><span class="chip lime">boot log · lw452</span><p class="mono"><span class="k">LoginComplete</span>, ALL desktop agents alive (Dock, MenuBarAgent, SystemUIServer, WallpaperAgent, WindowManager), 12 frames all zero. the black is real, not probe damage.<span class="caret"></span></p></div>
   </div>
-  <p class="guess">Honest guess from the repo: “a usable desktop is still days to weeks out, not hours.”</p>
+  <p class="guess" data-rv>Honest guess from the repo: “a usable desktop is still days to weeks out, not hours.”</p>
 </div></section>
 
-<section class="sec" id="roadmap"><div class="wrap">
-  <div class="sec-head"><span class="chip">the road ahead</span><h2>one milestone at a time.</h2></div>
-  <div class="road">
-    <div class="step r1">{ico["sun"]}<span class="chip">now</span><h3>first real window pixels</h3><p>The display path works end to end; the composite still comes out black. Find the stage where it turns to zero, fix it.</p></div>
-    <div class="step r2">{ico["dot"]}<span class="chip">next</span><h3>input, end to end</h3><p>HID is half done: the event plumbing exists, the last dispatch gaps don't. Keys and clicks need to land in AppKit.</p></div>
-    <div class="step r3">{ico["half"]}<span class="chip">then</span><h3>a desktop you can use</h3><p>Finder, the Dock, the default macOS&nbsp;27 apps behaving like a daily desktop.</p></div>
-    <div class="step r4">{ico["check"]}<span class="chip">planned</span><h3>third-party apps</h3><p>.dmg and .pkg install paths the way macOS does them, then app-by-app work. No app-specific hacks.</p></div>
-    <div class="step r5">{ico["quart"]}<span class="chip lime">north star</span><h3>drop an IPSW in a window</h3><p>A desktop app where you drag a macOS IPSW in and the desktop appears inside that window. Planned, not started.</p></div>
-  </div>
-  <p class="road-note">The old from-scratch design docs (VISION, ARCHITECTURE, ROADMAP) describe a dropped plan with no Darling. They're kept in the repo for history; the list above is the live direction.</p>
+<section class="road-pin" id="roadmap"><div class="road-stick">
+  <div class="wrap sec-head road-head"><span class="chip" data-rv>the road ahead</span><h2 data-split>one milestone at a time.</h2></div>
+  <div class="road-view"><div class="road">{steps}</div></div>
+  <p class="wrap road-note">The old from-scratch design docs (VISION, ARCHITECTURE, ROADMAP) describe a dropped plan with no Darling. They're kept in the repo for history; the list above is the live direction.</p>
 </div></section>
 
-<section class="sec" id="faq"><div class="wrap faq-grid">
-  <div class="vm"><span class="chip lime">is this a VM?</span><p class="no">no.</p><p>There's no hypervisor and no virtual machine. macOS code runs as ordinary Linux processes on the same kernel; the “hardware” it sees is answered in userspace.</p></div>
-  <div class="qa">
-    <details><summary>so… is it a Hackintosh?</summary><p>No. Linux stays Linux. DaySetta doesn't boot macOS or replace your OS. It runs the macOS userland (WindowServer, AppKit, daemons) as processes and fakes the kernel and devices below them.</p></details>
-    <details><summary>where do the Apple binaries come from?</summary><p>Your own macOS 27 IPSW. No Apple binaries are committed to git; the repo only holds the translation layers and tooling.</p></details>
-    <details><summary>does it work today?</summary><p>Not as a usable desktop, no. Login completes and all the desktop agents run, but composited frames are still black. The repo's own guess is days to weeks, not hours.</p></details>
-    <details><summary>what hardware do I need?</summary><p>An ARM (aarch64) Linux box. The reference host is plain ARMv8.0; macOS 27 is arm64e, so PAC and LSE instructions get emulated. A GPU helps: without one, Vulkan falls back to llvmpipe and it's slow.</p></details>
-    <details><summary>why not just use Darling's GUI?</summary><p>Darling is the kernel floor here, not the whole stack. DaySetta adds the display, GPU and input side (iokitd and reims-vgpu) so Apple's real WindowServer and Metal driver can run instead of a reimplemented server.</p></details>
-    <details><summary>what about x86 hosts?</summary><p>Later. The goal is running ARM Mac apps first; the ARM build has to mature before an x86_64 path (via an ARM64 emulator) makes sense.</p></details>
-    <details><summary>is this affiliated with Apple?</summary><p>No. It's a personal project, for fun. macOS is a trademark of Apple Inc.</p></details>
+<section class="sec faq" id="faq">
+  <div class="edge top" style="clip-path:{torn_edge(41, False)}"></div>
+  <div class="wrap faq-grid">
+    <div class="vm" data-rv="drop" style="clip-path:{torn(33, 1.4)}"><span class="tape" style="--tr:4deg"></span><span class="chip">is this a VM?</span><p class="no">no.</p><p>There's no hypervisor and no virtual machine. macOS code runs as ordinary Linux processes on the same kernel; the “hardware” it sees is answered in userspace.</p></div>
+    <div class="qa">{qa}</div>
   </div>
-</div></section>
+  <div class="edge bot" style="clip-path:{torn_edge(47, True)}"></div>
+</section>
 
 <section class="sec" id="devlog"><div class="wrap">
-  <div class="sec-head"><span class="chip">notes from the lab</span><h2>the devlog is the product demo.</h2><p class="lede">Real bugs and real fixes, quoted straight from the project's decisions file.</p></div>
-  <div class="cards">{"".join(card(p, True, i) for i, p in enumerate(posts[:3]))}</div>
+  <div class="sec-head"><span class="chip" data-rv>notes from the lab</span><h2 data-split>the devlog is the product demo.</h2><p class="lede" data-rv>Real bugs and real fixes, quoted straight from the project's decisions file.</p></div>
+  <div class="cards pinned">{"".join(card(p, True, i) for i, p in enumerate(posts[:3]))}</div>
   <div class="more"><a class="btn btn-ghost" href="devlog/">all entries →</a></div>
 </div></section>
 </main>
