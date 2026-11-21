@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" role="img" aria-label="Papercut illustration: a workshop control desk with levers and dials, cables running up to a glowing panel">
+  <defs>
+    <filter id="iw" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="3" seed="17" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="9"/>
+    </filter>
+    <filter id="iw2" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.026" numOctaves="2" seed="13" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="5"/>
+    </filter>
+    <filter id="is" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="ig">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="27" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.16  0 0 0 0 0.13  0 0 0 0 0.10  0 0 0 0.6 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <linearGradient id="iwall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E7DCC2"/><stop offset="1" stop-color="#F6F1E6"/>
+    </linearGradient>
+    <linearGradient id="ipanel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B8D2DF"/><stop offset="1" stop-color="#8FB6CE"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="480" fill="url(#iwall)"/>
+  <!-- wall planks -->
+  <g stroke="#D8CBA8" stroke-width="3" opacity="0.6">
+    <line x1="0" y1="96" x2="720" y2="96"/><line x1="0" y1="192" x2="720" y2="192"/><line x1="0" y1="288" x2="720" y2="288"/>
+  </g>
+  <!-- floor -->
+  <path d="M-10,392 Q360,376 730,392 L730,490 L-10,490 Z" fill="#D8CBA8" filter="url(#iw)"/>
+  <path d="M-10,420 Q360,406 730,420 L730,490 L-10,490 Z" fill="#C9B380" opacity="0.7" filter="url(#iw)"/>
+  <!-- the framebuffer panel on the wall -->
+  <ellipse cx="360" cy="252" rx="200" ry="18" fill="#29241E" opacity="0.14" filter="url(#is)"/>
+  <g filter="url(#iw2)">
+    <rect x="216" y="52" width="288" height="176" rx="12" fill="#29241E"/>
+    <rect x="230" y="66" width="260" height="148" rx="6" fill="url(#ipanel)"/>
+    <!-- abstract scan content: bars + a bright square, no UI -->
+    <rect x="248" y="86" width="120" height="12" rx="4" fill="#F6F1E6" opacity="0.85"/>
+    <rect x="248" y="108" width="86" height="12" rx="4" fill="#F6F1E6" opacity="0.6"/>
+    <rect x="248" y="130" width="140" height="12" rx="4" fill="#F6F1E6" opacity="0.4"/>
+    <rect x="416" y="86" width="56" height="56" rx="6" fill="#DFA83E"/>
+    <rect x="248" y="164" width="224" height="30" rx="5" fill="#12333B" opacity="0.55"/>
+    <circle cx="266" cy="179" r="7" fill="#DFA83E"/><circle cx="290" cy="179" r="7" fill="#BC3F26"/><circle cx="314" cy="179" r="7" fill="#8FB6CE"/>
+  </g>
+  <!-- cables from desk to panel -->
+  <g fill="none" stroke-linecap="round" filter="url(#iw2)">
+    <path d="M262,330 Q240,270 268,232" stroke="#BC3F26" stroke-width="7"/>
+    <path d="M330,326 Q330,272 336,232" stroke="#12333B" stroke-width="7"/>
+    <path d="M420,326 Q446,272 428,232" stroke="#DFA83E" stroke-width="7"/>
+    <path d="M486,332 Q520,276 470,232" stroke="#47705B" stroke-width="7"/>
+  </g>
+  <!-- plugs -->
+  <g fill="#29241E" filter="url(#iw2)">
+    <rect x="258" y="222" width="20" height="14" rx="3"/><rect x="326" y="222" width="20" height="14" rx="3"/>
+    <rect x="418" y="222" width="20" height="14" rx="3"/><rect x="460" y="222" width="20" height="14" rx="3"/>
+  </g>
+  <!-- control desk -->
+  <ellipse cx="360" cy="430" rx="270" ry="22" fill="#29241E" opacity="0.16" filter="url(#is)"/>
+  <g filter="url(#iw)">
+    <path d="M120,330 Q360,310 600,330 L616,368 Q360,352 104,368 Z" fill="#B8613A"/>
+    <path d="M104,368 Q360,352 616,368 L610,428 Q360,414 110,428 Z" fill="#93492A"/>
+  </g>
+  <!-- desk face: drawers -->
+  <g filter="url(#iw2)">
+    <rect x="150" y="378" width="90" height="34" rx="5" fill="#B8613A"/>
+    <circle cx="195" cy="395" r="5" fill="#F1D488"/>
+    <rect x="480" y="378" width="90" height="34" rx="5" fill="#B8613A"/>
+    <circle cx="525" cy="395" r="5" fill="#F1D488"/>
+  </g>
+  <!-- taped note on the desk front -->
+  <g filter="url(#iw2)" transform="rotate(-3 360 396)">
+    <rect x="322" y="376" width="76" height="42" rx="3" fill="#F6F1E6"/>
+    <path d="M334,390 h50 M334,400 h38 M334,410 h44" stroke="#8FB6CE" stroke-width="3"/>
+    <rect x="344" y="370" width="32" height="10" rx="2" fill="#DFA83E" opacity="0.85"/>
+  </g>
+  <!-- levers -->
+  <g filter="url(#iw2)">
+    <rect x="176" y="316" width="34" height="16" rx="5" fill="#29241E"/>
+    <line x1="193" y1="318" x2="176" y2="284" stroke="#29241E" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="174" cy="280" r="10" fill="#BC3F26"/>
+    <rect x="238" y="314" width="34" height="16" rx="5" fill="#29241E"/>
+    <line x1="255" y1="316" x2="268" y2="280" stroke="#29241E" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="270" cy="276" r="10" fill="#DFA83E"/>
+  </g>
+  <!-- dials -->
+  <g filter="url(#iw2)">
+    <circle cx="330" cy="322" r="22" fill="#F6F1E6" stroke="#29241E" stroke-width="4"/>
+    <line x1="330" y1="322" x2="342" y2="308" stroke="#BC3F26" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="392" cy="320" r="22" fill="#F6F1E6" stroke="#29241E" stroke-width="4"/>
+    <line x1="392" y1="320" x2="382" y2="304" stroke="#12333B" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="452" cy="322" r="16" fill="#F6F1E6" stroke="#29241E" stroke-width="4"/>
+    <line x1="452" y1="322" x2="462" y2="312" stroke="#47705B" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <!-- toggle switches -->
+  <g filter="url(#iw2)">
+    <rect x="500" y="312" width="52" height="20" rx="10" fill="#12333B"/>
+    <circle cx="540" cy="322" r="8" fill="#DFA83E"/>
+    <rect x="560" y="316" width="40" height="16" rx="8" fill="#12333B"/>
+    <circle cx="570" cy="324" r="6.5" fill="#8FB6CE"/>
+  </g>
+  <!-- desk lamp -->
+  <g filter="url(#iw2)">
+    <rect x="86" y="330" width="34" height="10" rx="5" fill="#29241E"/>
+    <path d="M103,332 Q96,296 118,278" stroke="#29241E" stroke-width="6" fill="none"/>
+    <path d="M104,270 l34,10 l-12,22 l-26,-14 Z" fill="#BC3F26"/>
+    <ellipse cx="132" cy="304" rx="16" ry="8" fill="#F1D488" opacity="0.65"/>
+  </g>
+  <!-- mug + notebook on desk -->
+  <g filter="url(#iw2)">
+    <rect x="612" y="316" width="26" height="24" rx="4" fill="#47705B"/>
+    <path d="M638,322 q12,4 0,14" stroke="#47705B" stroke-width="5" fill="none"/>
+    <path d="M614,310 q4,-8 0,-14 M626,310 q4,-8 0,-14" stroke="#C9B380" stroke-width="3" fill="none" opacity="0.8"/>
+  </g>
+  <!-- wall shelf with jars -->
+  <g filter="url(#iw2)">
+    <rect x="560" y="120" width="130" height="10" rx="4" fill="#93492A"/>
+    <rect x="576" y="88" width="26" height="32" rx="5" fill="#8FB6CE"/>
+    <rect x="576" y="84" width="26" height="8" rx="3" fill="#29241E"/>
+    <rect x="612" y="96" width="22" height="24" rx="5" fill="#DFA83E"/>
+    <rect x="612" y="92" width="22" height="7" rx="3" fill="#29241E"/>
+    <rect x="644" y="90" width="24" height="30" rx="5" fill="#BC3F26"/>
+    <rect x="644" y="86" width="24" height="8" rx="3" fill="#29241E"/>
+  </g>
+  <!-- hanging blueprint -->
+  <g filter="url(#iw2)">
+    <rect x="42" y="70" width="110" height="84" rx="4" fill="#F6F1E6" stroke="#C9B380" stroke-width="3"/>
+    <circle cx="97" cy="100" r="18" fill="none" stroke="#8FB6CE" stroke-width="3"/>
+    <path d="M60,132 h74 M60,142 h50" stroke="#8FB6CE" stroke-width="3"/>
+    <circle cx="97" cy="66" r="4" fill="#BC3F26"/>
+  </g>
+  <rect width="720" height="480" filter="url(#ig)" opacity="0.2"/>
+</svg>

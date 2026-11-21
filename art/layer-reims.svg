@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" role="img" aria-label="Papercut illustration: a furnace-prism turning flowing ribbons into triangular shards on a conveyor">
+  <defs>
+    <filter id="rw" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="3" seed="31" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="9"/>
+    </filter>
+    <filter id="rw2" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.026" numOctaves="2" seed="23" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="5"/>
+    </filter>
+    <filter id="rs" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="rg">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="37" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.16  0 0 0 0 0.13  0 0 0 0 0.10  0 0 0 0.6 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <linearGradient id="rsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1E4A54"/><stop offset="0.62" stop-color="#12333B"/><stop offset="1" stop-color="#0B2228"/>
+    </linearGradient>
+    <linearGradient id="rprism" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F1D488"/><stop offset="0.5" stop-color="#DFA83E"/><stop offset="1" stop-color="#BC3F26"/>
+    </linearGradient>
+    <linearGradient id="rglow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F1D488" stop-opacity="0.5"/><stop offset="1" stop-color="#F1D488" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="480" fill="url(#rsky)"/>
+  <!-- stars -->
+  <g fill="#F6F1E6" opacity="0.7">
+    <circle cx="80" cy="60" r="2.5"/><circle cx="180" cy="40" r="2"/><circle cx="300" cy="70" r="2.5"/>
+    <circle cx="520" cy="46" r="2"/><circle cx="640" cy="80" r="2.5"/><circle cx="600" cy="140" r="1.8"/>
+    <circle cx="120" cy="130" r="1.8"/><circle cx="420" cy="36" r="2"/>
+  </g>
+  <!-- moon -->
+  <circle cx="620" cy="90" r="38" fill="#F6F1E6" opacity="0.92" filter="url(#rw2)"/>
+  <circle cx="632" cy="82" r="34" fill="#1E4A54" opacity="0.35"/>
+  <!-- ground -->
+  <path d="M-10,360 Q360,340 730,360 L730,490 L-10,490 Z" fill="#0E2A31" filter="url(#rw)"/>
+  <path d="M-10,400 Q360,384 730,400 L730,490 L-10,490 Z" fill="#0B2228" filter="url(#rw)"/>
+  <!-- glow under prism -->
+  <ellipse cx="360" cy="366" rx="190" ry="26" fill="#DFA83E" opacity="0.22" filter="url(#rs)"/>
+  <!-- incoming ribbon (metal command stream) -->
+  <g fill="none" stroke-linecap="round" filter="url(#rw2)">
+    <path d="M-10,208 Q120,168 236,224 Q284,248 316,262" stroke="#BC3F26" stroke-width="16"/>
+    <path d="M-10,232 Q130,196 240,244 Q286,264 318,276" stroke="#DFA83E" stroke-width="10" opacity="0.9"/>
+    <path d="M-10,254 Q140,226 246,262 Q288,276 320,288" stroke="#8FB6CE" stroke-width="6" opacity="0.8"/>
+  </g>
+  <!-- command buffer packets riding the ribbon -->
+  <g filter="url(#rw2)">
+    <rect x="66" y="182" width="30" height="22" rx="4" fill="#F6F1E6" transform="rotate(-8 81 193)"/>
+    <rect x="140" y="182" width="30" height="22" rx="4" fill="#F6F1E6" transform="rotate(4 155 193)"/>
+    <rect x="212" y="206" width="30" height="22" rx="4" fill="#F6F1E6" transform="rotate(14 227 217)"/>
+    <g stroke="#29241E" stroke-width="2.5">
+      <path d="M74,190 h16 M74,197 h12" transform="rotate(-8 81 193)"/>
+      <path d="M148,190 h16 M148,197 h12" transform="rotate(4 155 193)"/>
+      <path d="M220,214 h16 M220,221 h12" transform="rotate(14 227 217)"/>
+    </g>
+  </g>
+  <!-- the furnace-prism -->
+  <g filter="url(#rw2)">
+    <path d="M360,120 L448,320 L272,320 Z" fill="url(#rprism)"/>
+    <path d="M360,120 L448,320 L360,320 Z" fill="#93301D" opacity="0.35"/>
+    <path d="M360,150 L426,304 L294,304 Z" fill="#F6F1E6" opacity="0.16"/>
+    <!-- furnace mouth -->
+    <rect x="330" y="252" width="60" height="52" rx="8" fill="#29241E"/>
+    <rect x="340" y="262" width="40" height="32" rx="5" fill="#F1D488"/>
+    <path d="M348,294 q4,-14 8,-18 q2,10 8,12 q4,-8 2,-16 q8,6 8,22 Z" fill="#BC3F26"/>
+  </g>
+  <!-- light cone rising from prism tip -->
+  <path d="M348,120 L372,120 L392,40 L328,40 Z" fill="url(#rglow)"/>
+  <!-- outgoing shards (vulkan triangles) -->
+  <g filter="url(#rw2)">
+    <path d="M470,236 l26,-42 l26,42 Z" fill="#8FB6CE"/>
+    <path d="M528,268 l22,-36 l22,36 Z" fill="#DFA83E"/>
+    <path d="M584,238 l24,-40 l24,40 Z" fill="#BC3F26"/>
+    <path d="M636,282 l19,-31 l19,31 Z" fill="#F6F1E6"/>
+    <path d="M500,306 l17,-28 l17,28 Z" fill="#47705B"/>
+    <path d="M600,318 l15,-25 l15,25 Z" fill="#8FB6CE" opacity="0.85"/>
+  </g>
+  <!-- shard trails -->
+  <g stroke="#F1D488" stroke-width="3" fill="none" opacity="0.55" stroke-linecap="round">
+    <path d="M448,262 q22,-16 34,-30"/><path d="M452,286 q40,-8 66,-16"/><path d="M450,300 q60,4 120,-22"/>
+  </g>
+  <!-- conveyor -->
+  <g filter="url(#rw2)">
+    <rect x="252" y="330" width="380" height="16" rx="8" fill="#29241E"/>
+    <g fill="#8FB6CE">
+      <circle cx="280" cy="352" r="8"/><circle cx="360" cy="352" r="8"/><circle cx="440" cy="352" r="8"/>
+      <circle cx="520" cy="352" r="8"/><circle cx="600" cy="352" r="8"/>
+    </g>
+    <rect x="264" y="358" width="356" height="8" rx="4" fill="#12333B"/>
+  </g>
+  <!-- shards riding out on the conveyor -->
+  <g filter="url(#rw2)">
+    <path d="M470,330 l16,-26 l16,26 Z" fill="#DFA83E"/>
+    <path d="M540,330 l14,-23 l14,23 Z" fill="#8FB6CE"/>
+    <path d="M600,330 l13,-21 l13,21 Z" fill="#BC3F26"/>
+  </g>
+  <!-- little worker robot watching (no people) -->
+  <g filter="url(#rw2)">
+    <rect x="120" y="300" width="52" height="56" rx="10" fill="#8FB6CE"/>
+    <rect x="130" y="312" width="32" height="20" rx="5" fill="#12333B"/>
+    <circle cx="140" cy="322" r="4" fill="#F1D488"/><circle cx="152" cy="322" r="4" fill="#F1D488"/>
+    <line x1="146" y1="300" x2="146" y2="286" stroke="#29241E" stroke-width="4"/>
+    <circle cx="146" cy="282" r="5" fill="#BC3F26"/>
+    <rect x="126" y="356" width="14" height="14" rx="4" fill="#29241E"/>
+    <rect x="152" y="356" width="14" height="14" rx="4" fill="#29241E"/>
+    <path d="M172,318 q16,2 18,16" stroke="#29241E" stroke-width="5" fill="none"/>
+  </g>
+  <!-- sparks -->
+  <g fill="#F1D488">
+    <circle cx="322" cy="236" r="3.5"/><circle cx="398" cy="228" r="3"/><circle cx="416" cy="252" r="2.5"/>
+    <circle cx="300" cy="260" r="2.5"/><circle cx="452" cy="206" r="3"/>
+  </g>
+  <!-- heat shimmer above the mouth -->
+  <g stroke="#F1D488" stroke-width="2.5" fill="none" opacity="0.4" stroke-linecap="round">
+    <path d="M342,244 q4,-8 0,-14"/><path d="M360,240 q4,-8 0,-14"/><path d="M378,244 q4,-8 0,-14"/>
+  </g>
+  <!-- spare shard crate by the robot -->
+  <g filter="url(#rw2)">
+    <rect x="60" y="330" width="44" height="30" rx="4" fill="#29241E"/>
+    <path d="M70,330 l8,-14 l8,14 Z" fill="#8FB6CE"/>
+    <path d="M88,330 l7,-12 l7,12 Z" fill="#DFA83E"/>
+  </g>
+  <rect width="720" height="480" filter="url(#rg)" opacity="0.22"/>
+</svg>

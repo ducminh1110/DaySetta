@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 490" role="img" aria-label="Papercut illustration: a path of arches receding over paper hills toward one lit doorway">
+  <defs>
+    <filter id="aw" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="3" seed="41" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="10"/>
+    </filter>
+    <filter id="aw2" x="-8%" y="-8%" width="116%" height="116%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.024" numOctaves="2" seed="43" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="5"/>
+    </filter>
+    <filter id="as" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="ag">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="47" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.16  0 0 0 0 0.13  0 0 0 0 0.10  0 0 0 0.6 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+    <linearGradient id="asky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B8D2DF"/><stop offset="0.6" stop-color="#E9DFC8"/><stop offset="1" stop-color="#F6F1E6"/>
+    </linearGradient>
+    <radialGradient id="adoor" cx="0.5" cy="0.55" r="0.65">
+      <stop offset="0" stop-color="#F5DD9A"/><stop offset="0.7" stop-color="#E9BC55"/><stop offset="1" stop-color="#DFA83E"/>
+    </radialGradient>
+    <radialGradient id="ahalo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.5" stop-color="#DFA83E" stop-opacity="0.3"/><stop offset="1" stop-color="#DFA83E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1120" height="490" fill="url(#asky)"/>
+  <!-- sun small, left -->
+  <circle cx="150" cy="96" r="52" fill="#DFA83E" opacity="0.9" filter="url(#aw2)"/>
+  <!-- clouds -->
+  <g filter="url(#aw2)" fill="#FBF7EC">
+    <path d="M300,80 q22,-26 56,-16 q26,-17 54,-2 q25,2 19,23 l-130,0 q-12,-4 1,-5 Z" opacity="0.9"/>
+    <path d="M700,60 q18,-20 44,-12 q22,-13 42,-1 q19,2 15,18 l-102,0 q-9,-3 1,-5 Z" opacity="0.75"/>
+  </g>
+  <!-- far hills -->
+  <path d="M-10,260 Q200,200 420,246 T840,230 T1140,252 L1140,400 L-10,400 Z" fill="#C2D3CC" opacity="0.55" filter="url(#aw)"/>
+  <path d="M-10,310 Q260,262 520,300 T1140,290 L1140,440 L-10,440 Z" fill="#A9C2BC" opacity="0.5" filter="url(#aw)"/>
+  <!-- ground -->
+  <path d="M-10,360 Q360,336 720,352 T1140,346 L1140,500 L-10,500 Z" fill="#EADAB5" filter="url(#aw)"/>
+  <path d="M-10,420 Q400,400 800,414 T1140,408 L1140,500 L-10,500 Z" fill="#D8CBA8" opacity="0.8" filter="url(#aw)"/>
+  <!-- the path -->
+  <path d="M60,486 Q300,430 520,406 Q760,382 950,364 L980,376 Q780,398 540,424 Q320,450 120,496 Z" fill="#C0A873" filter="url(#aw)"/>
+  <g stroke="#A98F5C" stroke-width="3" opacity="0.6" fill="none">
+    <path d="M180,470 q30,-8 60,-12"/><path d="M420,428 q30,-6 60,-8"/><path d="M700,398 q28,-4 56,-6"/>
+  </g>
+
+  <!-- arch 1 (nearest, biggest, vermillion) -->
+  <g filter="url(#aw2)">
+    <ellipse cx="220" cy="452" rx="120" ry="16" fill="#29241E" opacity="0.15" filter="url(#as)"/>
+    <path d="M130,450 L130,300 Q130,220 220,220 Q310,220 310,300 L310,450 L272,450 L272,304 Q272,258 220,258 Q168,258 168,304 L168,450 Z" fill="#BC3F26"/>
+    <path d="M130,450 L130,300 Q130,220 220,220 L220,258 Q168,258 168,304 L168,450 Z" fill="#93301D" opacity="0.5"/>
+    <rect x="118" y="440" width="62" height="16" rx="4" fill="#93301D"/>
+    <rect x="260" y="440" width="62" height="16" rx="4" fill="#93301D"/>
+    <circle cx="220" cy="238" r="9" fill="#DFA83E"/>
+  </g>
+  <!-- arch 2 (ochre) -->
+  <g filter="url(#aw2)">
+    <ellipse cx="470" cy="424" rx="92" ry="13" fill="#29241E" opacity="0.14" filter="url(#as)"/>
+    <path d="M400,422 L400,306 Q400,244 470,244 Q540,244 540,306 L540,422 L510,422 L510,310 Q510,274 470,274 Q430,274 430,310 L430,422 Z" fill="#DFA83E"/>
+    <path d="M400,422 L400,306 Q400,244 470,244 L470,274 Q430,274 430,310 L430,422 Z" fill="#B9862C" opacity="0.55"/>
+    <rect x="390" y="414" width="50" height="13" rx="4" fill="#B9862C"/>
+    <rect x="500" y="414" width="50" height="13" rx="4" fill="#B9862C"/>
+    <circle cx="470" cy="259" r="7" fill="#BC3F26"/>
+  </g>
+  <!-- arch 3 (sky) -->
+  <g filter="url(#aw2)">
+    <ellipse cx="680" cy="400" rx="70" ry="10" fill="#29241E" opacity="0.13" filter="url(#as)"/>
+    <path d="M628,398 L628,310 Q628,262 680,262 Q732,262 732,310 L732,398 L708,398 L708,313 Q708,286 680,286 Q652,286 652,313 L652,398 Z" fill="#8FB6CE"/>
+    <path d="M628,398 L628,310 Q628,262 680,262 L680,286 Q652,286 652,313 L652,398 Z" fill="#6E96B0" opacity="0.55"/>
+    <rect x="620" y="392" width="40" height="10" rx="3" fill="#6E96B0"/>
+    <rect x="700" y="392" width="40" height="10" rx="3" fill="#6E96B0"/>
+  </g>
+  <!-- arch 4 (moss, smaller) -->
+  <g filter="url(#aw2)">
+    <ellipse cx="840" cy="382" rx="52" ry="8" fill="#29241E" opacity="0.12" filter="url(#as)"/>
+    <path d="M802,380 L802,314 Q802,278 840,278 Q878,278 878,314 L878,380 L860,380 L860,317 Q860,296 840,296 Q820,296 820,317 L820,380 Z" fill="#47705B"/>
+    <path d="M802,380 L802,314 Q802,278 840,278 L840,296 Q820,296 820,317 L820,380 Z" fill="#35543F" opacity="0.55"/>
+  </g>
+  <!-- the lit doorway (petrol frame, glowing inside) -->
+  <g filter="url(#aw2)">
+    <circle cx="972" cy="330" r="86" fill="url(#ahalo)"/>
+    <ellipse cx="972" cy="368" rx="46" ry="7" fill="#29241E" opacity="0.14" filter="url(#as)"/>
+    <path d="M938,366 L938,312 Q938,282 972,282 Q1006,282 1006,312 L1006,366 L990,366 L990,315 Q990,298 972,298 Q954,298 954,315 L954,366 Z" fill="#12333B"/>
+    <path d="M954,366 L954,315 Q954,298 972,298 Q990,298 990,315 L990,366 Z" fill="url(#adoor)"/>
+    <!-- light spilling out -->
+    <path d="M954,366 L990,366 L1012,384 L932,384 Z" fill="#E9BC55" opacity="0.5"/>
+    <circle cx="972" cy="290" r="5" fill="#DFA83E"/>
+  </g>
+  <!-- milestone flags along the path -->
+  <g filter="url(#aw2)">
+    <line x1="350" y1="446" x2="350" y2="410" stroke="#29241E" stroke-width="4"/>
+    <path d="M350,410 l26,8 l-26,8 Z" fill="#BC3F26"/>
+    <line x1="580" y1="414" x2="580" y2="384" stroke="#29241E" stroke-width="3.5"/>
+    <path d="M580,384 l22,7 l-22,7 Z" fill="#DFA83E"/>
+    <line x1="760" y1="392" x2="760" y2="366" stroke="#29241E" stroke-width="3"/>
+    <path d="M760,366 l18,6 l-18,6 Z" fill="#8FB6CE"/>
+  </g>
+  <!-- foreground grass tufts + pebbles -->
+  <g filter="url(#aw2)">
+    <path d="M60,470 q2,-18 -8,-26 M60,470 q3,-14 12,-20" stroke="#47705B" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M1050,452 q2,-16 -7,-23 M1050,452 q3,-12 11,-17" stroke="#47705B" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <ellipse cx="500" cy="466" rx="18" ry="8" fill="#C9B380"/>
+    <ellipse cx="900" cy="440" rx="14" ry="6" fill="#A9C2BC"/>
+    <circle cx="180" cy="480" r="4" fill="#BC3F26" opacity="0.6"/>
+    <circle cx="1010" cy="470" r="3.5" fill="#DFA83E" opacity="0.7"/>
+  </g>
+  <!-- birds toward the door -->
+  <g stroke="#29241E" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.5">
+    <path d="M880,180 q7,-7 14,0 q7,-7 14,0"/><path d="M930,158 q5,-5 10,0 q5,-5 10,0"/><path d="M960,200 q4,-4 8,0 q4,-4 8,0"/>
+  </g>
+  <rect width="1120" height="490" filter="url(#ag)" opacity="0.2"/>
+</svg>
