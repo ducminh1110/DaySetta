@@ -1,15 +1,13 @@
-// theme toggle only — everything else is plain html
+// theme toggle, remembered per browser
 (function () {
-  var btn = document.getElementById('themeBtn');
+  var b = document.getElementById('themeBtn');
+  if (!b) return;
   var root = document.documentElement;
-  function sync() {
-    btn.setAttribute('aria-pressed', root.dataset.theme === 'dark' ? 'true' : 'false');
-  }
+  function sync() { b.setAttribute('aria-pressed', root.dataset.theme === 'dark' ? 'true' : 'false'); }
   sync();
-  btn.addEventListener('click', function () {
-    var dark = root.dataset.theme === 'dark';
-    if (dark) delete root.dataset.theme; else root.dataset.theme = 'dark';
-    try { localStorage.setItem('ds-theme', dark ? 'light' : 'dark'); } catch (e) {}
+  b.addEventListener('click', function () {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('ds-theme', root.dataset.theme); } catch (e) {}
     sync();
   });
 })();
