@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DaySetta: the real macOS desktop on ARM Linux. No VM.</title>
+<meta name="description" content="DaySetta runs Apple's own macOS 27 userland (WindowServer, AppKit, the daemons) unmodified on an ARM Linux box. No VM, no hypervisor. Honest status, real logs.">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/site.css">
+<link rel="icon" href="art/favicon.svg" type="image/svg+xml">
+<script>
+// set theme before first paint so there's no flash
+try {
+  var t = localStorage.getItem('ds-theme');
+  if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark';
+} catch (e) {}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">skip to content</a>
+
+<header class="nav wrap">
+  <nav class="nav-card" aria-label="main">
+    <a class="brand" href="./">Day<span>Setta</span></a>
+    <div class="nav-links">
+      <a href="#how">how it works</a>
+      <a href="#status">status</a>
+      <a href="#roadmap">roadmap</a>
+      <a href="#faq">faq</a>
+      <a href="devlog/">devlog</a>
+    </div>
+    <div class="nav-actions">
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7" y2="7"/><line x1="17" y1="17" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="7" y2="17"/><line x1="17" y1="7" x2="19.1" y2="4.9"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="btn btn-ghost nav-gh" href="https://github.com/ducminh1110/DaySetta">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+
+<!-- ============ hero ============ -->
+<section class="hero wrap">
+  <div class="hero-grid">
+    <div class="hero-copy">
+      <p class="tape">a personal systems project</p>
+      <h1>The real macOS desktop.<br>On ARM Linux. <em>No&nbsp;VM.</em></h1>
+      <p class="lede">DaySetta runs Apple's own macOS&nbsp;27 userland (WindowServer, AppKit, the daemons) <strong>unmodified</strong>, on a plain ARM Linux box. Everything below it is faked: a userspace XNU, fake kexts, Metal translated to Vulkan.</p>
+      <div class="hero-cta">
+        <a class="btn btn-solid" href="devlog/">read the devlog</a>
+        <a class="btn btn-ghost" href="https://github.com/ducminh1110/DaySetta">view on GitHub</a>
+      </div>
+      <div class="sticker" aria-hidden="true">
+        <span class="sticker-tape"></span>
+        no hypervisor.<br>really.
+      </div>
+    </div>
+    <figure class="hero-art">
+      <img src="art/hero-stack.svg" width="880" height="1040" alt="Papercut illustration of three floating layers: an ARM Linux bedrock with circuit traces at the bottom, a translation workshop with gears and a crane in the middle, and an abstract city of window-shaped buildings on top, connected by beams of light." fetchpriority="high">
+    </figure>
+  </div>
+  <dl class="stats">
+    <div><dt>guest</dt><dd>macOS 27 <span>arm64e</span></dd></div>
+    <div><dt>kernel</dt><dd>xnu-12377 <span>in userspace</span></dd></div>
+    <div><dt>host</dt><dd>ARMv8.0 <span>PAC/LSE emulated</span></dd></div>
+    <div><dt>VMs used</dt><dd>0 <span>no hypervisor</span></dd></div>
+  </dl>
+</section>
+
+<!-- ============ what it is ============ -->
+<section class="what wrap section" id="what">
+  <p class="tape">what this is</p>
+  <div class="what-grid">
+    <h2>Don't reimplement macOS.<br>Run it, and fake the floor.</h2>
+    <div class="what-copy">
+      <p>Most macOS-on-Linux attempts rewrite Apple's software. DaySetta goes the other way: it runs <strong>Apple's own binaries</strong> (WindowServer, SkyLight, AppKit, the launchd daemons) exactly as shipped in the macOS&nbsp;27 IPSW, and fakes everything <em>below</em> them.</p>
+      <p>It's the follow-up to Daylight, an older x86 experiment that tried to reimplement WindowServer. That taught the lesson this project is built on: the protocol is the hard part, so let Apple's code speak it.</p>
+      <p class="fine">Apple binaries never live in git. Everything Apple comes from your own IPSW.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ how it works ============ -->
+<section class="how section" id="how">
+  <div class="wrap">
+    <p class="tape">how it works</p>
+    <h2>Four floors, one building.</h2>
+    <p class="section-lede">The macOS userland thinks it's on Apple hardware. Each floor below pretends to be the thing the floor above expects.</p>
+
+    <div class="stack-diagram" role="img" aria-label="Stack diagram: macOS 27 arm64e userland on top, talking Mach, XPC and IOKit to Darling's userspace XNU, then iokitd playing the kexts, then reims-vgpu translating Metal to Vulkan, all on Linux aarch64.">
+      <div class="floor floor-guest">
+        <span class="floor-name">macOS 27 arm64e userland</span>
+        <span class="floor-note">real binaries from the IPSW: WindowServer · AppKit apps · launchd daemons</span>
+      </div>
+      <div class="wire"><span>Mach / XPC / IOKit</span></div>
+      <div class="floor floor-darling">
+        <span class="floor-name">Darling</span>
+        <span class="floor-note">userspace XNU (darlingserver), dyld, libsystem_kernel</span>
+      </div>
+      <div class="floor floor-iokitd">
+        <span class="floor-name">iokitd</span>
+        <span class="floor-note">plays the kexts in userspace: IOMobileFramebuffer, AppleParavirtGPU (IOGPU), IOSurface, IOHID</span>
+      </div>
+      <div class="floor floor-reims">
+        <span class="floor-name">reims-vgpu</span>
+        <span class="floor-note">paravirt GPU device → metal2vulkan → Vulkan</span>
+      </div>
+      <div class="wire wire-linux"><span>syscalls</span></div>
+      <div class="floor floor-linux">
+        <span class="floor-name">Linux aarch64</span>
+        <span class="floor-note">ARMv8.0, no PAC/LSE, so they're emulated in src/exec</span>
+      </div>
+    </div>
+
+    <div class="layer-cards">
+      <article class="layer-card card-darling">
+        <img src="art/layer-darling.svg" width="720" height="480" loading="lazy" alt="Papercut illustration of a bridge carrying small tokens between two riverbanks of buildings, with a red gear turning in the water below.">
+        <div class="layer-body">
+          <h3><span class="mono">01</span> Darling</h3>
+          <p>The kernel that isn't. Darling's userspace XNU, ported up to xnu-12377 (the macOS&nbsp;27 one), answers Mach traps and syscalls so Apple's libsystem never notices it's on Linux.</p>
+        </div>
+      </article>
+      <article class="layer-card card-iokitd">
+        <img src="art/layer-iokitd.svg" width="720" height="480" loading="lazy" alt="Papercut illustration of a workshop control desk with levers, dials and switches, cables running up to a glowing wall panel.">
+        <div class="layer-body">
+          <h3><span class="mono">02</span> iokitd</h3>
+          <p>There are no kexts here. iokitd answers their user clients instead, so WindowServer thinks it's talking to Apple's paravirtual display and GPU: the same path a macOS VM would see.</p>
+        </div>
+      </article>
+      <article class="layer-card card-reims">
+        <img src="art/layer-reims.svg" width="720" height="480" loading="lazy" alt="Papercut illustration of a glowing furnace-prism at night, turning flowing ribbons with packets into triangular shards on a conveyor, watched by a small robot.">
+        <div class="layer-body">
+          <h3><span class="mono">03</span> reims-vgpu</h3>
+          <p>The guest's Metal command buffers go to reims-vgpu and get translated to Vulkan. Metal stays 100% Apple's own driver. On a box with no GPU that's llvmpipe, so it's slow.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ status (dark band) ============ -->
+<section class="status-band" id="status">
+  <svg class="torn" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 L1440,0 L1440,12 Q1380,26 1310,18 T1160,24 T1010,14 T860,26 T710,16 T560,28 T410,14 T260,24 T110,16 T0,22 Z" fill="var(--paper)"/></svg>
+  <div class="wrap section">
+    <p class="tape tape-dark">honest status — nov 2026</p>
+    <h2>Login completes. The pixels<br>are still black.</h2>
+    <p class="section-lede">No mock-ups here. This is exactly where the project stands, with the log line to prove it.</p>
+
+    <div class="status-grid">
+      <div class="status-col">
+        <h3 class="mono works">works</h3>
+        <ul class="check-list">
+          <li>WindowServer 27 boots and stays up</li>
+          <li>the Metal driver comes up, command buffers execute, swaps reach the display</li>
+          <li>first real pixels through the whole GPU → present → readback path <span class="fine">(a test pattern, not a window yet)</span></li>
+          <li>an AppKit test app launches, connects to WindowServer and runs its whole script</li>
+          <li>login completes: Dock, MenuBarAgent, SystemUIServer, WallpaperAgent and WindowManager all run</li>
+        </ul>
+      </div>
+      <div class="status-col">
+        <h3 class="mono notyet">not yet</h3>
+        <ul class="cross-list">
+          <li>composited frames are still black, the current fight. The GPU store path is proven correct; the guest commits empty layers, and loginwindow's login transition stalls the commit</li>
+          <li>keyboard / mouse (HID) is half done</li>
+          <li>Finder and the default apps as a usable desktop</li>
+          <li>a desktop screenshot: none exists yet, so this page shows illustrations instead</li>
+        </ul>
+      </div>
+    </div>
+
+    <figure class="logcard">
+      <figcaption class="mono">lead boot log — lw452, nov 21, probe-free iokitd</figcaption>
+      <pre class="mono"><code>LoginComplete, ALL desktop agents alive (Dock, MenuBarAgent,
+SystemUIServer, WallpaperAgent, WindowManager), 12 frames all
+zero — the black is real, not probe damage.</code></pre>
+    </figure>
+
+    <p class="status-guess">Honest guess from the repo: <em>“a usable desktop is still days to weeks out, not hours.”</em></p>
+  </div>
+  <svg class="torn torn-bottom" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0,40 L1440,40 L1440,20 Q1370,8 1290,18 T1130,12 T980,24 T830,10 T680,22 T530,12 T380,26 T230,14 T80,22 T0,16 Z" fill="var(--paper)"/></svg>
+</section>
+
+<!-- ============ roadmap ============ -->
+<section class="roadmap wrap section" id="roadmap">
+  <p class="tape">the road ahead</p>
+  <h2>Every arch is a milestone.<br>One door is lit.</h2>
+  <figure class="roadmap-art">
+    <img src="art/roadmap-arch.svg" width="1120" height="490" loading="lazy" alt="Papercut illustration of a path over paper hills passing through four arches of decreasing size, ending at a small doorway glowing with warm light.">
+  </figure>
+  <ol class="milestones">
+    <li class="now">
+      <span class="mono m-tag">now</span>
+      <h3>First real window pixels</h3>
+      <p>The composite path works end to end; the scene the guest commits is empty. Next: seed the missing session/wallpaper content so layers commit with real uniforms.</p>
+    </li>
+    <li>
+      <span class="mono m-tag">next</span>
+      <h3>Input, end to end</h3>
+      <p>HID is half done: the event plumbing exists, the last dispatch gaps don't. Keys and clicks need to land in AppKit.</p>
+    </li>
+    <li>
+      <span class="mono m-tag">then</span>
+      <h3>A desktop you can use</h3>
+      <p>Finder, the Dock, the default macOS 27 apps behaving like a daily desktop.</p>
+    </li>
+    <li>
+      <span class="mono m-tag">planned</span>
+      <h3>Third-party apps</h3>
+      <p>.dmg and .pkg install paths the way macOS does them, then app-by-app work. No app-specific hacks: if an app breaks, fix the general thing underneath.</p>
+    </li>
+    <li>
+      <span class="mono m-tag">north star</span>
+      <h3>Drop an IPSW in a window</h3>
+      <p>The long-term vision: a desktop app where you drag a macOS IPSW in, it extracts, and the macOS desktop appears inside that window. Planned, not started. No commitments.</p>
+    </li>
+  </ol>
+  <p class="fine">The old from-scratch design docs (VISION, ARCHITECTURE, ROADMAP) describe a dropped plan with no Darling. They're kept in the repo for history; the list above is the live direction.</p>
+</section>
+
+<!-- ============ faq ============ -->
+<section class="faq wrap section" id="faq">
+  <p class="tape">questions people ask</p>
+  <h2>Fair questions.</h2>
+  <div class="faq-grid">
+    <div class="vm-note" >
+      <span class="vm-tape" aria-hidden="true"></span>
+      <p class="vm-q">“is this a VM?”</p>
+      <p class="vm-a">No. There's no hypervisor and no virtual machine. macOS code runs as ordinary Linux processes on the same kernel; the “hardware” it sees is answered in userspace.</p>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary>So… is it a Hackintosh?</summary>
+        <div><p>No. Linux stays Linux. DaySetta doesn't boot macOS or replace your OS. It runs the macOS <em>userland</em> (WindowServer, AppKit, daemons) as processes and fakes the kernel and devices below them.</p></div>
+      </details>
+      <details>
+        <summary>Where do the Apple binaries come from?</summary>
+        <div><p>Your own macOS 27 IPSW. No Apple binaries are committed to git; the repo only holds the translation layers and tooling.</p></div>
+      </details>
+      <details>
+        <summary>Does it work today?</summary>
+        <div><p>Not as a usable desktop, no. Login completes and all the desktop agents run, but composited frames are still black. The <a href="#status">status section</a> has the current log line; the repo's own guess is days to weeks, not hours.</p></div>
+      </details>
+      <details>
+        <summary>What hardware do I need?</summary>
+        <div><p>An ARM (aarch64) Linux box. The reference host is plain ARMv8.0; macOS 27 is arm64e, so PAC and LSE instructions get emulated. A GPU helps: without one, Vulkan falls back to llvmpipe and it's slow.</p></div>
+      </details>
+      <details>
+        <summary>Why not just use Darling's GUI?</summary>
+        <div><p>Darling is the kernel floor here, not the whole stack. DaySetta adds the display/GPU/input side (iokitd and reims-vgpu) so Apple's real WindowServer and Metal driver can run instead of a reimplemented server.</p></div>
+      </details>
+      <details>
+        <summary>What about x86 Macs / x86 hosts?</summary>
+        <div><p>Later. The goal is running ARM Mac apps first; the ARM build has to mature before an x86_64 path (via an ARM64 emulator) makes sense.</p></div>
+      </details>
+      <details>
+        <summary>Is this affiliated with Apple?</summary>
+        <div><p>No. It's a personal project, for fun. macOS is a trademark of Apple Inc.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ devlog teaser ============ -->
+<section class="devlog-teaser wrap section" id="devlog">
+  <p class="tape">notes from the lab</p>
+  <div class="teaser-head">
+    <h2>The devlog is the product demo.</h2>
+    <a class="btn btn-ghost" href="devlog/">all entries →</a>
+  </div>
+  <div class="teaser-cards">
+    <a class="post-card" href="devlog/#gpu6">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>the store works, the scene is empty</h3>
+      <p>Black composites split three ways: a host test proves render-pass stores land; the CA layer uniform is all zero in every draw; the fence waits on loginwindow's login transition.</p>
+      <span class="mono post-src">decisions.md · gpu6</span>
+    </a>
+    <a class="post-card" href="devlog/#gpu4">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>“segment length not usable” = stale kernel cmds</h3>
+      <p>The exec list walked a reused ring past its live chunk. Bounding the walk predicted 232/232 faults across 147 submits, 0 left after.</p>
+      <span class="mono post-src">decisions.md · gpu4</span>
+    </a>
+    <a class="post-card" href="devlog/#postlogin">
+      <span class="mono tag tag-boot">boot</span>
+      <h3>post-login spawn via routine 817/823</h3>
+      <p>loginwindow pokes Dock and Finder through libxpc's pipe, not MIG. Every poke got ENOTSUP and the quorum check logged us out, until launchd learned the two routines.</p>
+      <span class="mono post-src">decisions.md · postlogin</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div>
+      <p class="brand footer-brand">Day<span>Setta</span></p>
+      <p class="fine">The real macOS desktop on ARM Linux. No VM.<br>A personal project, for fun.</p>
+    </div>
+    <nav aria-label="footer">
+      <a href="#how">how it works</a>
+      <a href="#status">status</a>
+      <a href="#roadmap">roadmap</a>
+      <a href="devlog/">devlog</a>
+      <a href="https://github.com/ducminh1110/DaySetta">GitHub</a>
+      <a href="https://github.com/darlinghq/darling">Darling</a>
+      <a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a>
+    </nav>
+  </div>
+  <div class="wrap footer-legal">
+    <p>macOS is a trademark of Apple Inc. DaySetta is not affiliated with Apple.</p>
+    <p class="fine">Built on Darling, reims-vgpu and metal2vulkan. Illustrations drawn in code (SVG), no Apple artwork.</p>
+  </div>
+</footer>
+
+<script src="js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devlog — DaySetta</title>
+<meta name="description" content="Notes from the lab: the DaySetta devlog, quoted verbatim from the project's decisions file. Real bugs, real fixes, no marketing.">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="icon" href="../art/favicon.svg" type="image/svg+xml">
+<script>
+try {
+  var t = localStorage.getItem('ds-theme');
+  if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark';
+} catch (e) {}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">skip to content</a>
+
+<header class="nav wrap">
+  <nav class="nav-card" aria-label="main">
+    <a class="brand" href="../">Day<span>Setta</span></a>
+    <div class="nav-links">
+      <a href="../#how">how it works</a>
+      <a href="../#status">status</a>
+      <a href="../#roadmap">roadmap</a>
+      <a href="../#faq">faq</a>
+      <a href="./" aria-current="page">devlog</a>
+    </div>
+    <div class="nav-actions">
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="switch colour theme" aria-pressed="false">
+        <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7" y2="7"/><line x1="17" y1="17" x2="19.1" y2="19.1"/><line x1="4.9" y1="19.1" x2="7" y2="17"/><line x1="17" y1="7" x2="19.1" y2="4.9"/></g></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="btn btn-ghost nav-gh" href="https://github.com/ducminh1110/DaySetta">GitHub</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main" class="wrap">
+  <div class="page-head">
+    <p class="tape">notes from the lab</p>
+    <h1>The devlog.</h1>
+    <p class="section-lede devlog-note">Every card below comes from the project's <span class="mono">devlog/decisions.md</span> — short notes on why things are the way they are, newest first, lightly condensed with the source lines cited. Raw test logs live next to them in <span class="mono">devlog/logs/</span>. Nothing here is polished after the fact.</p>
+  </div>
+
+  <div class="devlog-list">
+
+    <h2 class="sr-only">entries</h2>
+    <article class="post-card" id="gpu6">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>gpu6: black composites split — the store works, the scene is empty.</h3>
+      <p>host test (llvmpipe) proves render-pass stores into a writable surface over guest pages land (clear/quad/textured/private, 4/4). decoded the CA uber-shader A2Xghc AIR-&gt;IR: output colour gated by the layer Uniform (frag loc1), which is ALL ZERO in every draw (color=0, params1[1]=0) + config enables no image -&gt; transparent -&gt; empty scene. window backing textures have glyphs but the layer uniform is zero; guest-side (shared buffer). fence holder=loginwindow, its login transition (~6s snapshot+window moves) delays the commit past the deadline. wallpaper store empty + ExtensionKit missing = one concrete empty-content source. no iokitd/reims fix; only added the store host test. report GPU6.md</p>
+      <span class="mono post-src">decisions.md:107</span>
+    </article>
+
+    <article class="post-card" id="gpu5">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>gpu5: black composites — guest draws empty scene, not a gpu bug.</h3>
+      <p>fences are CA mach-port NO_SENDERS fences (0x87..=pid135&lt;&lt;32|N), not stamps; gpu completions all delivered (17/17 notifies ok, port registered first). gpu4 skip proved safe: 23 skipped cmds all byte-dups/stale-length, 0 real work dropped, completion is per-submit so can't be lost. zero pixels = all-zero frag uniforms on every store-pass to surface4/5. caught that surface2's "content" is the injected g0 gradient TEMP probe (surf3-2..6 == surf-g0-2 byte-for-byte), not real output. no iokitd/reims defect -&gt; no staged fix, named the upstream probes instead. report GPU5.md</p>
+      <span class="mono post-src">decisions.md:106</span>
+    </article>
+
+    <article class="post-card" id="gpu4">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>gpu4: "segment length not usable" = iokitd execs stale kernel cmds.</h3>
+      <p>arg0 is a reused ring; the live set is arg1's closed chunk header @0x20 {count, len|0x80000000}. iokitd walked arg0 to the end and ran leftover cmds with old lengths against the rewritten res2. fix: bound the list walk by the closed len, skip cmds no live list pairs. predicted 232/232 faults across all 147 lw433 submits, 0 left after. also explains gpu3's lw340 0x38c-vs-0x68 (same bug, my "consequence of compute fault" guess was wrong). replayed real sub52 bytes red-&gt;green. staged iokitd.new fa07e424. report GPU4.md</p>
+      <span class="mono post-src">decisions.md:105</span>
+    </article>
+
+    <article class="post-card" id="metalapps">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>metalapps: sel29 slow submit was silent zero-success -&gt; batched frames dropped.</h3>
+      <p>iokitd only had trap0 (count==1); count&gt;1 goes sel29 (IOGPU-NOTIF disasm 0x1a7f85f48) and fell thru to success-noop. fix: pulled trap0's per-buffer body into submitOne(), sel29 loops it. trap0 byte-preserved. host test red(8)-&gt;green(23). staged iokitd.new 6c5961a4. also compiled the real store-27 Chess/Music/Freeform metallibs on lavapipe profile: 41 PASS 0 refusals (blur+compute covered). census: 7 direct Metal apps, rest via CA frameworks (all link Metal). top gap = stale installed reims (still has DEBUG line), rebuild before trusting pixels. report METAL-APPS.md</p>
+      <span class="mono post-src">decisions.md:104 · log 2026-11-21-metalapps.txt</span>
+    </article>
+
+    <article class="post-card" id="gpu3">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>gpu3: desktop compute pipelines come via sel266, iokitd ignored it.</h3>
+      <p>"object 61 empty entry" — guest creates compute pipelines only via 266 (lw340 dump lines 142/146, ref 0x3d/0x40), iokitd had no 266 branch -&gt; zero-success, no entry. fix: file args+0x20 (a reims cmd-11 compute record) as type-7 at ref args[0x14], exactly what the kext createObjectInternal does. host test red-&gt;green. also: addObject must refuse a live entry, like the kext — silently overwriting desynced entry from cached ref -&gt; AttachmentFormat(Color(1)). report GPU3.md</p>
+      <span class="mono post-src">decisions.md:101–103</span>
+    </article>
+
+    <article class="post-card" id="childtex2">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>childtex2: the child texture is a stale cached object.</h3>
+      <p>lw280 dump: WS reuses ref 0x2b — create memoryless(256), delete(258), re-create as iosurface mapper-ref(9). iokitd handles no delete selector so reims never evicts; reims never re-reads a cached ref's entry (cache.rs:324) -&gt; ref stays the memoryless child -&gt; exec faults + AttachmentFormat(Color(0)) fatal. fix: forward sel258/259 to reims as op37 DeleteResource{task,ref}. host test red-&gt;green. report CHILDTEX2.md</p>
+      <span class="mono post-src">decisions.md:99–100</span>
+    </article>
+
+    <article class="post-card" id="postlogin">
+      <span class="mono tag tag-boot">boot</span>
+      <h3>postlogin spawn via routine 817/823.</h3>
+      <p>loginwindow pokes dock/finder/etc through apple libxpc's xpc pipe, not the old MIG spawn — our launchd only spoke MIG + a few v5 routines, so every poke got ENOTSUP and the quorum check logged us out. mapped 817-&gt;job_mig_kickstart (jobs already loaded), 823-&gt;accept (one jobmgr, nothing to switch). tried nothing else — the disasm showed the exact keys/reply, host test red-&gt;green. staged launchd.new, ws23 owns the boot.</p>
+      <span class="mono post-src">decisions.md:96 · log 2026-11-20-postlogin.txt</span>
+    </article>
+
+    <article class="post-card" id="lsd-session">
+      <span class="mono tag tag-boot">boot</span>
+      <h3>lsd session gap = random asid, not lsd logic.</h3>
+      <p>apple lsd keys sessions by the token asid; loginwindow's SessionCreate randomized the local asid (getentropy) so it never matched the token's 100000 -&gt; leader got session 0. tried tracing lsd handlers first (all present + working), the notify name session.1476852751 vs token 0x186a0 gave it away. AU_ASSIGN_ASID now -&gt; 100000, host red/green</p>
+      <span class="mono post-src">decisions.md:86 · log 2026-11-19-lsd-session.txt</span>
+    </article>
+
+    <article class="post-card" id="auditon">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>auditon(351) in libsystem_kernel.</h3>
+      <p>authd's agent_create/session_update call A_GETSINFO_ADDR and it was ENOSYS (LOGIN-27 §3.3). implemented A_GETSINFO_ADDR/A_GETPINFO_ADDR against the same synthetic console session getaudit_addr uses, A_GETCOND returns AUC_NOAUDIT (int+long like xnu), rest ENOSYS. autest written, can't run it: rule 9 reserves all darling boots for wsprobe. installed the dylib so the next ws23 boot picks it up.</p>
+      <span class="mono post-src">decisions.md:82</span>
+    </article>
+
+    <article class="post-card" id="glass2">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>glass2: LP_NUM_THREADS=6 is the cheap speed win.</h3>
+      <p>present pass 1440x900: 34.9ms@1 → 8.0ms@6, pixel-identical (cmp). runws sets none today. apple's own blur downsamples 2/4/8x by radius (quartzcore disasm) so low-res blur is faithful not a downgrade. also: xr10 fetch/blend already works on lavapipe — ran the guest-shape RGB10A8_2P_XR10 pipelines (fetch+premul blend+discard) at 1 and 6 threads, all green.</p>
+      <span class="mono post-src">decisions.md:91–93</span>
+    </article>
+
+    <article class="post-card" id="hid2">
+      <span class="mono tag tag-input">input</span>
+      <h3>hid2 verified: csops arm64 fix landed, entitlement cascade gone.</h3>
+      <p>ws27 is fat arm64e and csops only picked x86_64 slices -&gt; EBADEXEC -&gt; no entitlements -&gt; ws self-check fails. fixed csops.c to pick the running arch's slice. ws2340 (wsprobe run, nov19): 0 "not entitled"/0 hid.client.admin/0 queue-10000003/0 server-died vs 14/2/3/8 in ws186. ws is its own hid event server, no hidd needed.</p>
+      <span class="mono post-src">decisions.md:74, 81 · log 2026-11-18-hid2-csops.txt</span>
+    </article>
+
+    <article class="post-card" id="hid-step2">
+      <span class="mono tag tag-input">input</span>
+      <h3>hid step2 in iokitd: esuc services + type3 queue client.</h3>
+      <p>keysym-&gt;usage and rfb-&gt;button tables pure C (host tests 133 checks), serializers byte-checked vs APSL struct defs. queue fan-out lives in IOHIDSystem like the kext dataQueueSet; map_memory stub replaced with real remap dispatch. dual path (esuc queues + direct WS queue) cause the hidd/IOHIDLib plugin path is unproven under darling.</p>
+      <span class="mono post-src">decisions.md:77 · log 2026-11-18-hidimpl.txt</span>
+    </article>
+
+    <article class="post-card" id="sandbox-sentinel">
+      <span class="mono tag tag-boot">boot</span>
+      <h3>sandbox sentinel sysctl in libsystem_kernel.</h3>
+      <p>loginwindow needs System.keychain; __amkrtemp wants security.mac.sandbox.sentinel (LOGIN-27.md). added a security node to the sysctl table, value .sb-&lt;boottime hex&gt;, stable per process. tried __simple_sprintf %08x first but it has no width support (printed ".sb-8x"), so spelled the hex digits out. sbtest in src/sbtest passes (PASS, len 12).</p>
+      <span class="mono post-src">decisions.md:75 · log 2026-11-18-loginwin-sbtest.txt</span>
+    </article>
+
+    <article class="post-card" id="m4-reclaim">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>m4 arena reclaim: free-list + two gates.</h3>
+      <p>dead-client pages go back only when mach_port_type says the task port is a dead name AND DeleteTask's stamp landed (reims publishes only the completed prefix, so all gpu work done). deleting an unconfirmed task faults the fifo and iokitd never resumes, so a definedTasks() set gates it; live-close/unconfirmed clients get forget() = honest leak. host test 19/19 + red 6 fails, regressions all green.</p>
+      <span class="mono post-src">decisions.md:80 · log 2026-11-19-m4fix.txt</span>
+    </article>
+
+    <article class="post-card" id="cache-sweep">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>cache sweep: whole __text census via real decode().</h3>
+      <p>906m words, 46.4m need lowering, 984k rejected (598k of those are data). tried capstone first, not installed; llvm-mc --disassemble with mcpu=generic gates features exactly, gnu objdump fallback names FEAT_THE that llvm 21 misses. fp16 masks were overconstrained: 25,422 real fp16 words rejected cause the mask rows pin rn bits to 0; zeroing rn makes 11,196 unique words decode.</p>
+      <span class="mono post-src">decisions.md:72–73</span>
+    </article>
+
+    <article class="post-card" id="libnotify">
+      <span class="mono tag tag-boot">boot</span>
+      <h3>libnotify 348 boot-death: it was our xpc stub logging.</h3>
+      <p>asl_open -&gt; notify_register_check -&gt; libnotify's introspection dispatch_once -&gt; xpc_copy_entitlement_for_token -&gt; xpc_stub() -&gt; os_log -&gt; asl_open again -&gt; same dispatch_once -&gt; libdispatch brk. dropped the log in that one stub, not a notify hack.</p>
+      <span class="mono post-src">decisions.md:66 · log 2026-11-18-libnotify-348.txt</span>
+    </article>
+
+    <article class="post-card" id="mem-entries">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>mem entries: ported upstream by hand, not our own impl.</h3>
+      <p>ported upstream 75909fa branch by hand (3-way merge-file). base already had page-query fixes we lacked so a plain git apply would've kept our stubs; took theirs for page queries, kept our remap/shared_fd stuff. guest libsyscall intercepts make_memory_entry_64 locally so the test calls the raw _mach_make_memory_entry mig stub instead.</p>
+      <span class="mono post-src">decisions.md:70 · log 2026-11-18-mentry.txt</span>
+    </article>
+
+    <article class="post-card" id="fbview">
+      <span class="mono tag tag-display">display</span>
+      <h3>fbview: python stdlib rfb server, raw-only.</h3>
+      <p>poll the shm counter. tried diffing whole rows first, kept it: 190-470kb updates vs 5mb full at 30fps. bgra-&gt;rgbx done per-client on demand cause novnc asks shifts 0,8,16 not our native 16,8,0. torn-frame guard = counter read twice, head+tail; writer writes counter last.</p>
+      <span class="mono post-src">decisions.md:69 · log 2026-11-18-fbview.txt</span>
+    </article>
+
+    <article class="post-card" id="iokit-traps">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>arm64 iokit traps never left the process.</h3>
+      <p>IOKit's iokit_user_client_trap is a raw `svc` and ds-exec leaves svc native (linux syscall from x8 = garbage). dyld now rewrites the stub to adrp/ldr/br into darling_iokit_user_client_trap, written via /proc/self/mem so lazy ds-exec lowering + page prot stay as they were. tried a mach trap table entry first, useless since svc never gets emulated, reverted. ws now gets a Metal device, makes cmd + notif queues and keeps running.</p>
+      <span class="mono post-src">decisions.md:51</span>
+    </article>
+
+    <article class="post-card" id="metal-plugin">
+      <span class="mono tag tag-gpu">gpu</span>
+      <h3>metal = apple's own paravirt plugin.</h3>
+      <p>AppleParavirtGPU in iokitd is the IOAccelerator with MetalPluginName/ClassName (same as the vm kext personality), genuine Metal loads AppleParavirtGPUMetalIOGPUFamily.bundle. device info 292b = deviceInfo ivar layout (from the objc type string) + 56b features, only max shader version 3.1 set, rest left "undefined" so plugin defaults win. this is the pvg path reims eats, so it lines up with the display side.</p>
+      <span class="mono post-src">decisions.md:50</span>
+    </article>
+
+    <article class="post-card" id="kevent-ulock">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>two darling bugs on the way.</h3>
+      <p>kevent_qos with ERROR_EVENTS still let libkqueue poll real events into the spare slots then threw them away (EV_DISPATCH knote disarmed forever) -&gt; every darling-native mach source fired once then died. cap nevents to receipts. tiny kqtest repro proved it (2000 round trips now). then ulock_wait always returned 1 ("slow path hack"), apple pthread_dependency_wait_np traps on anything but 0, so count waiters per addr.</p>
+      <span class="mono post-src">decisions.md:49</span>
+    </article>
+
+    <article class="post-card" id="paravirt-display">
+      <span class="mono tag tag-display">display</span>
+      <h3>real ws display = vm paravirt path.</h3>
+      <p>IOMobileFramebuffer userland has a vm branch: /arm-io child with compatible "paravirtualizedgraphics,gpu" -&gt; AppleParavirtGPU DisplayPortCount -&gt; match IOMobileFramebuffer (AppleParavirtDisplay). iokitd fakes exactly that, mode/timing dicts shaped like stela's dcp modes.rs. tried the dcp/arm-io real-hw path first in my head, way more stuff, vm path is tiny.</p>
+      <span class="mono post-src">decisions.md:48</span>
+    </article>
+
+    <article class="post-card" id="dispatch-2bugs">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>libdispatch crashes were 2 bugs, not dispatch.</h3>
+      <p>(1) darling workloop emu had no owner tracking so a DISCOVER_OWNER thread request kept spawning threads that couldnt drain -&gt; wake/rearm spin 170/s. now owner is read from dq_state low bits, no thread while owned, END_OWNERSHIP restarts. (2) ds-exec turned xpac into an in-place `and`, wrong for bit-55 values, dispatch's -2 sentinel got mangled -&gt; its own autda check brk'd. xpac goes thru an island now (tbnz 55 / and / orr, no temps no flags).</p>
+      <span class="mono post-src">decisions.md:47</span>
+    </article>
+
+    <article class="post-card" id="real-ws">
+      <span class="mono tag tag-boot">boot</span>
+      <h3>switch to real windowserver (owner call).</h3>
+      <p>fake ws input on 27 stuck in skylight dispatch for days, real ws gets the protocol for free + reims-vgpu covers metal. spike: ws 27 runs under darling, needed sandbox op 4 allowed in mac_syscall, now dies at "IOMainPort failed" cuz aarch64 darling builds only cli (no iokitd). next is iokitd on arm + fake iomfb/hid user clients.</p>
+      <span class="mono post-src">decisions.md:44</span>
+    </article>
+
+    <article class="post-card" id="nsscreen">
+      <span class="mono tag tag-boot">boot</span>
+      <h3>nsscreen empty = 27 display-state layout.</h3>
+      <p>the 26.6 blob (438b) misparses under skylight 27 (header gained a flag+bool+count shift), so screens was 0 and windows collapsed to 1x28. swapped in a 27 blob (one 1920x1080 display, trimmed from the recorded reply): screens=1, visibleframe right, hello2 window drawn at 420x268.</p>
+      <span class="mono post-src">decisions.md:23–26</span>
+    </article>
+
+    <article class="post-card" id="sha3">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>eor3 sigill = host has no FEAT_SHA3.</h3>
+      <p>vimage/libcache keccak hits eor3 -&gt; native sigill on armv8.0 hosts. added sha3 eor3/bcax/rax1/xar to the trap path (same shape as the fp16 work, encodings from gnu as + real cache words).</p>
+      <span class="mono post-src">decisions.md:27–29</span>
+    </article>
+
+    <article class="post-card" id="fp16">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>fp16 on the trap path first.</h3>
+      <p>the inline version kept giving 1+1=1 lol. trap path is slow but correct, window first, speed later. later: rewrote build_inline_fp16's encodings (verified against llvm-mc). arithmetic in S precision to match both the host and the trap path's half conversions. NaN results need a canonical 0x7e00 fixup after s2h or results drifted.</p>
+      <span class="mono post-src">decisions.md:13, 18–21</span>
+    </article>
+
+    <article class="post-card" id="lzfse">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>don't patch data that lives in __text.</h3>
+      <p>lzfse keeps a mask table inside code, one entry looked like an fp16 instr and got patched -&gt; black window. current fix is a narrow rule (all-h31 fma = data). proper fix = only patch reachable code, todo. also found on the way: q8-q15 full save in the trampoline block — c abi only keeps the low half, handler was eating the top half.</p>
+      <span class="mono post-src">decisions.md:14–15</span>
+    </article>
+
+    <article class="post-card" id="ds-exec">
+      <span class="mono tag tag-kernel">kernel</span>
+      <h3>ds-exec instead of a full cpu emulator.</h3>
+      <p>host is armv8.0, apple code uses pac/lse/etc. patching just the missing instrs is way faster than qemu-user. qemu was the backup plan, never needed it. udot/sdot as inline neon, not traps — sqlite's checksum loop hammers it, trapping every time would be slow af. tried sysctl feature hiding first but the code doesnt even check, its unconditional.</p>
+      <span class="mono post-src">decisions.md:7–8</span>
+    </article>
+
+    <article class="post-card" id="ground-rules">
+      <span class="mono tag tag-rules">rules</span>
+      <h3>apple libs only from the 27 ipsw.</h3>
+      <p>tried reusing my 26.6 set once, nope. mixing versions = weird crashes later. no darling-built libdispatch/objc/cf — only kernel-ish shims get replaced. if apple code breaks, fix the emulation not the lib. real mach vouchers &gt; the empty-voucher hack: the hack worked for plutil but broke later stuff. did it properly once.</p>
+      <span class="mono post-src">decisions.md:5–6, 9</span>
+    </article>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div>
+      <p class="brand footer-brand">Day<span>Setta</span></p>
+      <p class="fine">The real macOS desktop on ARM Linux. No VM.<br>A personal project, for fun.</p>
+    </div>
+    <nav aria-label="footer">
+      <a href="../#how">how it works</a>
+      <a href="../#status">status</a>
+      <a href="../#roadmap">roadmap</a>
+      <a href="./">devlog</a>
+      <a href="https://github.com/ducminh1110/DaySetta">GitHub</a>
+    </nav>
+  </div>
+  <div class="wrap footer-legal">
+    <p>macOS is a trademark of Apple Inc. DaySetta is not affiliated with Apple.</p>
+    <p class="fine">Entries quoted from the project's devlog/decisions.md; raw logs in devlog/logs/.</p>
+  </div>
+</footer>
+
+<script src="../js/site.js" defer></script>
+</body>
+</html>
