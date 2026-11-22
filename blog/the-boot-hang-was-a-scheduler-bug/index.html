@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The boot hang was a scheduler bug · daysetta blog</title>
+<meta name="description" content="Most boots stalled before login. An A/B swap of one binary pointed at the exact function, and the fix was a single condition.">
+<meta property="og:title" content="The boot hang was a scheduler bug · daysetta blog">
+<meta property="og:description" content="Most boots stalled before login. An A/B swap of one binary pointed at the exact function, and the fix was a single condition.">
+<meta property="og:image" content="../../brand/lockup-horizontal-color.png">
+<meta name="theme-color" content="#F4EFE6">
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="icon" href="../../brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../../brand/app-icon-180.png">
+<link rel="alternate" type="application/rss+xml" title="daysetta blog" href="../../blog/feed.xml">
+<script>
+try {
+  var t = localStorage.getItem('ds-theme');
+  if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark';
+} catch (e) {}
+try {
+  if (sessionStorage.getItem('ds-seen')) document.documentElement.classList.add('seen');
+  sessionStorage.setItem('ds-seen', '1');
+} catch (e) {}
+</script>
+</head>
+<body>
+<div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="cursor" aria-hidden="true"><span>drag me</span></div><a class="skip" href="#main">skip to content</a>
+<header class="nav"><div class="wrap nav-in">
+  <a class="brand" href="../../" aria-label="daysetta home"><img class="lt" src="../../brand/lockup-small-color.svg" alt="daysetta" width="200" height="38"><img class="dk" src="../../brand/lockup-small-color-dark.svg" alt="" width="200" height="38"></a>
+  <nav class="nav-links" aria-label="main"><a href="../../#how">how it works</a><a href="../../#status">status</a><a href="../../docs/">docs</a><a href="../../blog/" aria-current="page">blog</a><a href="../../devlog/">devlog</a></nav>
+  <div class="nav-actions">
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="switch dark mode" aria-pressed="false">
+      <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="currentColor"/></svg>
+    </button>
+    <a class="btn btn-solid" href="https://github.com/ducminh1110/DaySetta">GitHub</a>
+  </div>
+</div></header>
+<main id="main"><article class="post wrap">
+  <header class="post-head">
+    <p class="post-meta" data-rv><span class="chip pink">blog</span><time datetime="2026-11-22">nov 22, 2026</time><span>2 min read</span></p>
+    <h1 data-split>The boot hang was a scheduler bug</h1>
+    <p class="lede" data-rv>Most boots stalled before login. An A/B swap of one binary pointed at the exact function, and the fix was a single condition.</p>
+    <p class="post-tags" data-rv><span class="chip">kernel</span><span class="chip">boot</span></p>
+  </header>
+  <div class="prose post-body" data-rv><p>While chasing the black screen, the boots themselves got worse: most of them stopped before login, stuck at <code>StartedAuthCopy</code> or <code>FinishLaunchingStart</code>. Out of 19 boots in a row, only 2 logged in.</p>
+<h2 id="following-the-stuck-message">Following the stuck message</h2>
+<p>The logs showed the chain. <code>loginwindow</code> asks the HI services daemon a small question about the caps-lock key and waits for the answer. To answer, that daemon opens a HID connection to WindowServer. WindowServer accepts the connection and replies. Then the daemon sends its next two messages into the fresh connection port, the sends succeed, and <strong>WindowServer never wakes up to read them.</strong> Everything else in WindowServer keeps running; only that one port goes deaf.</p>
+<p>That is a lost wakeup, the same family as bugs fixed earlier in the project, and those fixes were all still installed.</p>
+<h2 id="one-binary-two-versions">One binary, two versions</h2>
+<p>So instead of guessing, the boots ran an A/B test with only the <code>darlingserver</code> binary swapped:</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>darlingserver</th>
+<th>logged in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the older build</td>
+<td>6 / 10</td>
+</tr>
+<tr>
+<td>the current build</td>
+<td>2 / 19</td>
+</tr>
+</tbody>
+</table></div>
+<p>A function-by-function diff of the two binaries found exactly <strong>one</strong> functional change: <code>Thread::doWork</code>, the scheduler's resume path. An earlier fix for a resume racing a suspend set a "resume pending" marker unconditionally. A stray resume on a thread that was running, not parking, left the marker behind; a later genuine suspend ate it and skipped its park, and a blocking receive returned without ever waiting. A lost wakeup, manufactured by the fix for another lost wakeup.</p>
+<h2 id="the-fix">The fix</h2>
+<p>Only remember the pending resume when the thread is really parking:</p>
+<pre><code class="language-cpp">if (_running) {
+    // only when actually parking
+    if (_suspended) {
+        _resumePending = true;
+    }
+    ...
+}
+</code></pre>
+<p>A host test reproduces the poison red and goes green with the condition; the earlier park-race test still passes. On real boots, logins went from 2 / 19 to 4 / 10.</p>
+<h2 id="not-done-yet">Not done yet</h2>
+<p>About half the boots still hang, and this time it is not the port layer: port logging shows every message arriving and being read. In the stuck boots, a libdispatch event handler (a connection invalidation callback) simply never runs, so <code>loginwindow</code> waits forever on a semaphore nobody signals. That is the next hunt: the guest's workqueue emulation, where work gets queued but never executed.</p></div>
+  <footer class="post-end"><a class="btn btn-ghost" href="../../blog/">← all posts</a><a class="btn btn-solid" href="https://github.com/ducminh1110/DaySetta/tree/site/content/blog">write one →</a></footer>
+</article>
+<section class="wrap more-posts"><h2>more from the lab</h2><div class="cards"><a class="card c2" href="../../blog/chasing-a-black-screen/"><span class="tag">nov 22, 2026</span><h3>Chasing a black screen</h3><p>Login completes, every desktop agent runs, and every frame is black. Five rounds of digging later, the pixels turn out to never have been lost.</p></a></div></section>
+</main>
+<footer class="foot"><div class="wrap">
+  <p class="foot-word" aria-label="daysetta"><span style="--j:0">d</span><span style="--j:1">a</span><span style="--j:2">y</span><span style="--j:3">s</span><span style="--j:4">e</span><span style="--j:5">t</span><span style="--j:6">t</span><span style="--j:7">a</span></p>
+  <div class="foot-grid">
+    <p>the real macOS desktop on arm linux. no vm.<br>a personal project, for fun.</p>
+    <nav aria-label="footer"><a href="../../#how">how it works</a><a href="../../#status">status</a><a href="../../#roadmap">roadmap</a><a href="../../docs/">docs</a><a href="../../blog/">blog</a><a href="../../devlog/">devlog</a><a href="../../blog/feed.xml">rss</a><a href="https://github.com/ducminh1110/DaySetta">GitHub</a><a href="https://github.com/darlinghq/darling">Darling</a><a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a></nav>
+  </div>
+  <p class="legal">macOS is a trademark of Apple Inc. DaySetta is not affiliated with Apple. Built on Darling, reims-vgpu and metal2vulkan. No Apple artwork on this site.</p>
+</div></footer>
+<script src="../../js/vendor/lenis.min.js"></script>
+<script src="../../js/site.js"></script>
+</body>
+</html>

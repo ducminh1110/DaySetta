@@ -115,7 +115,62 @@
     targets.forEach(function (el) { io.observe(el); });
   }
 
+  // docs: highlight the section you are reading in the right-hand list
+  var tocLinks = document.querySelectorAll('.doc-toc a');
+  if (tocLinks.length && 'IntersectionObserver' in window) {
+    var tio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        tocLinks.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    document.querySelectorAll('.prose h2[id]').forEach(function (h) { tio.observe(h); });
+  }
+
   if (calm) return;
+
+  // smooth wheel scrolling on desktop; touch keeps native scrolling
+  var lenis = null;
+  if (fine && window.Lenis) {
+    lenis = new Lenis({ lerp: .1 });
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var t = a.getAttribute('href').length > 1 && document.querySelector(a.getAttribute('href'));
+        if (t) { e.preventDefault(); lenis.scrollTo(t, { offset: -90 }); }
+      });
+    });
+  }
+
+  // hero headline: every letter thins and lifts as the cursor comes near
+  var chars = [];
+  document.querySelectorAll('.hero h1 .w > span').forEach(function (sp) {
+    (function letterize(node) {
+      [].slice.call(node.childNodes).forEach(function (n) {
+        if (n.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          n.textContent.split('').forEach(function (c) {
+            var e = document.createElement('span'); e.className = 'ch'; e.textContent = c; frag.appendChild(e); chars.push(e);
+          });
+          node.replaceChild(frag, n);
+        } else letterize(n);
+      });
+    })(sp);
+  });
+
+  // tilt + glare on the solid blocks
+  if (fine) document.querySelectorAll('.card, .stat, .step, .box, .pn a').forEach(function (el) {
+    el.classList.add('tilt');
+    el.addEventListener('pointermove', function (e) {
+      if (el.hasAttribute('data-rv') && !el.classList.contains('in')) return;
+      var r = el.getBoundingClientRect(), px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      el.style.transition = 'transform .12s ease-out';
+      el.style.transform = 'perspective(900px) rotateX(' + ((.5 - py) * 9).toFixed(2) + 'deg) rotateY(' + ((px - .5) * 11).toFixed(2) + 'deg) translateZ(0)';
+      el.style.setProperty('--gx', (px * 100).toFixed(1) + '%'); el.style.setProperty('--gy', (py * 100).toFixed(1) + '%'); el.style.setProperty('--go', 1);
+    });
+    el.addEventListener('pointerleave', function () {
+      el.style.transition = 'transform .6s cubic-bezier(.2,.9,.25,1.15)'; el.style.transform = ''; el.style.setProperty('--go', 0);
+    });
+  });
 
   // ticker tapes: run on their own, speed up and flip with scroll
   var tracks = [].map.call(document.querySelectorAll('.band .track'), function (t, i) {
@@ -210,7 +265,8 @@
     pin.style.height = (innerHeight + Math.max(road.scrollWidth - innerWidth, 0)) + 'px';
   }
 
-  function frame() {
+  function frame(now) {
+    if (lenis) lenis.raf(now);
     var y = scrollY, h = root.scrollHeight - innerHeight;
     vel = vel * .8 + (y - lastY) * .2; lastY = y;
     if (bar) bar.style.setProperty('--p', h > 0 ? y / h : 0);
@@ -255,6 +311,16 @@
       var r = pin.getBoundingClientRect(), span = pin.offsetHeight - innerHeight;
       var t2 = clamp(-r.top / (span || 1), 0, 1);
       road.style.transform = 'translate3d(' + (-t2 * Math.max(0, road.scrollWidth - innerWidth)).toFixed(1) + 'px,0,0)';
+    }
+
+    if (chars.length && fine && mx > 0) {
+      var hb = hero.getBoundingClientRect();
+      if (hb.bottom > 0) chars.forEach(function (c) {
+        var r = c.getBoundingClientRect(), d = Math.hypot(r.left + r.width / 2 - mx, r.top + r.height / 2 - my);
+        var k = clamp(1 - d / 220, 0, 1);
+        c.style.setProperty('--wg', (700 - 300 * k).toFixed(0));
+        c.style.setProperty('--ly', (-10 * k).toFixed(1) + 'px');
+      });
     }
 
     if (cur && fine) {

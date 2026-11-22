@@ -1,6 +1,8 @@
 # builds index.html + devlog/index.html from the brand pieces. run: python3 tools/build.py
-import re, html, pathlib
+import os, re, sys, html, pathlib, datetime
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / ".pylib"))
+import markdown
 C = dict(ink="#111111", paper="#F4EFE6", ultra="#4B3CF5", ember="#FF6B2C", forest="#0F5C3A", lime="#E4FF7A",
          pink="#FF2E88", sun="#FFD23F", lilac="#C9A0DC", mint="#2AD18B", blush="#FFC7E8", wine="#7A1E2C")
 
@@ -79,11 +81,10 @@ ico = {
  "half":  svg("0 0 96 96", '<path fill="currentColor" d="M8 88A40 40 0 0 1 88 88Z"/><rect x="8" y="8" width="80" height="20" fill="currentColor"/>'),
 }
 
-def nav(prefix, current=""):
-    links = [("how it works", f"{prefix}#how"), ("status", f"{prefix}#status"), ("roadmap", f"{prefix}#roadmap"),
-             ("faq", f"{prefix}#faq"), ("devlog", f"{prefix}devlog/" if prefix == "./" else "./")]
+def nav(b, current=""):
+    links = [("how it works", f"{b}#how"), ("status", f"{b}#status"), ("docs", f"{b}docs/"),
+             ("blog", f"{b}blog/"), ("devlog", f"{b}devlog/")]
     a = "".join(f'<a href="{h}"{" aria-current=\"page\"" if t == current else ""}>{t}</a>' for t, h in links)
-    b = "./" if prefix == "./" else "../"
     return f'''<a class="skip" href="#main">skip to content</a>
 <header class="nav"><div class="wrap nav-in">
   <a class="brand" href="{b}" aria-label="daysetta home"><img class="lt" src="{b}brand/lockup-small-color.svg" alt="daysetta" width="200" height="38"><img class="dk" src="{b}brand/lockup-small-color-dark.svg" alt="" width="200" height="38"></a>
@@ -114,6 +115,7 @@ def head(title, desc, b):
 <link rel="icon" href="{b}brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="{b}brand/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="{b}brand/app-icon-180.png">
+<link rel="alternate" type="application/rss+xml" title="daysetta blog" href="{b}blog/feed.xml">
 <script>
 try {{
   var t = localStorage.getItem('ds-theme');
@@ -136,17 +138,23 @@ def foot(b):
   <p class="foot-word" aria-label="daysetta">{LETTERS}</p>
   <div class="foot-grid">
     <p>the real macOS desktop on arm linux. no vm.<br>a personal project, for fun.</p>
-    <nav aria-label="footer"><a href="{b}#how">how it works</a><a href="{b}#status">status</a><a href="{b}#roadmap">roadmap</a><a href="{b}devlog/">devlog</a><a href="https://github.com/ducminh1110/DaySetta">GitHub</a><a href="https://github.com/darlinghq/darling">Darling</a><a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a></nav>
+    <nav aria-label="footer"><a href="{b}#how">how it works</a><a href="{b}#status">status</a><a href="{b}#roadmap">roadmap</a><a href="{b}docs/">docs</a><a href="{b}blog/">blog</a><a href="{b}devlog/">devlog</a><a href="{b}blog/feed.xml">rss</a><a href="https://github.com/ducminh1110/DaySetta">GitHub</a><a href="https://github.com/darlinghq/darling">Darling</a><a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a></nav>
   </div>
   <p class="legal">macOS is a trademark of Apple Inc. DaySetta is not affiliated with Apple. Built on Darling, reims-vgpu and metal2vulkan. No Apple artwork on this site.</p>
 </div></footer>
+<script src="{b}js/vendor/lenis.min.js"></script>
 <script src="{b}js/site.js"></script>
 </body>
 </html>
 '''
 
 # devlog entries come from the old page (each one quotes ~/daysetta/devlog/decisions.md)
-DEC = pathlib.Path.home() / "daysetta/devlog/decisions.md"
+# the site keeps its own copy of the devlog so CI can build it; a local build refreshes it from the repo first
+DEC = ROOT / "content/devlog/decisions.md"
+LOCAL_DEC = pathlib.Path.home() / "daysetta/devlog/decisions.md"
+if LOCAL_DEC.exists():
+    DEC.parent.mkdir(parents=True, exist_ok=True)
+    DEC.write_text(LOCAL_DEC.read_text())
 TAGS = [("gpu", r"gpu|metal|iokit|reims|surface|shader|render|composite|vulkan|pvg|fence|uniform|colou?r|glyph"),
         ("input", r"\bhid|input|keyboard|mouse"),
         ("kernel", r"stall|wakeup|kevent|kqueue|kevmerge|mach|xnu|dserver|darlingserver|thread|ulock|dyld|exec|syscall|vm_|\bpac\b|\blse\b|knote"),
@@ -326,6 +334,118 @@ DEVLOG = head("devlog · daysetta", "Notes from the lab: the DaySetta devlog, qu
   <div class="log-list">{"".join(card(p, i=i) for i, p in enumerate(posts))}</div>
 </div></main>
 ''' + foot("../")
+
+SITE = "https://ducminh1110.github.io/DaySetta/"
+
+def read_md(path):
+    text = path.read_text()
+    meta = {}
+    m = re.match(r"---\n(.*?)\n---\n", text, re.S)
+    if m:
+        for line in m.group(1).splitlines():
+            k, _, v = line.partition(":")
+            meta[k.strip()] = v.strip()
+        text = text[m.end():]
+    md = markdown.Markdown(extensions=["tables", "fenced_code", "toc", "sane_lists"], extension_configs={"toc": {"permalink": False}})
+    body = md.convert(text)
+    body = body.replace("<table>", '<div class="tbl"><table>').replace("</table>", "</table></div>")
+    return meta, body, md.toc_tokens
+
+def words(h):
+    return len(re.sub(r"<[^>]+>", " ", h).split())
+
+DOCS = []
+for f in sorted((ROOT / "content/docs").glob("*.md")):
+    meta, body, toc = read_md(f)
+    DOCS.append((re.sub(r"^\d+-", "", f.stem), meta, body, toc))
+
+def docs_side(cur, b):
+    items = "".join(f'<li><a href="{b}docs/{slug}/"{" aria-current=\"page\"" if slug == cur else ""}><span>{i + 1:02d}</span>{html.escape(m["title"])}</a></li>'
+                    for i, (slug, m, _, _) in enumerate(DOCS))
+    return f'<nav class="doc-side" aria-label="docs"><p class="chip">docs</p><ol>{items}</ol></nav>'
+
+def write(rel, page):
+    out = ROOT / rel
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(page)
+
+for i, (slug, meta, body, toc) in enumerate(DOCS):
+    b = "../../"
+    prev_ = DOCS[i - 1] if i > 0 else None
+    next_ = DOCS[i + 1] if i + 1 < len(DOCS) else None
+    pn = ('<nav class="pn">' + (f'<a class="pn-prev" href="{b}docs/{prev_[0]}/"><span>previous</span>{prev_[1]["title"]}</a>' if prev_ else "<span></span>")
+          + (f'<a class="pn-next" href="{b}docs/{next_[0]}/"><span>next</span>{next_[1]["title"]}</a>' if next_ else "") + "</nav>")
+    onpage = "".join(f'<li><a href="#{t["id"]}">{t["name"]}</a></li>' for t in toc if t["level"] == 2 for _ in [0]) or ""
+    toc_html = f'<aside class="doc-toc"><p>on this page</p><ol>{onpage}</ol></aside>' if onpage else '<aside class="doc-toc"></aside>'
+    write(f"docs/{slug}/index.html", head(f"{meta['title']} · daysetta docs", meta.get("summary", ""), b) + nav(b, "docs") + f'''
+<main id="main"><div class="wrap doc-grid">
+  {docs_side(slug, b)}
+  <article class="doc">
+    <p class="chip lime" data-rv>docs · {i + 1:02d}</p>
+    <h1 data-split>{html.escape(meta["title"])}</h1>
+    <p class="lede" data-rv>{html.escape(meta.get("summary", ""))}</p>
+    <div class="prose" data-rv>{body}</div>
+    {pn}
+  </article>
+  {toc_html}
+</div></main>
+''' + foot(b))
+
+DOC_CARDS = "".join(f'<a class="card c{i % 6 + 1}" href="{slug}/" data-rv="drop"><span class="tag">{i + 1:02d}</span><h3>{html.escape(m["title"])}</h3><p>{html.escape(m.get("summary", ""))}</p><span class="src">read →</span></a>'
+                    for i, (slug, m, _, _) in enumerate(DOCS))
+write("docs/index.html", head("docs · daysetta", "How DaySetta works, what it needs, and how the project is run.", "../") + nav("../", "docs") + f'''
+<main id="main"><div class="wrap">
+  <div class="page-head"><span class="chip lime" data-rv>the manual</span><h1 data-split>docs.</h1><p class="lede" data-rv>How DaySetta is put together, what it runs on, and the rules it is built by. Short pages, no fluff, every fact from the repo.</p></div>
+  <div class="cards docs-cards">{DOC_CARDS}</div>
+</div></main>
+''' + foot("../"))
+
+POSTS = []
+for f in sorted((ROOT / "content/blog").glob("*.md"), reverse=True):
+    m = re.match(r"(\d{4}-\d{2}-\d{2})-(.+)", f.stem)
+    if not m:
+        continue
+    meta, body, _ = read_md(f)
+    POSTS.append((m.group(2), datetime.date.fromisoformat(m.group(1)), meta, body))
+
+def nice(d):
+    return d.strftime("%b %-d, %Y").lower()
+
+for i, (slug, d, meta, body) in enumerate(POSTS):
+    b = "../../"
+    tags = "".join(f'<span class="chip">{html.escape(t.strip())}</span>' for t in meta.get("tags", "").split(",") if t.strip())
+    mins = max(1, round(words(body) / 220))
+    more = "".join(f'<a class="card c{j % 6 + 1}" href="{b}blog/{s2}/"><span class="tag">{nice(d2)}</span><h3>{html.escape(m2["title"])}</h3><p>{html.escape(m2.get("summary", ""))}</p></a>'
+                   for j, (s2, d2, m2, _) in enumerate(POSTS) if s2 != slug)[:3000]
+    write(f"blog/{slug}/index.html", head(f"{meta['title']} · daysetta blog", meta.get("summary", ""), b) + nav(b, "blog") + f'''
+<main id="main"><article class="post wrap">
+  <header class="post-head">
+    <p class="post-meta" data-rv><span class="chip pink">blog</span><time datetime="{d.isoformat()}">{nice(d)}</time><span>{mins} min read</span></p>
+    <h1 data-split>{html.escape(meta["title"])}</h1>
+    <p class="lede" data-rv>{html.escape(meta.get("summary", ""))}</p>
+    <p class="post-tags" data-rv>{tags}</p>
+  </header>
+  <div class="prose post-body" data-rv>{body}</div>
+  <footer class="post-end"><a class="btn btn-ghost" href="{b}blog/">← all posts</a><a class="btn btn-solid" href="https://github.com/ducminh1110/DaySetta/tree/site/content/blog">write one →</a></footer>
+</article>
+{f'<section class="wrap more-posts"><h2>more from the lab</h2><div class="cards">{more}</div></section>' if more else ''}
+</main>
+''' + foot(b))
+
+BLOG_CARDS = "".join(f'<a class="card post-card c{i % 6 + 1}" href="{slug}/" data-rv="drop"><span class="tag">{nice(d)}</span><h3>{html.escape(m["title"])}</h3><p>{html.escape(m.get("summary", ""))}</p><span class="src">{max(1, round(words(bd) / 220))} min read →</span></a>'
+                     for i, (slug, d, m, bd) in enumerate(POSTS))
+write("blog/index.html", head("blog · daysetta", "Longer stories from building DaySetta: the bugs, the dead ends, the fixes.", "../") + nav("../", "blog") + f'''
+<main id="main"><div class="wrap">
+  <div class="page-head"><span class="chip pink" data-rv>stories from the lab</span><h1 data-split>blog.</h1><p class="lede" data-rv>The devlog is one line per decision. These are the longer stories behind them. Written in markdown, straight in the repo. <a href="feed.xml">RSS</a></p></div>
+  <div class="cards blog-cards">{BLOG_CARDS}</div>
+</div></main>
+''' + foot("../"))
+
+items = "".join(f"""<item><title>{html.escape(m["title"])}</title><link>{SITE}blog/{slug}/</link><guid>{SITE}blog/{slug}/</guid><pubDate>{datetime.datetime(d.year, d.month, d.day, 12, tzinfo=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")}</pubDate><description>{html.escape(m.get("summary", ""))}</description></item>"""
+                for slug, d, m, _ in POSTS)
+write("blog/feed.xml", f"""<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"><channel><title>daysetta blog</title><link>{SITE}blog/</link><description>Stories from building DaySetta: the real macOS desktop on ARM Linux, no VM.</description><language>en</language>{items}</channel></rss>
+""")
 
 (ROOT / "index.html").write_text(INDEX)
 (ROOT / "devlog/index.html").write_text(DEVLOG)

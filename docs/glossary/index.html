@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossary · daysetta docs</title>
+<meta name="description" content="The words that show up in the devlog.">
+<meta property="og:title" content="Glossary · daysetta docs">
+<meta property="og:description" content="The words that show up in the devlog.">
+<meta property="og:image" content="../../brand/lockup-horizontal-color.png">
+<meta name="theme-color" content="#F4EFE6">
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="icon" href="../../brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../../brand/app-icon-180.png">
+<link rel="alternate" type="application/rss+xml" title="daysetta blog" href="../../blog/feed.xml">
+<script>
+try {
+  var t = localStorage.getItem('ds-theme');
+  if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark';
+} catch (e) {}
+try {
+  if (sessionStorage.getItem('ds-seen')) document.documentElement.classList.add('seen');
+  sessionStorage.setItem('ds-seen', '1');
+} catch (e) {}
+</script>
+</head>
+<body>
+<div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="cursor" aria-hidden="true"><span>drag me</span></div><a class="skip" href="#main">skip to content</a>
+<header class="nav"><div class="wrap nav-in">
+  <a class="brand" href="../../" aria-label="daysetta home"><img class="lt" src="../../brand/lockup-small-color.svg" alt="daysetta" width="200" height="38"><img class="dk" src="../../brand/lockup-small-color-dark.svg" alt="" width="200" height="38"></a>
+  <nav class="nav-links" aria-label="main"><a href="../../#how">how it works</a><a href="../../#status">status</a><a href="../../docs/" aria-current="page">docs</a><a href="../../blog/">blog</a><a href="../../devlog/">devlog</a></nav>
+  <div class="nav-actions">
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="switch dark mode" aria-pressed="false">
+      <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="currentColor"/></svg>
+    </button>
+    <a class="btn btn-solid" href="https://github.com/ducminh1110/DaySetta">GitHub</a>
+  </div>
+</div></header>
+<main id="main"><div class="wrap doc-grid">
+  <nav class="doc-side" aria-label="docs"><p class="chip">docs</p><ol><li><a href="../../docs/introduction/"><span>01</span>Introduction</a></li><li><a href="../../docs/how-it-works/"><span>02</span>How it works</a></li><li><a href="../../docs/requirements/"><span>03</span>Requirements</a></li><li><a href="../../docs/repo-tour/"><span>04</span>Repo tour</a></li><li><a href="../../docs/principles/"><span>05</span>Principles</a></li><li><a href="../../docs/glossary/" aria-current="page"><span>06</span>Glossary</a></li><li><a href="../../docs/write-a-post/"><span>07</span>Writing a blog post</a></li></ol></nav>
+  <article class="doc">
+    <p class="chip lime" data-rv>docs · 06</p>
+    <h1 data-split>Glossary</h1>
+    <p class="lede" data-rv>The words that show up in the devlog.</p>
+    <div class="prose" data-rv><div class="tbl"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>arm64e</strong></td>
+<td>Apple's ARM64 ABI with pointer authentication. macOS 27 userland is built for it</td>
+</tr>
+<tr>
+<td><strong>PAC</strong></td>
+<td>Pointer Authentication Codes: signed pointers checked by special instructions. Emulated on ARMv8.0</td>
+</tr>
+<tr>
+<td><strong>LSE</strong></td>
+<td>Large System Extensions: ARMv8.1 atomic instructions. Emulated on ARMv8.0</td>
+</tr>
+<tr>
+<td><strong>IPSW</strong></td>
+<td>Apple's firmware/restore image; the source of every Apple binary DaySetta uses</td>
+</tr>
+<tr>
+<td><strong>dyld shared cache</strong></td>
+<td>One big file holding most system frameworks, pre-linked</td>
+</tr>
+<tr>
+<td><strong>Darling</strong></td>
+<td>A Darwin/macOS compatibility layer for Linux; DaySetta's kernel floor</td>
+</tr>
+<tr>
+<td><strong>darlingserver</strong></td>
+<td>Darling's userspace XNU: Mach ports, IPC and threads live here</td>
+</tr>
+<tr>
+<td><strong>XNU</strong></td>
+<td>The macOS kernel. DaySetta targets xnu-12377 (macOS 27)</td>
+</tr>
+<tr>
+<td><strong>Mach port</strong></td>
+<td>A kernel endpoint for messages, with send/receive rights</td>
+</tr>
+<tr>
+<td><strong>MIG</strong></td>
+<td>Mach Interface Generator: turns interface definitions into message stubs</td>
+</tr>
+<tr>
+<td><strong>XPC</strong></td>
+<td>Apple's higher-level IPC on top of Mach, used by most daemons</td>
+</tr>
+<tr>
+<td><strong>launchd</strong></td>
+<td>The process that starts and looks up every service</td>
+</tr>
+<tr>
+<td><strong>libdispatch</strong></td>
+<td>Grand Central Dispatch: queues, workloops and event sources</td>
+</tr>
+<tr>
+<td><strong>kevent / workloop</strong></td>
+<td>The kernel event mechanism libdispatch waits on</td>
+</tr>
+<tr>
+<td><strong>WindowServer</strong></td>
+<td>The macOS compositor and window manager process</td>
+</tr>
+<tr>
+<td><strong>SkyLight</strong></td>
+<td>The private framework behind the WindowServer protocol</td>
+</tr>
+<tr>
+<td><strong>CoreAnimation</strong></td>
+<td>The layer tree and renderer apps and WindowServer use to draw</td>
+</tr>
+<tr>
+<td><strong>IOSurface</strong></td>
+<td>Shared GPU-backed image memory between processes</td>
+</tr>
+<tr>
+<td><strong>IOMobileFramebuffer</strong></td>
+<td>The display driver interface WindowServer presents frames through</td>
+</tr>
+<tr>
+<td><strong>AppleParavirtGPU</strong></td>
+<td>Apple's paravirtual GPU, the device a macOS VM sees; DaySetta impersonates it</td>
+</tr>
+<tr>
+<td><strong>iokitd</strong></td>
+<td>DaySetta's userspace stand-in for the kexts</td>
+</tr>
+<tr>
+<td><strong>reims-vgpu</strong></td>
+<td>The paravirtual GPU device that runs the guest's Metal work on Vulkan</td>
+</tr>
+<tr>
+<td><strong>metal2vulkan</strong></td>
+<td>The translator from Metal shaders and commands to Vulkan</td>
+</tr>
+<tr>
+<td><strong>llvmpipe</strong></td>
+<td>Mesa's CPU Vulkan driver, used when there is no GPU</td>
+</tr>
+</tbody>
+</table></div></div>
+    <nav class="pn"><a class="pn-prev" href="../../docs/principles/"><span>previous</span>Principles</a><a class="pn-next" href="../../docs/write-a-post/"><span>next</span>Writing a blog post</a></nav>
+  </article>
+  <aside class="doc-toc"></aside>
+</div></main>
+<footer class="foot"><div class="wrap">
+  <p class="foot-word" aria-label="daysetta"><span style="--j:0">d</span><span style="--j:1">a</span><span style="--j:2">y</span><span style="--j:3">s</span><span style="--j:4">e</span><span style="--j:5">t</span><span style="--j:6">t</span><span style="--j:7">a</span></p>
+  <div class="foot-grid">
+    <p>the real macOS desktop on arm linux. no vm.<br>a personal project, for fun.</p>
+    <nav aria-label="footer"><a href="../../#how">how it works</a><a href="../../#status">status</a><a href="../../#roadmap">roadmap</a><a href="../../docs/">docs</a><a href="../../blog/">blog</a><a href="../../devlog/">devlog</a><a href="../../blog/feed.xml">rss</a><a href="https://github.com/ducminh1110/DaySetta">GitHub</a><a href="https://github.com/darlinghq/darling">Darling</a><a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a></nav>
+  </div>
+  <p class="legal">macOS is a trademark of Apple Inc. DaySetta is not affiliated with Apple. Built on Darling, reims-vgpu and metal2vulkan. No Apple artwork on this site.</p>
+</div></footer>
+<script src="../../js/vendor/lenis.min.js"></script>
+<script src="../../js/site.js"></script>
+</body>
+</html>

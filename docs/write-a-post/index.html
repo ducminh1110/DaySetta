@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing a blog post · daysetta docs</title>
+<meta name="description" content="Posts are markdown files in the site branch. Push, and the site rebuilds itself.">
+<meta property="og:title" content="Writing a blog post · daysetta docs">
+<meta property="og:description" content="Posts are markdown files in the site branch. Push, and the site rebuilds itself.">
+<meta property="og:image" content="../../brand/lockup-horizontal-color.png">
+<meta name="theme-color" content="#F4EFE6">
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="icon" href="../../brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../../brand/app-icon-180.png">
+<link rel="alternate" type="application/rss+xml" title="daysetta blog" href="../../blog/feed.xml">
+<script>
+try {
+  var t = localStorage.getItem('ds-theme');
+  if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark';
+} catch (e) {}
+try {
+  if (sessionStorage.getItem('ds-seen')) document.documentElement.classList.add('seen');
+  sessionStorage.setItem('ds-seen', '1');
+} catch (e) {}
+</script>
+</head>
+<body>
+<div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="cursor" aria-hidden="true"><span>drag me</span></div><a class="skip" href="#main">skip to content</a>
+<header class="nav"><div class="wrap nav-in">
+  <a class="brand" href="../../" aria-label="daysetta home"><img class="lt" src="../../brand/lockup-small-color.svg" alt="daysetta" width="200" height="38"><img class="dk" src="../../brand/lockup-small-color-dark.svg" alt="" width="200" height="38"></a>
+  <nav class="nav-links" aria-label="main"><a href="../../#how">how it works</a><a href="../../#status">status</a><a href="../../docs/" aria-current="page">docs</a><a href="../../blog/">blog</a><a href="../../devlog/">devlog</a></nav>
+  <div class="nav-actions">
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="switch dark mode" aria-pressed="false">
+      <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="currentColor"/></svg>
+    </button>
+    <a class="btn btn-solid" href="https://github.com/ducminh1110/DaySetta">GitHub</a>
+  </div>
+</div></header>
+<main id="main"><div class="wrap doc-grid">
+  <nav class="doc-side" aria-label="docs"><p class="chip">docs</p><ol><li><a href="../../docs/introduction/"><span>01</span>Introduction</a></li><li><a href="../../docs/how-it-works/"><span>02</span>How it works</a></li><li><a href="../../docs/requirements/"><span>03</span>Requirements</a></li><li><a href="../../docs/repo-tour/"><span>04</span>Repo tour</a></li><li><a href="../../docs/principles/"><span>05</span>Principles</a></li><li><a href="../../docs/glossary/"><span>06</span>Glossary</a></li><li><a href="../../docs/write-a-post/" aria-current="page"><span>07</span>Writing a blog post</a></li></ol></nav>
+  <article class="doc">
+    <p class="chip lime" data-rv>docs · 07</p>
+    <h1 data-split>Writing a blog post</h1>
+    <p class="lede" data-rv>Posts are markdown files in the site branch. Push, and the site rebuilds itself.</p>
+    <div class="prose" data-rv><p>The site source lives in the <strong><code>site</code></strong> branch of the DaySetta repo. Every push to that branch runs a GitHub Action (<code>.github/workflows/pages.yml</code>) that rebuilds the site and publishes it to GitHub Pages. You can also run it by hand from the Actions tab ("build site" → Run workflow). The devlog page is built from the copy of <code>devlog/decisions.md</code> kept in <code>content/devlog/</code>.</p>
+<h2 id="add-a-post">Add a post</h2>
+<ol>
+<li>Open the <code>site</code> branch on GitHub and go to <code>content/blog/</code>.</li>
+<li>Create a file named <code>YYYY-MM-DD-short-slug.md</code>, for example <code>2026-11-30-first-light.md</code>.</li>
+<li>Start it with a front matter block, then write markdown:</li>
+</ol>
+<pre><code>---
+title: First light
+summary: One sentence that shows on the blog index.
+tags: gpu, milestone
+---
+Your post in **markdown**. Code blocks, tables, links and images work.
+</code></pre>
+<ol start="4">
+<li>Commit. About a minute later the post is live at <code>/blog/short-slug/</code> and in the RSS feed.</li>
+</ol>
+<h2 id="images">Images</h2>
+<p>Put images in <code>content/blog/img/</code> and link them as <code>![alt text](img/name.png)</code>. Keep them small (webp, under ~300 KB).</p>
+<h2 id="house-rules">House rules</h2>
+<ul>
+<li>Truth only: every claim should be backed by the devlog, a log line or a commit.</li>
+<li>No fake screenshots of a macOS desktop. When there is a real one, it will be the best post on this blog.</li>
+<li>No Apple logos or artwork.</li>
+</ul></div>
+    <nav class="pn"><a class="pn-prev" href="../../docs/glossary/"><span>previous</span>Glossary</a></nav>
+  </article>
+  <aside class="doc-toc"><p>on this page</p><ol><li><a href="#add-a-post">Add a post</a></li><li><a href="#images">Images</a></li><li><a href="#house-rules">House rules</a></li></ol></aside>
+</div></main>
+<footer class="foot"><div class="wrap">
+  <p class="foot-word" aria-label="daysetta"><span style="--j:0">d</span><span style="--j:1">a</span><span style="--j:2">y</span><span style="--j:3">s</span><span style="--j:4">e</span><span style="--j:5">t</span><span style="--j:6">t</span><span style="--j:7">a</span></p>
+  <div class="foot-grid">
+    <p>the real macOS desktop on arm linux. no vm.<br>a personal project, for fun.</p>
+    <nav aria-label="footer"><a href="../../#how">how it works</a><a href="../../#status">status</a><a href="../../#roadmap">roadmap</a><a href="../../docs/">docs</a><a href="../../blog/">blog</a><a href="../../devlog/">devlog</a><a href="../../blog/feed.xml">rss</a><a href="https://github.com/ducminh1110/DaySetta">GitHub</a><a href="https://github.com/darlinghq/darling">Darling</a><a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a></nav>
+  </div>
+  <p class="legal">macOS is a trademark of Apple Inc. DaySetta is not affiliated with Apple. Built on Darling, reims-vgpu and metal2vulkan. No Apple artwork on this site.</p>
+</div></footer>
+<script src="../../js/vendor/lenis.min.js"></script>
+<script src="../../js/site.js"></script>
+</body>
+</html>

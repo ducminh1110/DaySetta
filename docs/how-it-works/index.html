@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works · daysetta docs</title>
+<meta name="description" content="Five floors. Each one pretends to be what the floor above expects.">
+<meta property="og:title" content="How it works · daysetta docs">
+<meta property="og:description" content="Five floors. Each one pretends to be what the floor above expects.">
+<meta property="og:image" content="../../brand/lockup-horizontal-color.png">
+<meta name="theme-color" content="#F4EFE6">
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="icon" href="../../brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../../brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="../../brand/app-icon-180.png">
+<link rel="alternate" type="application/rss+xml" title="daysetta blog" href="../../blog/feed.xml">
+<script>
+try {
+  var t = localStorage.getItem('ds-theme');
+  if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark';
+} catch (e) {}
+try {
+  if (sessionStorage.getItem('ds-seen')) document.documentElement.classList.add('seen');
+  sessionStorage.setItem('ds-seen', '1');
+} catch (e) {}
+</script>
+</head>
+<body>
+<div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="cursor" aria-hidden="true"><span>drag me</span></div><a class="skip" href="#main">skip to content</a>
+<header class="nav"><div class="wrap nav-in">
+  <a class="brand" href="../../" aria-label="daysetta home"><img class="lt" src="../../brand/lockup-small-color.svg" alt="daysetta" width="200" height="38"><img class="dk" src="../../brand/lockup-small-color-dark.svg" alt="" width="200" height="38"></a>
+  <nav class="nav-links" aria-label="main"><a href="../../#how">how it works</a><a href="../../#status">status</a><a href="../../docs/" aria-current="page">docs</a><a href="../../blog/">blog</a><a href="../../devlog/">devlog</a></nav>
+  <div class="nav-actions">
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="switch dark mode" aria-pressed="false">
+      <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="currentColor"/></svg>
+      <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="currentColor"/></svg>
+    </button>
+    <a class="btn btn-solid" href="https://github.com/ducminh1110/DaySetta">GitHub</a>
+  </div>
+</div></header>
+<main id="main"><div class="wrap doc-grid">
+  <nav class="doc-side" aria-label="docs"><p class="chip">docs</p><ol><li><a href="../../docs/introduction/"><span>01</span>Introduction</a></li><li><a href="../../docs/how-it-works/" aria-current="page"><span>02</span>How it works</a></li><li><a href="../../docs/requirements/"><span>03</span>Requirements</a></li><li><a href="../../docs/repo-tour/"><span>04</span>Repo tour</a></li><li><a href="../../docs/principles/"><span>05</span>Principles</a></li><li><a href="../../docs/glossary/"><span>06</span>Glossary</a></li><li><a href="../../docs/write-a-post/"><span>07</span>Writing a blog post</a></li></ol></nav>
+  <article class="doc">
+    <p class="chip lime" data-rv>docs · 02</p>
+    <h1 data-split>How it works</h1>
+    <p class="lede" data-rv>Five floors. Each one pretends to be what the floor above expects.</p>
+    <div class="prose" data-rv><p>macOS userland expects Apple hardware and the XNU kernel. DaySetta keeps the userland real and replaces every layer underneath it.</p>
+<pre><code> macOS 27 arm64e userland (real binaries from the IPSW)
+   WindowServer · AppKit apps · launchd daemons
+            │  Mach / XPC / IOKit
+ Darling     │  userspace XNU (darlingserver), dyld, libsystem_kernel
+ iokitd      │  plays the kexts in userspace
+ reims-vgpu  │  paravirt GPU device -&gt; metal2vulkan -&gt; Vulkan
+            │  syscalls
+ Linux aarch64 (ARMv8.0, no PAC/LSE -&gt; emulated in src/exec)
+</code></pre>
+<h2 id="01-linux-aarch64">01 · Linux aarch64</h2>
+<p>The reference host is a plain <strong>ARMv8.0</strong> machine. macOS 27 is built for <strong>arm64e</strong>, which uses pointer authentication (PAC) and LSE atomics. The host has neither, so <code>src/exec</code> lowers those instructions at runtime instead of running a full CPU emulator.</p>
+<h2 id="02-reims-vgpu">02 · reims-vgpu</h2>
+<p>The guest's Metal command buffers go to <a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a>, a paravirtual GPU device, and get translated to <strong>Vulkan</strong> through metal2vulkan. Metal itself stays Apple's own driver. On a box without a GPU, Vulkan falls back to llvmpipe, so it is slow.</p>
+<h2 id="03-iokitd">03 · iokitd</h2>
+<p>There are no kexts. <code>iokitd</code> answers their <strong>user clients</strong> instead: IOMobileFramebuffer, AppleParavirtGPU (IOGPU), IOSurface and IOHID. WindowServer thinks it is talking to Apple's paravirtual display and GPU, the same path a macOS VM would see.</p>
+<h2 id="04-darling">04 · Darling</h2>
+<p><a href="https://github.com/darlinghq/darling">Darling</a> provides the kernel that isn't: a userspace XNU (<code>darlingserver</code>), dyld and <code>libsystem_kernel</code>, ported up to <strong>xnu-12377</strong>, the macOS 27 kernel. It answers Mach traps and syscalls so Apple's libraries never notice they are on Linux.</p>
+<h2 id="05-macos-27-userland">05 · macOS 27 userland</h2>
+<p>Real arm64e binaries from your own macOS 27 IPSW: WindowServer, SkyLight, AppKit apps and the launchd daemons, unmodified.</p>
+<h2 id="a-boot-end-to-end">A boot, end to end</h2>
+<ol>
+<li>Darling starts <code>launchd</code>, which brings up the daemons (notifyd, cfprefsd, opendirectoryd, runningboardd, ColorSync, launchservicesd…).</li>
+<li>WindowServer opens the fake display through <code>iokitd</code> and starts compositing through the Metal driver.</li>
+<li><code>loginwindow</code> walks its login states, authenticates, and launches the desktop agents.</li>
+<li>Every frame WindowServer composites goes through reims-vgpu to Vulkan and back to the display.</li>
+</ol>
+<p>Today step 3 completes, step 4 produces frames, and those frames are black. That is the current fight.</p></div>
+    <nav class="pn"><a class="pn-prev" href="../../docs/introduction/"><span>previous</span>Introduction</a><a class="pn-next" href="../../docs/requirements/"><span>next</span>Requirements</a></nav>
+  </article>
+  <aside class="doc-toc"><p>on this page</p><ol><li><a href="#01-linux-aarch64">01 · Linux aarch64</a></li><li><a href="#02-reims-vgpu">02 · reims-vgpu</a></li><li><a href="#03-iokitd">03 · iokitd</a></li><li><a href="#04-darling">04 · Darling</a></li><li><a href="#05-macos-27-userland">05 · macOS 27 userland</a></li><li><a href="#a-boot-end-to-end">A boot, end to end</a></li></ol></aside>
+</div></main>
+<footer class="foot"><div class="wrap">
+  <p class="foot-word" aria-label="daysetta"><span style="--j:0">d</span><span style="--j:1">a</span><span style="--j:2">y</span><span style="--j:3">s</span><span style="--j:4">e</span><span style="--j:5">t</span><span style="--j:6">t</span><span style="--j:7">a</span></p>
+  <div class="foot-grid">
+    <p>the real macOS desktop on arm linux. no vm.<br>a personal project, for fun.</p>
+    <nav aria-label="footer"><a href="../../#how">how it works</a><a href="../../#status">status</a><a href="../../#roadmap">roadmap</a><a href="../../docs/">docs</a><a href="../../blog/">blog</a><a href="../../devlog/">devlog</a><a href="../../blog/feed.xml">rss</a><a href="https://github.com/ducminh1110/DaySetta">GitHub</a><a href="https://github.com/darlinghq/darling">Darling</a><a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a></nav>
+  </div>
+  <p class="legal">macOS is a trademark of Apple Inc. DaySetta is not affiliated with Apple. Built on Darling, reims-vgpu and metal2vulkan. No Apple artwork on this site.</p>
+</div></footer>
+<script src="../../js/vendor/lenis.min.js"></script>
+<script src="../../js/site.js"></script>
+</body>
+</html>
