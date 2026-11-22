@@ -260,7 +260,8 @@
 
   function layoutPin() {
     if (!pin) return;
-    if (!wide.matches) { pin.classList.remove('pinned'); pin.style.height = ''; road.style.transform = ''; return; }
+    // only pin when the cards fit the screen; short windows get the plain grid
+    if (!wide.matches || innerHeight < 700) { pin.classList.remove('pinned'); pin.style.height = ''; road.style.transform = ''; return; }
     pin.classList.add('pinned');
     pin.style.height = (innerHeight + Math.max(road.scrollWidth - innerWidth, 0)) + 'px';
   }

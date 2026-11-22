@@ -229,8 +229,11 @@ p { margin: 0; }
 .road-pin.pinned { padding: 0; }
 .road-pin.pinned .road-stick { position: sticky; top: 76px; height: calc(100vh - 76px); display: flex; flex-direction: column; justify-content: center; }
 .road-pin.pinned .road { display: flex; width: max-content; max-width: none; padding: 0 max(24px, calc((100vw - 1320px) / 2 + 24px)); will-change: transform; }
-.road-pin.pinned .step { width: min(420px, 34vw); min-height: 440px; flex: none; }
-.road-pin.pinned .step h3 { font-size: 36px; }
+.road-pin.pinned .road-view { flex: none; }
+.road-pin.pinned .road-head { margin-bottom: 28px; }
+.road-pin.pinned .road-head h2 { font-size: clamp(40px, min(5.6vw, 8vh), 88px); }
+.road-pin.pinned .step { width: min(420px, 34vw); min-height: clamp(300px, calc(100vh - 430px), 440px); flex: none; }
+.road-pin.pinned .step h3 { font-size: clamp(26px, 3.4vh, 36px); }
 
 /* faq: an ultra band with torn edges, the answer pinned on as a paper note */
 .faq { background: var(--ultra); color: #fff; margin: 80px 0; padding: 70px 0; }
