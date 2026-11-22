@@ -60,9 +60,9 @@ def cut(vb, body):
 collage = (
     piece(6, 6, 78, .15, -3, f'<div class="sheet" style="clip-path:{torn(3)};background:#FFF8EA;aspect-ratio:1/1.02"></div>', "back", None, 0)
   + piece(40, 44, 56, .3, 7, f'<div class="sheet" style="clip-path:{torn(9)};background:var(--lilac);aspect-ratio:1.1/1"></div>', "back", None, 80)
-  + piece(12, 14, 20, .55, -7, cut("0 0 64 192", '<rect x="0" y="0" width="64" height="192" fill="#4B3CF5"/>' + checker(0, 0, 2, 2, 32, "#4B3CF5", "#E4FF7A")), "", -4, 160)
-  + piece(30, 8, 42, .85, 9, cut("0 0 96 96", quarter(0, 96, 96, "#FF6B2C", 0)), "", None, 260)
-  + piece(36, 46, 40, .7, -5, cut("0 0 96 96", quarter(0, 0, 96, "#E4FF7A", 1) + rings(0, 0, 96, "#0F5C3A", 3)), "", 6, 340)
+  + piece(12, 14, 20, .55, -7, cut("0 0 64 192", '<rect x="0" y="0" width="64" height="192" fill="#4B3CF5"/>' + checker(0, 0, 2, 2, 32, "#4B3CF5", "#E4FF7A")), "k-stem", -4, 160)
+  + piece(30, 8, 42, .85, 9, cut("0 0 96 96", quarter(0, 96, 96, "#FF6B2C", 0)), "k-sun", None, 260)
+  + piece(36, 46, 40, .7, -5, cut("0 0 96 96", quarter(0, 0, 96, "#E4FF7A", 1) + rings(0, 0, 96, "#0F5C3A", 3)), "k-rings", 6, 340)
   + piece(72, 4, 20, 1.2, 0, cut("0 0 40 40", '<circle cx="20" cy="20" r="20" fill="#FF2E88"/>'), "", None, 420)
   + piece(74, 66, 18, 1, 11, cut("0 0 90 90", checker(0, 0, 3, 3, 30, "#111111", "#F4EFE6")), "", -8, 500)
   + piece(6, 74, 12, 1.4, 0, cut("0 0 40 40", '<circle cx="20" cy="20" r="20" fill="#FFD23F"/>'), "", None, 560)
@@ -119,13 +119,21 @@ try {{
   var t = localStorage.getItem('ds-theme');
   if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.theme = 'dark';
 }} catch (e) {{}}
+try {{
+  if (sessionStorage.getItem('ds-seen')) document.documentElement.classList.add('seen');
+  sessionStorage.setItem('ds-seen', '1');
+}} catch (e) {{}}
 </script>
 </head>
-<body>'''
+<body>
+<div class="curtain" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="cursor" aria-hidden="true"><span>drag me</span></div>'''
+
+LETTERS = "".join(f'<span style="--j:{j}">{c}</span>' for j, c in enumerate("daysetta"))
 
 def foot(b):
     return f'''<footer class="foot"><div class="wrap">
-  <img class="foot-word" data-rv="rise" src="{b}brand/wordmark-white.svg" alt="daysetta" width="948" height="305">
+  <p class="foot-word" aria-label="daysetta">{LETTERS}</p>
   <div class="foot-grid">
     <p>the real macOS desktop on arm linux. no vm.<br>a personal project, for fun.</p>
     <nav aria-label="footer"><a href="{b}#how">how it works</a><a href="{b}#status">status</a><a href="{b}#roadmap">roadmap</a><a href="{b}devlog/">devlog</a><a href="https://github.com/ducminh1110/DaySetta">GitHub</a><a href="https://github.com/darlinghq/darling">Darling</a><a href="https://github.com/steelbrain/reims-vgpu">reims-vgpu</a></nav>
@@ -138,12 +146,31 @@ def foot(b):
 '''
 
 # devlog entries come from the old page (each one quotes ~/daysetta/devlog/decisions.md)
-old = (ROOT / "devlog/index.html").read_text()
-posts = re.findall(r'<article class="post-card" id="([^"]+)">\s*<span class="mono tag tag-([a-z]+)">([^<]+)</span>\s*<h3>(.*?)</h3>\s*<p>(.*?)</p>\s*<span class="mono post-src">(.*?)</span>', old, re.S)
-if posts:
-    (ROOT / "tools/devlog-posts.txt").write_text("\n\x1e\n".join("\x1f".join(p) for p in posts))
-else:
-    posts = [tuple(x.split("\x1f")) for x in (ROOT / "tools/devlog-posts.txt").read_text().split("\n\x1e\n")]
+DEC = pathlib.Path.home() / "daysetta/devlog/decisions.md"
+TAGS = [("gpu", r"gpu|metal|iokit|reims|surface|shader|render|composite|vulkan|pvg|fence|uniform|colou?r|glyph"),
+        ("input", r"\bhid|input|keyboard|mouse"),
+        ("kernel", r"stall|wakeup|kevent|kqueue|kevmerge|mach|xnu|dserver|darlingserver|thread|ulock|dyld|exec|syscall|vm_|\bpac\b|\blse\b|knote"),
+        ("boot", r"login|boot|launchd|finder|dock|cfprefs|spawn|daemon|xpc|session"),
+        ("display", r"display|window|cursor|wallpaper|menubar")]
+def tag_of(title, body):
+    # the title names the area; the body only breaks ties
+    for t in (title, body):
+        for name, rx in TAGS:
+            if re.search(rx, t, re.I):
+                return name
+    return "rules"
+def inline(t):
+    return re.sub(r"`([^`]+)`", r"<code>\1</code>", html.escape(t, quote=False))
+posts = []
+for ln, line in enumerate(DEC.read_text().splitlines(), 1):
+    m = re.match(r"- \*\*(.+?)\*\*\s*(.*)", line)
+    if not m:
+        continue
+    title, body = m.group(1).strip(), m.group(2).strip()
+    tg = tag_of(title, body)
+    pid = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:48] or f"l{ln}"
+    posts.append((pid, tg, tg, inline(title), inline(body), f"decisions.md:{ln}"))
+posts.reverse()
 TAGC = {"gpu": "c1", "kernel": "c2", "boot": "c3", "input": "c4", "display": "c5", "rules": "c6"}
 
 def card(p, short=False, i=None):
@@ -153,13 +180,16 @@ def card(p, short=False, i=None):
         body = re.split(r'(?<=\.)\s', html.unescape(body), maxsplit=1)[0]
         body = html.escape(body)
     tape = f'<span class="tape" style="--tr:{(-4, 3, -2)[i % 3] if i is not None else 0}deg"></span>' if short else ""
-    return (f'<article class="card {cls}" id="{pid}" data-rv="drop">{tape}<span class="tag">{tagtxt}</span>'
+    return (f'<article class="card {cls}" id="{pid}" data-tag="{tag}" data-rv="drop">{tape}<span class="tag">{tagtxt}</span>'
             f'<h3>{h}</h3><p>{body}</p><span class="src">{src}</span></article>')
 
 TICK = ["no vm", "real WindowServer", "xnu-12377 in userspace", "arm64e on ARMv8.0", "metal → vulkan", "no fake ui", "fake the floor"]
 def band(cls, words):
     items = "".join(f"<span>{w}</span><i aria-hidden=\"true\"></i>" for w in words)
     return f'<div class="band {cls}" aria-hidden="true"><div class="track">{items}{items}</div></div>'
+
+NEWS = posts[:6]
+news = "".join(f'<li><span class="ts">{p[1]}</span><span class="tl">{p[3]}</span></li>' for p in NEWS)
 
 FLOORS = [
     ("01", "Linux aarch64", "plain ARMv8.0 with no PAC or LSE, so those instructions get emulated (src/exec).", "stem", "the ground floor"),
@@ -204,7 +234,7 @@ INDEX = head("daysetta: the real macOS desktop on arm linux. no vm.",
     <p class="lede" data-rv>DaySetta runs Apple's own macOS&nbsp;27 userland (WindowServer, AppKit, the daemons) unmodified, on a plain ARM Linux box. Everything below it is faked: a userspace XNU, fake kexts, Metal translated to Vulkan.</p>
     <div class="cta" data-rv><a class="btn btn-solid" href="devlog/">read the devlog</a><a class="btn btn-ghost" href="https://github.com/ducminh1110/DaySetta">view on GitHub</a></div>
   </div>
-  <div class="collage" role="img" aria-label="a scrapbook collage of cut-paper shapes: a blue stem, an orange quarter sun, a quarter of green rings, a pink dot and a checker square">{collage}</div>
+  <div class="collage" data-drag role="img" aria-label="a scrapbook collage of cut-paper shapes: a blue stem, an orange quarter sun, a quarter of green rings, a pink dot and a checker square">{collage}<p class="made" aria-hidden="true">the pieces make the mark.</p></div>
 </div></section>
 
 <div class="wrap stats" aria-label="facts">
@@ -215,6 +245,15 @@ INDEX = head("daysetta: the real macOS desktop on arm linux. no vm.",
 </div>
 
 <div class="tapes">{band("b1", TICK)}{band("b2", TICK[::-1])}</div>
+
+<section class="sec news" id="news"><div class="wrap news-grid">
+  <div class="sec-head"><span class="chip pink" data-rv>latest from the lab · nov 22</span><h2 data-split>the black screen has a suspect.</h2>
+  <p class="lede" data-rv>The GPU path is proven faithful end to end. The desktop's text draws multiply by a colour whose alpha is already zero when the draw is made, inside the apps, before WindowServer sees it. That is the one link left. Meanwhile a scheduler bug behind most boot hangs got found and fixed.</p></div>
+  <div class="term" data-rv aria-label="the newest devlog entries">
+    <div class="term-bar"><i></i><b>tail -f devlog/decisions.md</b></div>
+    <ol class="feed">{news}</ol>
+  </div>
+</div></section>
 
 <section class="sec" id="what"><div class="wrap">
   <div class="sec-head"><span class="chip" data-rv>what this is</span><h2 data-split>don't reimplement macOS. run it, and fake the floor.</h2></div>
@@ -239,11 +278,13 @@ INDEX = head("daysetta: the real macOS desktop on arm linux. no vm.",
       <li>WindowServer 27 boots and stays up</li>
       <li>the Metal driver comes up, command buffers execute, swaps reach the display</li>
       <li>first real pixels through the whole GPU → present → readback path (a test pattern, not a window yet)</li>
+      <li>a real boot's frame replayed on the host through the same GPU code: the path is faithful, it draws exactly what it is given</li>
       <li>an AppKit test app launches, connects to WindowServer and runs its whole script</li>
       <li>login completes: Dock, MenuBarAgent, SystemUIServer, WallpaperAgent and WindowManager all run</li>
     </ul></div>
     <div class="box nope" data-rv><h3>not yet</h3><ul>
-      <li>composited frames are still black. the current fight: tracing where between draw and present the pixels turn to zero</li>
+      <li>composited frames are still black: the text draws get a fill colour with alpha 0, made inside the apps. finding who zeroes it is the current fight</li>
+      <li>about half the boots still hang before login: work queued in libdispatch never runs. under investigation</li>
       <li>keyboard / mouse (HID) is half done</li>
       <li>Finder and the default apps as a usable desktop</li>
       <li>a desktop screenshot. none exists yet, so this page has no fake one</li>
@@ -276,9 +317,12 @@ INDEX = head("daysetta: the real macOS desktop on arm linux. no vm.",
 </main>
 ''' + foot("./")
 
+FILTERS = '<div class="filters" role="group" aria-label="filter by tag">' + "".join(f'<button type="button" class="chip f-btn" data-f="{t}" aria-pressed="{str(t == "all").lower()}">{t}</button>' for t in ["all", "gpu", "kernel", "boot", "input", "display", "rules"]) + "</div>"
+
 DEVLOG = head("devlog · daysetta", "Notes from the lab: the DaySetta devlog, quoted from the project's decisions file. Real bugs, real fixes, no marketing.", "../") + nav("../", "devlog") + f'''
 <main id="main"><div class="wrap">
-  <div class="page-head"><span class="chip lime">notes from the lab</span><h1>devlog.</h1><p class="lede">Every entry is quoted from <span class="mono">devlog/decisions.md</span> in the repo: what broke, why, what fixed it. Newest first, {len(posts)} entries.</p></div>
+  <div class="page-head"><span class="chip lime">notes from the lab</span><h1>devlog.</h1><p class="lede">Every entry is quoted from <span class="mono">devlog/decisions.md</span> in the repo: what broke, why, what fixed it. Newest first, {len(posts)} entries, straight from the repo.</p></div>
+  {FILTERS}
   <div class="log-list">{"".join(card(p, i=i) for i, p in enumerate(posts))}</div>
 </div></main>
 ''' + foot("../")
